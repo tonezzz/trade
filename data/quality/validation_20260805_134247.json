@@ -1,0 +1,288 @@
+{
+  "summary": {
+    "timestamp": "2026-08-05T13:42:47.658670",
+    "duration_seconds": 5.588615,
+    "total_validations": 17,
+    "failed_validations": 17,
+    "success_rate": 0.0,
+    "exchange_rates_validated": 8,
+    "commodities_validated": 8,
+    "dollar_index_validated": 1,
+    "tolerance_pct": 5.0,
+    "max_freshness_days": 2
+  },
+  "detailed_results": [
+    {
+      "symbol": "E",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 13:42:42.144608",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "N",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 13:42:42.857311",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "J",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 13:42:43.494972",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "A",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 13:42:44.154987",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "G",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 13:42:44.823745",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "C",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 13:42:45.502118",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "T",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 13:42:46.166122",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "C",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 13:42:46.876175",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "W",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 13:42:47.631001",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "S",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 13:42:47.636594",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "C",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 13:42:47.639195",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "C",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 13:42:47.641929",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "B",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 13:42:47.644179",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "X",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 13:42:47.646657",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "N",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 13:42:47.648414",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "X",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 13:42:47.650136",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "DXY",
+      "data_type": "dollar_index",
+      "timestamp": "2026-08-05 13:42:47.652174",
+      "db_value": 119.7034,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 5,
+      "completeness_pct": null,
+      "issues": [
+        "Data is 5 days old (max: 2)",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    }
+  ]
+}

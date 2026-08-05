@@ -23,6 +23,17 @@ settings:
   skip_validation: true
   
   # Data quality settings
+  data_quality:
+    enabled: true
+    tolerance_pct: 2.0
+    max_freshness_days: 2
+    min_completeness_pct: 90.0
+    alert_threshold: 3
+    run_after_import: true
+    schedule: "daily"
+    schedule_time: "18:00"
+  
+  # Data quality settings
   min_data_points: 1000  # Minimum data points for valid import
   max_gap_days: 7       # Maximum allowed gap in days
   require_ohlc: false    # Whether OHLC data is required

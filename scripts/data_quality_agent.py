@@ -76,9 +76,10 @@ class DataQualityAgent:
     
     def _get_exchange_rate_from_external(self, symbol: str) -> Tuple[Optional[float], str]:
         """Get current exchange rate from external sources."""
+        # Try multiple external sources with fallbacks
+        
+        # Source 1: ExchangeRate-API (free tier: 1,500 requests/month)
         try:
-            # Try XE.com API (simplified - would need actual API key in production)
-            # For now, use a public API or fallback to web scraping
             url = f"https://api.exchangerate-api.com/v4/latest/USD"
             response = requests.get(url, timeout=10)
             
@@ -105,23 +106,186 @@ class DataQualityAgent:
         except Exception as e:
             logger.warning(f"Failed to get exchange rate from exchangerate-api: {e}")
         
+        # Source 2: FRED API (free: 120 requests/minute) - requires API key
+        fred_api_key = os.getenv('FRED_API_KEY')
+        if fred_api_key:
+            try:
+                # Map symbols to FRED series IDs
+                fred_series_map = {
+                    'EUR': 'DEXUSEU',
+                    'GBP': 'DEXUSUK',
+                    'JPY': 'DEXJPUS',
+                    'CAD': 'DEXCAUS',
+                    'CHF': 'DEXSZUS',
+                    'AUD': 'DEXUSAL',
+                    'NZD': 'DEXUSNZ',
+                    'THB': 'DEXTHUS'
+                }
+                
+                series_id = fred_series_map.get(symbol)
+                if series_id:
+                    url = f"https://api.stlouisfed.org/fred/series/observations"
+                    params = {
+                        'series_id': series_id,
+                        'api_key': fred_api_key,
+                        'limit': 1,
+                        'sort_order': 'desc'
+                    }
+                    
+                    response = requests.get(url, params=params, timeout=10)
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        observations = data.get('observations', [])
+                        if observations and len(observations) > 0:
+                            latest_value = observations[0].get('value')
+                            if latest_value and latest_value != '.':
+                                return float(latest_value), 'fred-api'
+            
+            except Exception as e:
+                logger.warning(f"Failed to get exchange rate from FRED API: {e}")
+        
         # Fallback to alternative sources or return None
         return None, 'none'
     
     def _get_commodity_price_from_external(self, symbol: str) -> Tuple[Optional[float], str]:
         """Get current commodity price from external sources."""
-        # Placeholder for commodity price external sources
-        # Would need integration with commodity APIs like:
-        # - Alpha Vantage
-        # - Quandl
-        # - MetalPrices API
-        # etc.
+        
+        # Source 1: Alpha Vantage API (free tier: 25 requests/day)
+        alpha_vantage_key = os.getenv('ALPHA_VANTAGE_API_KEY')
+        if alpha_vantage_key:
+            try:
+                # Map symbols to Alpha Vantage format
+                av_symbol_map = {
+                    'GOLD': 'XAU',
+                    'SILVER': 'XAG',
+                    'COPPER': 'HG',  # Copper futures
+                    'OIL': 'WTI',    # Crude Oil
+                    'NATURAL_GAS': 'NG',
+                    'WHEAT': 'W',
+                    'CORN': 'ZC',
+                    'SOY': 'ZS'
+                }
+                
+                av_symbol = av_symbol_map.get(symbol, symbol)
+                
+                # Use commodity exchange rate function for precious metals
+                if symbol in ['GOLD', 'SILVER']:
+                    url = "https://www.alphavantage.co/query"
+                    params = {
+                        'function': 'COMMODITY_EXCHANGE_RATE',
+                        'from_currency': 'USD',
+                        'to_currency': av_symbol,
+                        'apikey': alpha_vantage_key
+                    }
+                    
+                    response = requests.get(url, params=params, timeout=10)
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        price = data.get('5. Exchange Rate')
+                        if price:
+                            return float(price), 'alpha-vantage'
+                
+                # Use GLOBAL_QUOTE for other commodities
+                else:
+                    url = "https://www.alphavantage.co/query"
+                    params = {
+                        'function': 'GLOBAL_QUOTE',
+                        'symbol': av_symbol,
+                        'apikey': alpha_vantage_key
+                    }
+                    
+                    response = requests.get(url, params=params, timeout=10)
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        quote = data.get('Global Quote', {})
+                        price = quote.get('05. price')
+                        if price:
+                            return float(price), 'alpha-vantage'
+            
+            except Exception as e:
+                logger.warning(f"Failed to get commodity price from Alpha Vantage: {e}")
+        
+        # Source 2: MetalPrices API (free tier: 100 requests/month)
+        metal_prices_key = os.getenv('METAL_PRICES_API_KEY')
+        if metal_prices_key and symbol in ['GOLD', 'SILVER']:
+            try:
+                metal_map = {'GOLD': 'XAU', 'SILVER': 'XAG'}
+                metal_symbol = metal_map.get(symbol, symbol)
+                
+                url = f"https://api.metalpriceapi.com/v1/latest"
+                params = {
+                    'api_key': metal_prices_key,
+                    'base': 'USD',
+                    'currencies': metal_symbol
+                }
+                
+                response = requests.get(url, params=params, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    rates = data.get('rates', {})
+                    if metal_symbol in rates:
+                        return rates[metal_symbol], 'metalprice-api'
+            
+            except Exception as e:
+                logger.warning(f"Failed to get commodity price from MetalPrices API: {e}")
+        
         return None, 'none'
     
     def _get_dollar_index_from_external(self, symbol: str) -> Tuple[Optional[float], str]:
         """Get current dollar index from external sources."""
-        # Placeholder for DXY external sources
-        # Would need integration with financial APIs
+        
+        # Source 1: FRED API (free: 120 requests/minute)
+        fred_api_key = os.getenv('FRED_API_KEY')
+        if fred_api_key:
+            try:
+                url = f"https://api.stlouisfed.org/fred/series/observations"
+                params = {
+                    'series_id': 'DTWEXBGS',  # Trade Weighted U.S. Dollar Index (Broad)
+                    'api_key': fred_api_key,
+                    'limit': 1,
+                    'sort_order': 'desc'
+                }
+                
+                response = requests.get(url, params=params, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    observations = data.get('observations', [])
+                    if observations and len(observations) > 0:
+                        latest_value = observations[0].get('value')
+                        if latest_value and latest_value != '.':
+                            return float(latest_value), 'fred-api'
+            
+            except Exception as e:
+                logger.warning(f"Failed to get DXY from FRED API: {e}")
+        
+        # Source 2: Alpha Vantage (free tier: 25 requests/day)
+        alpha_vantage_key = os.getenv('ALPHA_VANTAGE_API_KEY')
+        if alpha_vantage_key:
+            try:
+                url = "https://www.alphavantage.co/query"
+                params = {
+                    'function': 'CURRENCY_EXCHANGE_RATE',
+                    'from_currency': 'DXY',
+                    'to_currency': 'USD',
+                    'apikey': alpha_vantage_key
+                }
+                
+                response = requests.get(url, params=params, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    # Alpha Vantage may not support DXY directly, but we can try
+                    # This is a fallback attempt
+                    logger.info("Alpha Vantage DXY attempt - may not be supported")
+            
+            except Exception as e:
+                logger.warning(f"Failed to get DXY from Alpha Vantage: {e}")
+        
         return None, 'none'
     
     def _get_latest_db_value(self, data_type: str, symbol: str) -> Tuple[Optional[float], Optional[int], Optional[float]]:
@@ -248,14 +412,18 @@ class DataQualityAgent:
             .all()
         
         results = []
-        for (currency,) in currencies:
-            result = self.validate_symbol('exchange_rates', currency[0])
-            results.append(result)
-            self.results.append(result)
-            
-            # Log immediate issues
-            if not result.is_accurate:
-                logger.warning(f"Exchange rate {currency[0]} validation failed: {result.issues}")
+        for currency_tuple in currencies:
+            currency = currency_tuple[0]  # Extract the currency code from the tuple
+            if len(currency) == 3:  # Only validate proper 3-letter currency codes
+                result = self.validate_symbol('exchange_rates', currency)
+                results.append(result)
+                self.results.append(result)
+                
+                # Log immediate issues
+                if not result.is_accurate:
+                    logger.warning(f"Exchange rate {currency} validation failed: {result.issues}")
+            else:
+                logger.warning(f"Skipping invalid currency code: {currency}")
         
         return results
     
@@ -268,13 +436,17 @@ class DataQualityAgent:
             .all()
         
         results = []
-        for (commodity,) in commodities:
-            result = self.validate_symbol('commodities', commodity[0])
-            results.append(result)
-            self.results.append(result)
-            
-            if not result.is_accurate:
-                logger.warning(f"Commodity {commodity[0]} validation failed: {result.issues}")
+        for commodity_tuple in commodities:
+            commodity = commodity_tuple[0]  # Extract the symbol from the tuple
+            if len(commodity) >= 2:  # Only validate symbols with at least 2 characters
+                result = self.validate_symbol('commodities', commodity)
+                results.append(result)
+                self.results.append(result)
+                
+                if not result.is_accurate:
+                    logger.warning(f"Commodity {commodity} validation failed: {result.issues}")
+            else:
+                logger.warning(f"Skipping invalid commodity symbol: {commodity}")
         
         return results
     

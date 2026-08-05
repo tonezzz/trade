@@ -310,7 +310,6 @@ def main():
         chart_data(args)
     elif args.command == 'health':
         from src.health import main as health_main
-        import sys
         sys.exit(health_main())
     elif args.command == 'quality':
         script_path = Path(__file__).parent / 'scripts' / 'data_quality_agent.py'
