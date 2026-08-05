@@ -189,6 +189,21 @@ data_sources:
     enabled: true
     formatter: "format_currency_data"
 
+  # Thai Baht
+  thb_exchange_rates:
+    name: "USD/THB Exchange Rates"
+    description: "USD to Thai Baht daily exchange rates"
+    type: "exchange_rate"
+    symbol: "THB"
+    quote_currency: "THB"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXTHUS"
+    schedule: "daily"
+    schedule_time: "17:00"
+    import_function: "import_exchange_rates"
+    source: "automated_thb"
+    enabled: true
+    formatter: "format_currency_data"
+
   # US Dollar Index (DXY)
   dxy:
     name: "US Dollar Index"

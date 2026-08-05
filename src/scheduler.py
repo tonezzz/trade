@@ -24,6 +24,9 @@ from src.database import get_db
 from src.importer import DataImporter
 from src.notifications import NotificationManager, NotificationConfig, StatusLogger, load_notification_config_from_env
 from src.models import CommodityPrice, ExchangeRate, DollarIndex
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 class JobStatus(Enum):
@@ -399,6 +402,17 @@ class JobScheduler:
                 f"Processed {result_data} records."
             )
             self.status_logger.log_job_complete(job.name, "success", result_data)
+            
+            # Run data quality check after successful import
+            try:
+                quality_summary = self.run_data_quality_check()
+                if quality_summary and quality_summary['failed_validations'] > 0:
+                    self.logger.warning(
+                        f"Data quality check found {quality_summary['failed_validations']} issues "
+                        f"after importing {job.name}"
+                    )
+            except Exception as quality_error:
+                self.logger.warning(f"Data quality check failed: {quality_error}")
         else:
             result.status = JobStatus.FAILED
             result.error_message = error
@@ -543,6 +557,39 @@ class JobScheduler:
                 print("  Status: Never run")
         
         print("\n" + "=" * 60)
+    
+    def run_data_quality_check(self, tolerance_pct: float = 2.0, max_freshness_days: int = 2):
+        """
+        Run data quality validation after data import.
+        
+        Args:
+            tolerance_pct: Acceptable percentage difference between DB and external sources
+            max_freshness_days: Maximum acceptable data age in days
+        """
+        try:
+            from scripts.data_quality_agent import DataQualityAgent
+            
+            self.logger.info("Running data quality validation...")
+            
+            agent = DataQualityAgent(
+                tolerance_pct=tolerance_pct,
+                max_freshness_days=max_freshness_days
+            )
+            
+            summary = agent.run_full_validation()
+            
+            # Send notification if there are failures
+            if summary['failed_validations'] > 0:
+                self.notification_manager.send_notification(
+                    subject=f"Data Quality Issues Detected - {summary['failed_validations']} failures",
+                    message=f"Data quality validation found {summary['failed_validations']} issues out of {summary['total_validations']} validations. Success rate: {summary['success_rate']:.1f}%"
+                )
+            
+            return summary
+            
+        except Exception as e:
+            self.logger.error(f"Data quality check failed: {e}")
+            return None
 
 
 def main():

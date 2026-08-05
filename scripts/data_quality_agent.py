@@ -1,0 +1,454 @@
+#!/usr/bin/env python3
+"""
+Data Quality Monitoring Agent for Trade Database
+
+This agent monitors data quality by:
+1. Comparing database values against external sources
+2. Checking data freshness and completeness
+3. Validating data accuracy within acceptable tolerances
+4. Maintaining historical quality records
+5. Alerting on data quality issues
+"""
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from datetime import datetime, timedelta
+from src.database import db
+from src.models import ExchangeRate, CommodityPrice, DollarIndex
+import requests
+import json
+import logging
+from typing import Dict, List, Tuple, Optional
+from dataclasses import dataclass, asdict
+from decimal import Decimal
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/data_quality.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger('DataQualityAgent')
+
+
+@dataclass
+class ValidationResult:
+    """Data validation result."""
+    symbol: str
+    data_type: str
+    timestamp: datetime
+    db_value: Optional[float]
+    external_value: Optional[float]
+    difference_pct: Optional[float]
+    is_accurate: bool
+    freshness_days: Optional[int]
+    completeness_pct: Optional[float]
+    issues: List[str]
+    external_source: str
+
+
+class DataQualityAgent:
+    """Monitors and validates data quality across the trade database."""
+    
+    def __init__(self, tolerance_pct: float = 2.0, max_freshness_days: int = 2):
+        """
+        Initialize the data quality agent.
+        
+        Args:
+            tolerance_pct: Acceptable percentage difference between DB and external sources
+            max_freshness_days: Maximum acceptable data age in days
+        """
+        self.tolerance_pct = tolerance_pct
+        self.max_freshness_days = max_freshness_days
+        self.session = db.get_session()
+        self.results: List[ValidationResult] = []
+        
+        # External source APIs
+        self.external_sources = {
+            'exchange_rates': self._get_exchange_rate_from_external,
+            'commodities': self._get_commodity_price_from_external,
+            'dollar_index': self._get_dollar_index_from_external
+        }
+    
+    def _get_exchange_rate_from_external(self, symbol: str) -> Tuple[Optional[float], str]:
+        """Get current exchange rate from external sources."""
+        try:
+            # Try XE.com API (simplified - would need actual API key in production)
+            # For now, use a public API or fallback to web scraping
+            url = f"https://api.exchangerate-api.com/v4/latest/USD"
+            response = requests.get(url, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                rates = data.get('rates', {})
+                
+                # Map symbol to API format
+                symbol_map = {
+                    'EUR': 'EUR',
+                    'GBP': 'GBP', 
+                    'JPY': 'JPY',
+                    'CAD': 'CAD',
+                    'CHF': 'CHF',
+                    'AUD': 'AUD',
+                    'NZD': 'NZD',
+                    'THB': 'THB'
+                }
+                
+                api_symbol = symbol_map.get(symbol, symbol)
+                if api_symbol in rates:
+                    return rates[api_symbol], 'exchangerate-api.com'
+            
+        except Exception as e:
+            logger.warning(f"Failed to get exchange rate from exchangerate-api: {e}")
+        
+        # Fallback to alternative sources or return None
+        return None, 'none'
+    
+    def _get_commodity_price_from_external(self, symbol: str) -> Tuple[Optional[float], str]:
+        """Get current commodity price from external sources."""
+        # Placeholder for commodity price external sources
+        # Would need integration with commodity APIs like:
+        # - Alpha Vantage
+        # - Quandl
+        # - MetalPrices API
+        # etc.
+        return None, 'none'
+    
+    def _get_dollar_index_from_external(self, symbol: str) -> Tuple[Optional[float], str]:
+        """Get current dollar index from external sources."""
+        # Placeholder for DXY external sources
+        # Would need integration with financial APIs
+        return None, 'none'
+    
+    def _get_latest_db_value(self, data_type: str, symbol: str) -> Tuple[Optional[float], Optional[int], Optional[float]]:
+        """
+        Get latest value from database along with freshness and completeness.
+        
+        Returns:
+            Tuple of (latest_value, freshness_days, completeness_pct)
+        """
+        try:
+            if data_type == 'exchange_rates':
+                latest = self.session.query(ExchangeRate)\
+                    .filter(ExchangeRate.quote_currency == symbol)\
+                    .order_by(ExchangeRate.date.desc())\
+                    .first()
+                
+                if latest:
+                    # Calculate freshness
+                    freshness = (datetime.now().date() - latest.date).days
+                    
+                    # Calculate completeness (expected daily data)
+                    date_range = (latest.date - datetime(2013, 1, 1).date()).days
+                    expected_records = max(1, date_range)
+                    actual_records = self.session.query(ExchangeRate)\
+                        .filter(ExchangeRate.quote_currency == symbol).count()
+                    completeness = (actual_records / expected_records) * 100
+                    
+                    return latest.close_price, freshness, completeness
+                    
+            elif data_type == 'commodities':
+                latest = self.session.query(CommodityPrice)\
+                    .filter(CommodityPrice.symbol == symbol)\
+                    .order_by(CommodityPrice.date.desc())\
+                    .first()
+                
+                if latest:
+                    freshness = (datetime.now().date() - latest.date).days
+                    return latest.close_price, freshness, None
+                    
+            elif data_type == 'dollar_index':
+                latest = self.session.query(DollarIndex)\
+                    .order_by(DollarIndex.date.desc())\
+                    .first()
+                
+                if latest:
+                    freshness = (datetime.now().date() - latest.date).days
+                    return latest.close_price, freshness, None
+                    
+        except Exception as e:
+            logger.error(f"Error getting latest DB value for {symbol}: {e}")
+        
+        return None, None, None
+    
+    def validate_symbol(self, data_type: str, symbol: str) -> ValidationResult:
+        """
+        Validate a single symbol against external sources.
+        
+        Args:
+            data_type: Type of data (exchange_rates, commodities, dollar_index)
+            symbol: Symbol to validate
+            
+        Returns:
+            ValidationResult with validation details
+        """
+        timestamp = datetime.now()
+        issues = []
+        
+        # Get database value
+        db_value, freshness_days, completeness_pct = self._get_latest_db_value(data_type, symbol)
+        
+        # Get external value
+        external_func = self.external_sources.get(data_type)
+        external_value, external_source = external_func(symbol) if external_func else (None, 'none')
+        
+        # Calculate difference
+        difference_pct = None
+        is_accurate = True
+        
+        if db_value and external_value:
+            difference_pct = abs((db_value - external_value) / external_value) * 100
+            if difference_pct > self.tolerance_pct:
+                is_accurate = False
+                issues.append(f"Value difference {difference_pct:.2f}% exceeds tolerance {self.tolerance_pct}%")
+        
+        # Check freshness
+        if freshness_days is not None and freshness_days > self.max_freshness_days:
+            is_accurate = False
+            issues.append(f"Data is {freshness_days} days old (max: {self.max_freshness_days})")
+        
+        # Check completeness
+        if completeness_pct is not None and completeness_pct < 90:
+            is_accurate = False
+            issues.append(f"Data completeness {completeness_pct:.1f}% below 90%")
+        
+        # Check for missing data
+        if db_value is None:
+            is_accurate = False
+            issues.append("No data found in database")
+        
+        if external_value is None:
+            issues.append("Could not fetch external reference value")
+        
+        return ValidationResult(
+            symbol=symbol,
+            data_type=data_type,
+            timestamp=timestamp,
+            db_value=db_value,
+            external_value=external_value,
+            difference_pct=difference_pct,
+            is_accurate=is_accurate,
+            freshness_days=freshness_days,
+            completeness_pct=completeness_pct,
+            issues=issues,
+            external_source=external_source
+        )
+    
+    def validate_all_exchange_rates(self) -> List[ValidationResult]:
+        """Validate all exchange rates in the database."""
+        logger.info("Validating exchange rates...")
+        
+        # Get all unique quote currencies
+        currencies = self.session.query(ExchangeRate.quote_currency)\
+            .distinct()\
+            .all()
+        
+        results = []
+        for (currency,) in currencies:
+            result = self.validate_symbol('exchange_rates', currency[0])
+            results.append(result)
+            self.results.append(result)
+            
+            # Log immediate issues
+            if not result.is_accurate:
+                logger.warning(f"Exchange rate {currency[0]} validation failed: {result.issues}")
+        
+        return results
+    
+    def validate_all_commodities(self) -> List[ValidationResult]:
+        """Validate all commodity prices in the database."""
+        logger.info("Validating commodity prices...")
+        
+        commodities = self.session.query(CommodityPrice.symbol)\
+            .distinct()\
+            .all()
+        
+        results = []
+        for (commodity,) in commodities:
+            result = self.validate_symbol('commodities', commodity[0])
+            results.append(result)
+            self.results.append(result)
+            
+            if not result.is_accurate:
+                logger.warning(f"Commodity {commodity[0]} validation failed: {result.issues}")
+        
+        return results
+    
+    def validate_dollar_index(self) -> ValidationResult:
+        """Validate dollar index data."""
+        logger.info("Validating dollar index...")
+        
+        result = self.validate_symbol('dollar_index', 'DXY')
+        self.results.append(result)
+        
+        if not result.is_accurate:
+            logger.warning(f"Dollar index validation failed: {result.issues}")
+        
+        return result
+    
+    def run_full_validation(self) -> Dict[str, any]:
+        """
+        Run full validation across all data types.
+        
+        Returns:
+            Summary of validation results
+        """
+        logger.info("=" * 60)
+        logger.info("Starting full data quality validation")
+        logger.info("=" * 60)
+        
+        start_time = datetime.now()
+        
+        # Validate all data types
+        exchange_rate_results = self.validate_all_exchange_rates()
+        commodity_results = self.validate_all_commodities()
+        dxy_result = self.validate_dollar_index()
+        
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        
+        # Calculate summary statistics
+        total_validations = len(self.results)
+        failed_validations = sum(1 for r in self.results if not r.is_accurate)
+        success_rate = ((total_validations - failed_validations) / total_validations * 100) if total_validations > 0 else 0
+        
+        summary = {
+            'timestamp': end_time.isoformat(),
+            'duration_seconds': duration,
+            'total_validations': total_validations,
+            'failed_validations': failed_validations,
+            'success_rate': success_rate,
+            'exchange_rates_validated': len(exchange_rate_results),
+            'commodities_validated': len(commodity_results),
+            'dollar_index_validated': 1 if dxy_result else 0,
+            'tolerance_pct': self.tolerance_pct,
+            'max_freshness_days': self.max_freshness_days
+        }
+        
+        logger.info("=" * 60)
+        logger.info("Validation Summary")
+        logger.info("=" * 60)
+        logger.info(f"Total validations: {total_validations}")
+        logger.info(f"Failed validations: {failed_validations}")
+        logger.info(f"Success rate: {success_rate:.1f}%")
+        logger.info(f"Duration: {duration:.2f} seconds")
+        logger.info("=" * 60)
+        
+        # Save results to file
+        self._save_validation_results(summary)
+        
+        return summary
+    
+    def _save_validation_results(self, summary: Dict):
+        """Save validation results to JSON file for historical tracking."""
+        results_dir = 'data/quality'
+        os.makedirs(results_dir, exist_ok=True)
+        
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        results_file = os.path.join(results_dir, f'validation_{timestamp}.json')
+        
+        output = {
+            'summary': summary,
+            'detailed_results': [asdict(r) for r in self.results]
+        }
+        
+        with open(results_file, 'w') as f:
+            json.dump(output, f, indent=2, default=str)
+        
+        logger.info(f"Validation results saved to: {results_file}")
+    
+    def get_quality_history(self, days: int = 30) -> List[Dict]:
+        """
+        Get historical quality validation results.
+        
+        Args:
+            days: Number of days of history to retrieve
+            
+        Returns:
+            List of historical validation summaries
+        """
+        results_dir = 'data/quality'
+        history = []
+        
+        if not os.path.exists(results_dir):
+            return history
+        
+        cutoff_date = datetime.now() - timedelta(days=days)
+        
+        for filename in os.listdir(results_dir):
+            if filename.startswith('validation_') and filename.endswith('.json'):
+                filepath = os.path.join(results_dir, filename)
+                
+                # Extract timestamp from filename
+                try:
+                    file_timestamp = datetime.strptime(filename.replace('validation_', '').replace('.json', ''), '%Y%m%d_%H%M%S')
+                    
+                    if file_timestamp >= cutoff_date:
+                        with open(filepath, 'r') as f:
+                            data = json.load(f)
+                            history.append(data['summary'])
+                except ValueError:
+                    continue
+        
+        # Sort by timestamp
+        history.sort(key=lambda x: x['timestamp'])
+        
+        return history
+    
+    def __del__(self):
+        """Cleanup database session."""
+        if hasattr(self, 'session'):
+            self.session.close()
+
+
+def main():
+    """Main entry point for data quality agent."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Data Quality Monitoring Agent')
+    parser.add_argument('--tolerance', type=float, default=2.0, 
+                       help='Acceptable percentage difference (default: 2.0)')
+    parser.add_argument('--freshness', type=int, default=2,
+                       help='Maximum data age in days (default: 2)')
+    parser.add_argument('--history', type=int, default=30,
+                       help='Show quality history for N days (default: 30)')
+    parser.add_argument('--history-only', action='store_true',
+                       help='Only show history, skip validation')
+    
+    args = parser.parse_args()
+    
+    agent = DataQualityAgent(
+        tolerance_pct=args.tolerance,
+        max_freshness_days=args.freshness
+    )
+    
+    if args.history_only:
+        # Show historical data
+        history = agent.get_quality_history(args.history)
+        
+        print("\n" + "=" * 60)
+        print("Data Quality History")
+        print("=" * 60)
+        
+        for summary in history:
+            print(f"\nTimestamp: {summary['timestamp']}")
+            print(f"Success Rate: {summary['success_rate']:.1f}%")
+            print(f"Failed: {summary['failed_validations']}/{summary['total_validations']}")
+        
+        if not history:
+            print("No historical data found.")
+    else:
+        # Run full validation
+        summary = agent.run_full_validation()
+        
+        # Exit with error code if validation failed
+        if summary['failed_validations'] > 0:
+            sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

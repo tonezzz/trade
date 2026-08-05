@@ -9,8 +9,8 @@ from datetime import datetime
 
 def download_thb_data():
     """Download USD/THB data from FRED API."""
-    # FRED API endpoint for CSV data
-    url = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=EXTHUS"
+    # FRED API endpoint for CSV data (using DEXTHUS for daily data instead of EXTHUS monthly)
+    url = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DEXTHUS"
     output_file = 'data/archive/thb_raw.csv'
     
     try:
@@ -39,7 +39,7 @@ def format_thb_data():
             writer = csv.writer(outfile)
             
             # Write header
-            writer.writerow(['date', 'quote_currency', 'rate', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
+            writer.writerow(['date', 'base_currency', 'quote_currency', 'rate', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
             
             # Skip header row
             header = next(reader)
@@ -84,6 +84,7 @@ def format_thb_data():
                         
                         writer.writerow([
                             date_formatted, 
+                            'USD',
                             'THB', 
                             f"{rate:.4f}", 
                             f"{open_price:.4f}", 

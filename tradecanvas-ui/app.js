@@ -15,6 +15,8 @@ class TradeCanvasApp {
         this.websocket = null;
         this.autoRefreshInterval = null;
         this.activeIndicators = new Set();
+        this.initialChartLoad = false; // Track if this is the initial chart load
+        this.markers = []; // Store chart markers
         this.chartSettings = {
             upColor: '#238636',
             downColor: '#da3633',
@@ -41,6 +43,7 @@ class TradeCanvasApp {
         document.getElementById('symbol-selector').addEventListener('change', (e) => {
             this.currentSymbol = e.target.value;
             this.updateChartTitle();
+            this.initialChartLoad = false; // Reset for new symbol
             this.loadData();
             // Reconnect WebSocket with new symbol
             if (this.websocket) {
@@ -53,6 +56,7 @@ class TradeCanvasApp {
         document.getElementById('timeframe-selector').addEventListener('change', (e) => {
             this.currentTimeframe = e.target.value;
             this.updateChartTitle();
+            this.initialChartLoad = false; // Reset for new timeframe
             this.loadData();
         });
 
@@ -64,6 +68,16 @@ class TradeCanvasApp {
         // Settings button
         document.getElementById('settings-btn').addEventListener('click', () => {
             this.openSettings();
+        });
+
+        // Add marker button
+        document.getElementById('add-marker-btn').addEventListener('click', () => {
+            this.addRandomMarker();
+        });
+
+        // Clear markers button
+        document.getElementById('clear-markers-btn').addEventListener('click', () => {
+            this.clearMarkers();
         });
 
         // Chart type buttons
@@ -200,6 +214,7 @@ class TradeCanvasApp {
                 },
                 timeScale: {
                     visible: false,
+                    timeVisible: false,
                 },
             });
 
@@ -209,6 +224,28 @@ class TradeCanvasApp {
                     type: 'volume',
                 },
                 priceScaleId: '',
+            });
+
+            // Sync time scale with main chart
+            this.chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+                if (range) {
+                    this.volumeChart.timeScale().setVisibleLogicalRange(range);
+                }
+            });
+
+            // Sync zoom from volume chart to main chart
+            this.volumeChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+                if (range) {
+                    this.chart.timeScale().setVisibleLogicalRange(range);
+                }
+            });
+
+            // Sync crosshair from volume chart to main chart
+            this.volumeChart.subscribeCrosshairMove(param => {
+                if (!param.time || !param.point) {
+                    return;
+                }
+                this.chart.setCrosshairPosition(param.point, param.time, this.volumeSeries);
             });
         }
 
@@ -229,7 +266,30 @@ class TradeCanvasApp {
             },
             timeScale: {
                 visible: false,
+                timeVisible: false,
             },
+        });
+
+        // Sync time scale with main chart
+        this.chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+            if (range) {
+                this.indicatorChart.timeScale().setVisibleLogicalRange(range);
+            }
+        });
+
+        // Sync zoom from indicator chart to main chart
+        this.indicatorChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+            if (range) {
+                this.chart.timeScale().setVisibleLogicalRange(range);
+            }
+        });
+
+        // Sync crosshair from indicator chart to main chart
+        this.indicatorChart.subscribeCrosshairMove(param => {
+            if (!param.time || !param.point) {
+                return;
+            }
+            this.chart.setCrosshairPosition(param.point, param.time, this.indicatorSeries);
         });
 
         // Handle resize
@@ -251,6 +311,14 @@ class TradeCanvasApp {
             if (data) {
                 this.updateCrosshairInfo(data, param.time);
             }
+
+            // Sync crosshair to volume chart
+            if (this.volumeChart) {
+                this.volumeChart.setCrosshairPosition(param.point, param.time, this.candlestickSeries);
+            }
+
+            // Sync crosshair to indicator chart
+            this.indicatorChart.setCrosshairPosition(param.point, param.time, this.candlestickSeries);
         });
     }
 
@@ -285,6 +353,15 @@ class TradeCanvasApp {
     updateChart() {
         if (!this.data || this.data.length === 0) return;
 
+        // Save current time scale state to preserve zoom/position
+        let visibleRange = null;
+        try {
+            visibleRange = this.chart.timeScale().getVisibleRange();
+        } catch (e) {
+            // Chart might not be ready yet
+            console.log('Could not get visible range:', e);
+        }
+
         const candlestickData = this.data.map(item => {
             const priceField = this.currentSymbol === 'DXY' ? 'value' :
                               this.currentSymbol === 'OIL' ? 'price' : 'rate';
@@ -300,6 +377,15 @@ class TradeCanvasApp {
         });
 
         this.candlestickSeries.setData(candlestickData);
+
+        // Restore time scale state to preserve zoom/position
+        if (visibleRange) {
+            try {
+                this.chart.timeScale().setVisibleRange(visibleRange);
+            } catch (e) {
+                console.log('Could not restore visible range:', e);
+            }
+        }
 
         // Update volume chart
         if (this.volumeSeries && this.chartSettings.showVolume) {
@@ -320,8 +406,12 @@ class TradeCanvasApp {
             this.addIndicator(indicator);
         });
 
-        // Fit content
-        this.chart.timeScale().fitContent();
+        // Only fit content on initial load, not on auto-refresh
+        // This preserves user's zoom and position during auto-refresh
+        if (!this.initialChartLoad) {
+            this.chart.timeScale().fitContent();
+            this.initialChartLoad = true;
+        }
     }
 
     updateChartType() {
@@ -712,6 +802,17 @@ class TradeCanvasApp {
         };
 
         this.candlestickSeries.update(newCandle);
+        
+        // Sync volume chart update
+        if (this.volumeSeries && this.chartSettings.showVolume) {
+            const newVolume = {
+                time: new Date(data.date).getTime() / 1000,
+                value: data.volume || 1000000,
+                color: data.close >= data.open ? this.chartSettings.upColor : this.chartSettings.downColor,
+            };
+            this.volumeSeries.update(newVolume);
+        }
+
         this.updateStatistics();
     }
 
@@ -768,7 +869,7 @@ class TradeCanvasApp {
         this.chartSettings.showCrosshair = document.getElementById('show-crosshair').checked;
         this.chartSettings.autoRefresh = parseInt(document.getElementById('auto-refresh').value);
 
-        // Apply settings to chart
+        // Apply settings to main chart
         this.chart.applyOptions({
             layout: {
                 background: { type: 'solid', color: this.chartSettings.backgroundColor },
@@ -788,10 +889,123 @@ class TradeCanvasApp {
             wickUpColor: this.chartSettings.upColor,
         });
 
+        // Sync settings to volume chart
+        if (this.volumeChart) {
+            this.volumeChart.applyOptions({
+                layout: {
+                    background: { type: 'solid', color: this.chartSettings.backgroundColor },
+                },
+                grid: {
+                    vertLines: { color: this.chartSettings.gridColor },
+                    horzLines: { color: this.chartSettings.gridColor },
+                },
+            });
+        }
+
+        // Sync settings to indicator chart
+        this.indicatorChart.applyOptions({
+            layout: {
+                background: { type: 'solid', color: this.chartSettings.backgroundColor },
+            },
+            grid: {
+                vertLines: { color: this.chartSettings.gridColor },
+                horzLines: { color: this.chartSettings.gridColor },
+            },
+        });
+
         // Restart auto refresh with new interval
         this.startAutoRefresh();
 
         this.closeSettings();
+    }
+
+    addMarker(markerData) {
+        // Add marker to main chart
+        const marker = {
+            time: markerData.time,
+            position: markerData.position || 'aboveBar',
+            color: markerData.color || '#238636',
+            shape: markerData.shape || 'arrowUp',
+            text: markerData.text || '',
+        };
+
+        this.candlestickSeries.setMarkers([marker]);
+        this.markers.push(marker);
+
+        // Sync marker to volume chart if it exists
+        if (this.volumeSeries) {
+            this.volumeSeries.setMarkers([marker]);
+        }
+
+        // Sync marker to indicator chart if it exists
+        if (this.indicatorSeries) {
+            this.indicatorSeries.setMarkers([marker]);
+        }
+    }
+
+    clearMarkers() {
+        this.candlestickSeries.setMarkers([]);
+        if (this.volumeSeries) {
+            this.volumeSeries.setMarkers([]);
+        }
+        if (this.indicatorSeries) {
+            this.indicatorSeries.setMarkers([]);
+        }
+        this.markers = [];
+    }
+
+    addBuySignal(time) {
+        this.addMarker({
+            time: time,
+            position: 'belowBar',
+            color: '#238636',
+            shape: 'arrowUp',
+            text: 'BUY'
+        });
+    }
+
+    addSellSignal(time) {
+        this.addMarker({
+            time: time,
+            position: 'aboveBar',
+            color: '#da3633',
+            shape: 'arrowDown',
+            text: 'SELL'
+        });
+    }
+
+    addEventMarker(time, text, color = '#58a6ff') {
+        this.addMarker({
+            time: time,
+            position: 'inBar',
+            color: color,
+            shape: 'circle',
+            text: text
+        });
+    }
+
+    addRandomMarker() {
+        // Add a random marker to demonstrate the feature
+        if (this.data.length > 0) {
+            const randomIndex = Math.floor(Math.random() * this.data.length);
+            const randomData = this.data[randomIndex];
+            const time = new Date(randomData.date).getTime() / 1000;
+            
+            const markerTypes = ['buy', 'sell', 'event'];
+            const randomType = markerTypes[Math.floor(Math.random() * markerTypes.length)];
+            
+            switch (randomType) {
+                case 'buy':
+                    this.addBuySignal(time);
+                    break;
+                case 'sell':
+                    this.addSellSignal(time);
+                    break;
+                case 'event':
+                    this.addEventMarker(time, 'Event');
+                    break;
+            }
+        }
     }
 }
 

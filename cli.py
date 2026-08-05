@@ -282,7 +282,15 @@ def main():
     subparsers.add_parser('health', help='Run system health checks')
     
     # Data quality command
-    subparsers.add_parser('quality', help='Generate data quality report')
+    quality_parser = subparsers.add_parser('quality', help='Generate data quality report')
+    quality_parser.add_argument('--tolerance', type=float, default=2.0,
+                               help='Acceptable percentage difference (default: 2.0)')
+    quality_parser.add_argument('--freshness', type=int, default=2,
+                               help='Maximum data age in days (default: 2)')
+    quality_parser.add_argument('--history', type=int, default=30,
+                               help='Show quality history for N days (default: 30)')
+    quality_parser.add_argument('--history-only', action='store_true',
+                               help='Only show history, skip validation')
     
     args = parser.parse_args()
     
@@ -305,9 +313,18 @@ def main():
         import sys
         sys.exit(health_main())
     elif args.command == 'quality':
-        from src.data_quality import main as quality_main
-        import sys
-        sys.exit(quality_main())
+        script_path = Path(__file__).parent / 'scripts' / 'data_quality_agent.py'
+        cmd = [sys.executable, str(script_path)]
+        if args.tolerance:
+            cmd.extend(['--tolerance', str(args.tolerance)])
+        if args.freshness:
+            cmd.extend(['--freshness', str(args.freshness)])
+        if args.history:
+            cmd.extend(['--history', str(args.history)])
+        if args.history_only:
+            cmd.append('--history-only')
+        result = subprocess.run(cmd)
+        sys.exit(result.returncode)
     else:
         parser.print_help()
 

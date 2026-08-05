@@ -11,6 +11,8 @@ class TradingDashboard {
         this.depthChart = null;
         this.candlestickSeries = null;
         this.depthSeries = null;
+        this.initialChartLoad = false; // Track if this is the initial chart load
+        this.markers = []; // Store chart markers
         this.data = {
             exchangeRates: {},
             dollarIndex: [],
@@ -31,12 +33,14 @@ class TradingDashboard {
         // Asset selector
         document.getElementById('asset-selector').addEventListener('change', (e) => {
             this.currentAsset = e.target.value;
+            this.initialChartLoad = false; // Reset for new asset
             this.updateDashboard();
         });
 
         // Period selector
         document.getElementById('period-selector').addEventListener('change', (e) => {
             this.currentPeriod = e.target.value;
+            this.initialChartLoad = false; // Reset for new period
             this.updateDashboard();
         });
 
@@ -45,11 +49,22 @@ class TradingDashboard {
             this.loadAllData();
         });
 
+        // Add marker button
+        document.getElementById('add-marker-btn').addEventListener('click', () => {
+            this.addRandomMarker();
+        });
+
+        // Clear markers button
+        document.getElementById('clear-markers-btn').addEventListener('click', () => {
+            this.clearMarkers();
+        });
+
         // Chart type controls
         document.querySelectorAll('.chart-control-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.chart-control-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                this.initialChartLoad = false; // Reset for new chart type
                 this.changeChartType(e.target.dataset.type);
             });
         });
@@ -108,6 +123,7 @@ class TradingDashboard {
             },
             timeScale: {
                 visible: false,
+                timeVisible: false,
             },
         });
 
@@ -119,6 +135,28 @@ class TradingDashboard {
             priceScaleId: '',
         });
 
+        // Sync time scale with main chart
+        this.chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+            if (range) {
+                this.depthChart.timeScale().setVisibleLogicalRange(range);
+            }
+        });
+
+        // Sync zoom from depth chart to main chart
+        this.depthChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+            if (range) {
+                this.chart.timeScale().setVisibleLogicalRange(range);
+            }
+        });
+
+        // Sync crosshair from depth chart to main chart
+        this.depthChart.subscribeCrosshairMove(param => {
+            if (!param.time || !param.point) {
+                return;
+            }
+            this.chart.setCrosshairPosition(param.point, param.time, this.depthSeries);
+        });
+
         // Handle resize
         window.addEventListener('resize', () => {
             this.chart.applyOptions({
@@ -127,6 +165,16 @@ class TradingDashboard {
             this.depthChart.applyOptions({
                 width: depthContainer.clientWidth,
             });
+        });
+
+        // Crosshair move handler
+        this.chart.subscribeCrosshairMove(param => {
+            if (!param.time || !param.point) {
+                return;
+            }
+
+            // Sync crosshair to depth chart
+            this.depthChart.setCrosshairPosition(param.point, param.time, this.candlestickSeries);
         });
     }
 
@@ -251,8 +299,30 @@ class TradingDashboard {
         }
 
         if (data.length > 0) {
+            // Save current time scale state to preserve zoom/position
+            let visibleRange = null;
+            try {
+                visibleRange = this.chart.timeScale().getVisibleRange();
+            } catch (e) {
+                console.log('Could not get visible range:', e);
+            }
+
             this.candlestickSeries.setData(data);
-            this.chart.timeScale().fitContent();
+
+            // Restore time scale state to preserve zoom/position
+            if (visibleRange) {
+                try {
+                    this.chart.timeScale().setVisibleRange(visibleRange);
+                } catch (e) {
+                    console.log('Could not restore visible range:', e);
+                }
+            }
+
+            // Only fit content on initial load, not on auto-refresh
+            if (!this.initialChartLoad) {
+                this.chart.timeScale().fitContent();
+                this.initialChartLoad = true;
+            }
         }
     }
 
@@ -299,7 +369,11 @@ class TradingDashboard {
             }
 
             this.depthSeries.setData(data);
-            this.depthChart.timeScale().fitContent();
+
+            // Only fit content on initial load, not on auto-refresh
+            if (!this.initialChartLoad) {
+                this.depthChart.timeScale().fitContent();
+            }
             
             // Update depth statistics
             const bidVolume = data.slice(0, 20).reduce((sum, d) => sum + d.value, 0);
@@ -428,6 +502,14 @@ class TradingDashboard {
     }
 
     changeChartType(type) {
+        // Save current time scale state to preserve zoom/position
+        let visibleRange = null;
+        try {
+            visibleRange = this.chart.timeScale().getVisibleRange();
+        } catch (e) {
+            console.log('Could not get visible range:', e);
+        }
+
         // Remove existing series
         this.chart.removeSeries(this.candlestickSeries);
         
@@ -472,7 +554,20 @@ class TradingDashboard {
                 this.candlestickSeries.setData(data);
         }
 
-        this.chart.timeScale().fitContent();
+        // Restore time scale state to preserve zoom/position
+        if (visibleRange) {
+            try {
+                this.chart.timeScale().setVisibleRange(visibleRange);
+            } catch (e) {
+                console.log('Could not restore visible range:', e);
+            }
+        }
+
+        // Only fit content on initial load, not on chart type changes
+        if (!this.initialChartLoad) {
+            this.chart.timeScale().fitContent();
+            this.initialChartLoad = true;
+        }
     }
 
     updateLastUpdateTime() {
@@ -495,6 +590,100 @@ class TradingDashboard {
         setInterval(() => {
             this.loadAllData();
         }, 30000);
+    }
+
+    addMarker(markerData) {
+        // Add marker to main chart
+        const marker = {
+            time: markerData.time,
+            position: markerData.position || 'aboveBar',
+            color: markerData.color || '#238636',
+            shape: markerData.shape || 'arrowUp',
+            text: markerData.text || '',
+        };
+
+        this.candlestickSeries.setMarkers([marker]);
+        this.markers.push(marker);
+
+        // Sync marker to depth chart if it exists
+        if (this.depthSeries) {
+            this.depthSeries.setMarkers([marker]);
+        }
+    }
+
+    clearMarkers() {
+        this.candlestickSeries.setMarkers([]);
+        if (this.depthSeries) {
+            this.depthSeries.setMarkers([]);
+        }
+        this.markers = [];
+    }
+
+    addBuySignal(time) {
+        this.addMarker({
+            time: time,
+            position: 'belowBar',
+            color: '#238636',
+            shape: 'arrowUp',
+            text: 'BUY'
+        });
+    }
+
+    addSellSignal(time) {
+        this.addMarker({
+            time: time,
+            position: 'aboveBar',
+            color: '#da3633',
+            shape: 'arrowDown',
+            text: 'SELL'
+        });
+    }
+
+    addEventMarker(time, text, color = '#58a6ff') {
+        this.addMarker({
+            time: time,
+            position: 'inBar',
+            color: color,
+            shape: 'circle',
+            text: text
+        });
+    }
+
+    addRandomMarker() {
+        // Add a random marker to demonstrate the feature
+        let data = [];
+        switch (this.currentAsset) {
+            case 'DXY':
+                data = this.data.dollarIndex;
+                break;
+            case 'GOLD':
+            case 'OIL':
+                data = this.data.commodityPrices[this.currentAsset];
+                break;
+            default:
+                data = this.data.exchangeRates[this.currentAsset];
+        }
+
+        if (data && data.length > 0) {
+            const randomIndex = Math.floor(Math.random() * data.length);
+            const randomData = data[randomIndex];
+            const time = new Date(randomData.date).getTime() / 1000;
+            
+            const markerTypes = ['buy', 'sell', 'event'];
+            const randomType = markerTypes[Math.floor(Math.random() * markerTypes.length)];
+            
+            switch (randomType) {
+                case 'buy':
+                    this.addBuySignal(time);
+                    break;
+                case 'sell':
+                    this.addSellSignal(time);
+                    break;
+                case 'event':
+                    this.addEventMarker(time, 'Event');
+                    break;
+            }
+        }
     }
 }
 
