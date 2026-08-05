@@ -220,8 +220,8 @@ data_sources:
     name: "US Dollar Index"
     description: "US Dollar Index (DXY) daily values"
     type: "dollar_index"
-    # Download URL for DXY data (using Federal Reserve data)
-    url: "https://raw.githubusercontent.com/datasets/finance-vix/master/data/vix-daily.csv"
+    # Download URL for DXY data (using FRED - DTWEXBGS)
+    url: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS"
     # Schedule: daily at 6:00 PM
     schedule: "daily"
     schedule_time: "18:00"
@@ -230,7 +230,7 @@ data_sources:
     # Data source identifier for database
     source: "automated_dxy"
     # Enable/disable this source
-    enabled: false  # Disabled due to data quality issues
+    enabled: true  # Fixed data source to use FRED API
     # Custom formatter function (optional)
     formatter: "format_dxy_data"
 

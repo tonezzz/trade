@@ -292,6 +292,22 @@ def main():
     quality_parser.add_argument('--history-only', action='store_true',
                                help='Only show history, skip validation')
     
+    # Quality scheduler command
+    scheduler_parser = subparsers.add_parser('quality-scheduler', help='Manage data quality scheduling')
+    scheduler_parser.add_argument('--run-once', action='store_true',
+                                 help='Run all quality tasks once and exit')
+    scheduler_parser.add_argument('--config', default='config/data_sources.yml',
+                                 help='Path to configuration file')
+    
+    # Automation scheduler command
+    automation_parser = subparsers.add_parser('automation', help='Manage data automation scheduler')
+    automation_parser.add_argument('--run-once', action='store_true',
+                                   help='Run all automation jobs once and exit')
+    automation_parser.add_argument('--status', action='store_true',
+                                   help='Show automation job status')
+    automation_parser.add_argument('--config', default='config/data_sources.yml',
+                                   help='Path to configuration file')
+    
     args = parser.parse_args()
     
     if args.command == 'init':
@@ -324,6 +340,37 @@ def main():
             cmd.append('--history-only')
         result = subprocess.run(cmd)
         sys.exit(result.returncode)
+    elif args.command == 'quality-scheduler':
+        script_path = Path(__file__).parent / 'scripts' / 'schedule_quality_checks.py'
+        cmd = [sys.executable, str(script_path)]
+        if args.run_once:
+            cmd.append('--run-once')
+        if args.config:
+            cmd.extend(['--config', args.config])
+        result = subprocess.run(cmd)
+        sys.exit(result.returncode)
+    elif args.command == 'automation':
+        from src.scheduler import JobScheduler
+        scheduler = JobScheduler(args.config)
+        
+        if args.status:
+            scheduler.print_status_report()
+        elif args.run_once:
+            print("Running all automation jobs once...")
+            results = scheduler.run_all_jobs_now()
+            print("\nResults:")
+            for result in results:
+                print(f"{result.job_name}: {result.status.value}")
+                if result.status.value == 'success':
+                    print(f"  Records processed: {result.records_processed}")
+        else:
+            print("Starting automation scheduler daemon...")
+            print("Press Ctrl+C to stop")
+            try:
+                scheduler.start_scheduler()
+            except KeyboardInterrupt:
+                print("\nScheduler stopped by user")
+        sys.exit(0)
     else:
         parser.print_help()
 

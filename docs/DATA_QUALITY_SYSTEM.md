@@ -63,6 +63,23 @@ python cli.py quality --tolerance 5.0 --freshness 7
 python cli.py quality --history-only --history 30
 ```
 
+### Scheduled Quality Checks
+```bash
+# Run all quality tasks once (for testing)
+python cli.py quality-scheduler --run-once
+
+# Start the quality scheduler daemon
+python cli.py quality-scheduler
+
+# Start with custom configuration
+python cli.py quality-scheduler --config /path/to/config.yml
+```
+
+The scheduler automatically:
+- **Daily quality checks** at configured time (default: 18:00)
+- **Weekly reports** every Monday at 09:00
+- **Monthly cleanup** on the 1st of each month
+
 ### Automated Validation
 The system automatically runs data quality checks after each successful data import when using the scheduler. Failed validations trigger notifications based on your configuration.
 
@@ -187,8 +204,8 @@ This system would have prevented the USD/THB issue by:
 
 ## Configuration
 
-### Add to SSOT
-Consider adding data quality configuration to `config/data_sources.yml`:
+### SSOT Configuration
+Data quality settings are now integrated into `config/data_sources.yml`:
 
 ```yaml
 # Data quality settings
@@ -199,26 +216,56 @@ data_quality:
   min_completeness_pct: 90.0
   alert_threshold: 3
   run_after_import: true
-  external_sources:
-    exchange_rates: "exchangerate-api.com"
-    commodities: "alpha-vantage"
-    dollar_index: "fred"
+  schedule: "daily"
+  schedule_time: "18:00"
 ```
 
 ### Environment Variables
-Create a `.env` file for sensitive configuration:
+Create a `.env` file for sensitive configuration (see `.env.example`):
 
 ```bash
 # Data Quality Configuration
 DATA_QUALITY_ENABLED=true
-DATA_QUALITY_TOLERANCE=2.0
-DATA_QUALITY_FRESHNESS_DAYS=2
+QUALITY_TOLERANCE=2.0
+QUALITY_FRESHNESS_DAYS=2
+QUALITY_COMPLETENESS_PCT=90.0
+
+# External API Keys for Data Quality Validation
+FRED_API_KEY=your_fred_api_key_here
+ALPHA_VANTAGE_API_KEY=your_alpha_vantage_key_here
+METAL_PRICES_API_KEY=your_metal_prices_key_here
 
 # Alert Configuration
 ALERT_EMAIL_ENABLED=false
+ALERT_SMTP_SERVER=smtp.gmail.com
+ALERT_SMTP_PORT=587
+ALERT_EMAIL_USERNAME=your-email@gmail.com
+ALERT_EMAIL_PASSWORD=your-app-password
+ALERT_EMAIL_RECIPIENTS=admin@example.com,trader@example.com
 ALERT_WEBHOOK_ENABLED=false
+ALERT_WEBHOOK_URL=https://your-webhook-url.com/alerts
 ALERT_THRESHOLD=3
 ```
+
+### Getting API Keys
+
+**FRED API (Free):**
+1. Go to https://fred.stlouisfed.org/docs/api/api_key.html
+2. Request a free API key (no account required)
+3. 120 requests/minute limit
+4. Add to `.env`: `FRED_API_KEY=your_key`
+
+**Alpha Vantage (Free Tier):**
+1. Go to https://www.alphavantage.co/support/#api-key
+2. Sign up for free account
+3. 25 requests/day, 5 requests/minute
+4. Add to `.env`: `ALPHA_VANTAGE_API_KEY=your_key`
+
+**MetalPrices API (Free Tier):**
+1. Go to https://metalpriceapi.com/
+2. Sign up for free account
+3. 100 requests/month
+4. Add to `.env`: `METAL_PRICES_API_KEY=your_key`
 
 ## Monitoring and Maintenance
 
