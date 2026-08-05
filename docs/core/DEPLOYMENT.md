@@ -8,6 +8,28 @@
 
 The Trade API FastAPI backend has been successfully deployed to the web server at `http://tony-omen.local:8080/apps/trade/api`. The deployment uses Docker containers integrated with the existing Caddy reverse proxy infrastructure.
 
+## Database Setup
+
+### Automated Setup Wizard
+
+The project includes an automated database setup wizard that simplifies initial configuration:
+
+```bash
+# Run the database setup wizard
+python3 cli.py setup
+```
+
+The wizard will:
+1. Prompt you to choose between PostgreSQL or SQLite
+2. Collect database connection parameters
+3. Test the database connection
+4. Create the database if it doesn't exist
+5. Initialize the database schema with all required tables
+6. Save configuration to `.env` file
+7. Verify the setup was successful
+
+This replaces the manual database setup process and provides a user-friendly guided experience.
+
 ## Deployment Architecture
 
 ### Components

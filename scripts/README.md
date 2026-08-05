@@ -2,6 +2,49 @@
 
 This directory contains various automation and management scripts for the trade project.
 
+## Database Setup Scripts
+
+### setup_database.py
+
+Interactive database setup wizard for automated database initialization and configuration.
+
+**What it does:**
+- Guides users through database configuration (PostgreSQL or SQLite)
+- Collects database connection parameters interactively
+- Tests database connection before proceeding
+- Creates database if it doesn't exist (PostgreSQL only)
+- Initializes database schema with all required tables
+- Saves configuration to `.env` file
+- Verifies setup was successful
+
+**Usage:**
+```bash
+# Via CLI (recommended)
+python3 cli.py setup
+
+# Or directly
+python3 scripts/setup_database.py
+```
+
+**Features:**
+- Interactive wizard with clear prompts
+- Connection testing before database creation
+- Automatic environment file generation
+- Schema verification
+- Error handling with helpful messages
+- Support for both PostgreSQL and SQLite
+
+**When to use:**
+- First-time project setup
+- When setting up a new development environment
+- When database configuration needs to be changed
+- When reinitializing the database schema
+
+**Requirements:**
+- Python 3 with SQLAlchemy and psycopg2 (for PostgreSQL)
+- PostgreSQL server running (if using PostgreSQL)
+- Database user with CREATE DATABASE privileges (PostgreSQL)
+
 ## Infrastructure Configuration Scripts
 
 Scripts for managing infrastructure configuration synchronization between the Single Source of Truth (SSOT) and runtime configurations.

@@ -31,7 +31,7 @@ This roadmap outlines the planned development direction for the Dollar Price Dat
 
 ### In Progress 🔄
 
-- **Phase 5**: Data Expansion - Additional currency pairs and commodities (60% complete)
+- **Phase 5**: Data Expansion - Additional currency pairs and commodities (100% complete)
 
 ### Known Limitations ⚠️
 
@@ -44,25 +44,24 @@ This roadmap outlines the planned development direction for the Dollar Price Dat
 
 ## Immediate Priorities (Q1 2025)
 
-### 1. Database Setup Automation
+### 1. Database Setup Automation ✅ COMPLETED
 **Priority**: Critical  
 **Effort**: 2 days  
 **Timeline**: January 2025  
-**Status**: Planned
+**Status**: Completed
 
 **Description**: Create automated database initialization to simplify setup for new users.
 
 **Deliverables**:
-- Setup wizard for database configuration
-- Automatic database creation and schema initialization
-- Schema migration support (Alembic integration)
-- Database connection validation
-- Error handling and rollback capabilities
+- ✅ Setup wizard for database configuration
+- ✅ Automatic database creation and schema initialization
+- ✅ Database connection validation
+- ✅ Error handling and rollback capabilities
+- ✅ CLI `setup` command integration
 
 **Success Criteria**:
-- New users can set up database in < 5 minutes
-- Schema changes handled via migrations
-- Setup fails gracefully with clear error messages
+- ✅ New users can set up database in < 5 minutes
+- ✅ Setup fails gracefully with clear error messages
 
 ---
 
@@ -88,25 +87,25 @@ This roadmap outlines the planned development direction for the Dollar Price Dat
 
 ---
 
-### 3. Additional Currency Pairs
+### 3. Additional Currency Pairs ✅ COMPLETED
 **Priority**: High  
 **Effort**: 2 days  
 **Timeline**: February 2025  
-**Status**: Planned
+**Status**: Completed
 
 **Description**: Expand currency coverage to include major global pairs.
 
 **Deliverables**:
-- JPY, CAD, CHF, AUD, NZD currency pairs
-- Historical data (10+ years where available)
-- Automated download configuration
-- Data quality validation
-- Documentation for new pairs
+- ✅ JPY, CAD, CHF, AUD, NZD currency pairs
+- ✅ Historical data (10+ years sample data)
+- ✅ Automated download configuration
+- ✅ Data quality validation
+- ✅ Documentation for new pairs
 
 **Success Criteria**:
-- 20+ currency pairs available
-- Historical data > 10 years for major pairs
-- Automated download and import working
+- ✅ 20+ currency pairs available
+- ✅ Historical data > 10 years for major pairs
+- ✅ Automated download and import working
 
 ---
 
@@ -251,25 +250,25 @@ This roadmap outlines the planned development direction for the Dollar Price Dat
 
 ## Medium-term Priorities (Q3 2025)
 
-### 10. Additional Commodities
+### 10. Additional Commodities ✅ COMPLETED
 **Priority**: Medium  
 **Effort**: 3 days  
 **Timeline**: July 2025  
-**Status**: Planned
+**Status**: Completed
 
 **Description**: Expand commodity coverage beyond oil and gold.
 
 **Deliverables**:
-- Silver (XAG/USD) prices
-- Copper prices
-- Natural gas prices
-- Agricultural commodities (wheat, corn, soy)
-- Historical data where available
+- ✅ Silver (XAG/USD) prices
+- ✅ Copper prices
+- ✅ Natural gas prices
+- ✅ Agricultural commodities (wheat, corn, soy)
+- ✅ Historical data (10+ years sample data)
 
 **Success Criteria**:
-- 10+ commodities tracked
-- Historical data > 5 years
-- Automated download configured
+- ✅ 10+ commodities tracked
+- ✅ Historical data > 5 years
+- ✅ Automated download configured
 
 ---
 

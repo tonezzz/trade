@@ -210,6 +210,30 @@ This guide provides comprehensive sources for downloading historical dollar pric
 
 ## 📥 Import Instructions
 
+### Automated Download Scripts
+
+The project includes automated download scripts for quick data acquisition:
+
+#### Basic Data
+```bash
+# Download basic historical data (WTI/Brent oil)
+python3 download_data.py
+```
+
+#### Additional Currency Pairs
+```bash
+# Download JPY, CAD, CHF, AUD, NZD data
+python3 download_additional_currencies.py
+```
+
+#### Additional Commodities
+```bash
+# Download Silver, Copper, Natural Gas, Agricultural commodities
+python3 download_additional_commodities.py
+```
+
+**Note**: The additional download scripts currently generate sample data for demonstration purposes. For production use, replace the sample data generation with real data sources from the providers listed below.
+
 ### Step 1: Download Data
 Choose your data source and download the CSV file.
 

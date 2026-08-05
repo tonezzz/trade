@@ -40,30 +40,48 @@ A Python-based system for tracking historical dollar price data including USD ex
 - ✅ CLI tool ready for use
 - ✅ Interactive visualization system with Plotly
 - ✅ Automated data download and import scheduling system
+- ✅ Database setup automation wizard
+- ✅ Additional currency pairs (JPY, CAD, CHF, AUD, NZD)
+- ✅ Additional commodities (Silver, Copper, Natural Gas, Agricultural)
 
 ### Immediate Actions
 ```bash
-# 1. Download sample historical data
+# 1. Run database setup wizard (first-time setup)
+python3 cli.py setup
+
+# 2. Download sample historical data
 python3 download_data.py
 
-# 2. Import downloaded data
+# 3. Download additional currency pairs
+python3 download_additional_currencies.py
+
+# 4. Download additional commodities
+python3 download_additional_commodities.py
+
+# 5. Import downloaded data
 python cli.py import commodity_prices data/imported/wti_formatted.csv
 python cli.py import commodity_prices data/imported/brent_formatted.csv
+python cli.py import exchange_rates data/imported/jpy_formatted.csv
+python cli.py import commodity_prices data/imported/xag_formatted.csv
 
-# 3. Query the data
+# 6. Query the data
 python cli.py query commodity_prices --commodity OIL
+python cli.py query exchange_rates --currency JPY
 ```
 
 ## Features
 
 - **Multi-type Data Support**: Track exchange rates, Dollar Index, and commodity prices
 - **PostgreSQL Database**: Robust relational database with optimized indexes
+- **Database Setup Wizard**: Automated database initialization and configuration
 - **Manual CSV Import**: Easy data import from CSV files
 - **Query & Analysis**: Built-in functions for data retrieval and performance analysis
 - **Flexible Schema**: Supports OHLCV (Open, High, Low, Close, Volume) data
 - **Historical Data Sources**: Access to decades of free financial data
 - **Interactive Visualization**: Plotly-based charts for price history and analysis
 - **Automated Scheduling**: Hands-off automated data download and import system
+- **Extended Currency Coverage**: JPY, CAD, CHF, AUD, NZD in addition to EUR, GBP
+- **Extended Commodity Coverage**: Silver, Copper, Natural Gas, Wheat, Corn, Soy
 
 ## Project Structure
 
@@ -81,6 +99,7 @@ trade/
 │   └── logging_config.py    # Logging configuration
 ├── scripts/
 │   ├── auto_update.py       # Main automation script
+│   ├── setup_database.py    # Database setup wizard
 │   ├── deploy-mcp-config.sh # Deploy MCP server configuration
 │   ├── generate-mcp-configs.py # Generate Devin CLI MCP configs
 │   ├── validate-configs.sh  # Validate configuration consistency
@@ -149,6 +168,8 @@ trade/
 ├── cli.py                   # Command-line interface
 ├── download_data.py         # Historical data downloader
 ├── download_thb_data.py     # THB data downloader
+├── download_additional_currencies.py # Additional currency data downloader
+├── download_additional_commodities.py # Additional commodity data downloader
 ├── setup.sh                 # Setup script
 ├── deploy.sh                # Deployment script
 ├── requirements.txt         # Python dependencies

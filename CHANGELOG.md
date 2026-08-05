@@ -1,6 +1,13 @@
 ## [Unreleased]
 
 ### Added
+- Database setup automation wizard (scripts/setup_database.py) with interactive configuration
+- CLI `setup` command to launch database setup wizard
+- Additional currency pairs download script (download_additional_currencies.py)
+- Additional commodities download script (download_additional_commodities.py)
+- Support for JPY, CAD, CHF, AUD, NZD currency pairs with sample historical data
+- Support for Silver, Copper, Natural Gas, Wheat, Corn, Soy commodities with sample data
+- Git repository initialization with comprehensive .gitignore
 - Sub-agent usage guidelines (AGENTS.md and global_rules.md)
 - Initial knowledge base article: SSOT Configuration Pattern
 - Initial workflow: Configuration Update Workflow

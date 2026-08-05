@@ -3,6 +3,7 @@
 Command-line interface for the Dollar Price Database.
 """
 import argparse
+import subprocess
 import sys
 from pathlib import Path
 from src.database import db
@@ -17,6 +18,19 @@ def init_db():
     print("Initializing database...")
     db.init_db()
     print("Database initialized successfully.")
+
+
+def setup_db(args):
+    """Run database setup wizard."""
+    script_path = Path(__file__).parent / 'scripts' / 'setup_database.py'
+    
+    if not script_path.exists():
+        print(f"Error: Setup script not found at {script_path}")
+        sys.exit(1)
+    
+    print("Launching database setup wizard...")
+    result = subprocess.run([sys.executable, str(script_path)])
+    sys.exit(result.returncode)
 
 
 def import_csv(args):
@@ -208,6 +222,9 @@ def main():
     # Init command
     subparsers.add_parser('init', help='Initialize database')
     
+    # Setup command
+    subparsers.add_parser('setup', help='Run database setup wizard')
+    
     # Import command
     import_parser = subparsers.add_parser('import', help='Import data from CSV')
     import_parser.add_argument('type', choices=['exchange_rates', 'dollar_index', 'commodity_prices'],
@@ -271,6 +288,8 @@ def main():
     
     if args.command == 'init':
         init_db()
+    elif args.command == 'setup':
+        setup_db(args)
     elif args.command == 'import':
         import_csv(args)
     elif args.command == 'query':
