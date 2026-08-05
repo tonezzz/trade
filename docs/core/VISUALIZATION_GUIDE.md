@@ -1,7 +1,7 @@
 
 ---
 
-**Last Updated: 2026-08-04
+**Last Updated:** 2026-08-05
 # Price History Visualization Guide
 
 This guide explains how to use the visualization system for the dollar price database.

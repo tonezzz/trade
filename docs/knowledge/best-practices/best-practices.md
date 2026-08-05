@@ -1,7 +1,7 @@
 # Best Practices
 
 **Category:** best-practices  
-**Last Updated: 2026-08-04  
+**Last Updated:** 2026-08-05
 **Related Files:** [various project files]  
 **Tags:** best-practices, conventions, standards
 
@@ -217,7 +217,7 @@ api:
 # Document Title
 
 **Category:** [category]  
-**Last Updated:** YYYY-MM-DD  
+**Last Updated:** 2026-08-05
 **Related Files:** [file paths]  
 **Tags:** [tags]
 ```
@@ -389,5 +389,5 @@ Add a best practice when:
 
 ---
 
-**Last Updated: 2026-08-04  
+**Last Updated:** 2026-08-05
 **Maintainer:** trade documentation team

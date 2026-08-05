@@ -1,0 +1,15 @@
+[Unit]
+Description=Trade Data Automation Service
+After=network.target
+
+[Service]
+Type=simple
+User=tony
+WorkingDirectory=/home/tony/CascadeProjects/trade
+Environment="PATH=/home/tony/CascadeProjects/trade/venv/bin"
+ExecStart=/home/tony/CascadeProjects/trade/venv/bin/python scripts/auto_update.py --scheduled
+Restart=always
+RestartSec=3600
+
+[Install]
+WantedBy=multi-user.target

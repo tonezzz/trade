@@ -1,3 +1,7 @@
+
+---
+
+**Last Updated:** 2026-08-05
 # Trade Documentation Index
 
 Complete documentation for the Dollar Price Database system: historical USD exchange rates, Dollar Index (DXY), commodity prices, trading signals, and backtesting.
@@ -22,6 +26,8 @@ Complete documentation for the Dollar Price Database system: historical USD exch
 - [CHANGELOG Automation](CHANGELOG_AUTOMATION.md) - Guide for updating the changelog
 - [Project Status](../README.md#current-status) - Current implementation status
 - [Configuration Management](../CONFIGURATION_MANAGEMENT.md) - SSOT and configuration guide
+- [Contributing Guide](../CONTRIBUTING.md) - Contribution guidelines and process
+- [Agent Guidelines](../AGENTS.md) - Sub-agent usage guidelines
 
 ## 📖 Documentation Management
 
@@ -30,14 +36,7 @@ Complete documentation for the Dollar Price Database system: historical USD exch
 - [Knowledge Capture Guidelines](KNOWLEDGE_CAPTURE_GUIDELINES.md) - Guidelines for capturing knowledge across systems
 - [Documentation Review Schedule](DOCUMENTATION_REVIEW_SCHEDULE.md) - Schedule and procedures for documentation maintenance
 - [Archive Management Procedures](ARCHIVE_MANAGEMENT_PROCEDURES.md) - Operational procedures for archive management
-
----
-
-- [Development Workflow](DEVELOPMENT_WORKFLOW.md) - Integrated development workflow with documentation systems
-- [CHANGELOG Workflow](CHANGELOG_WORKFLOW.md) - CHANGELOG automation procedures and best practices
-- [Knowledge Capture Guidelines](KNOWLEDGE_CAPTURE_GUIDELINES.md) - Guidelines for capturing knowledge across systems
-- [Documentation Review Schedule](DOCUMENTATION_REVIEW_SCHEDULE.md) - Schedule and procedures for documentation maintenance
-- [Archive Management Procedures](ARCHIVE_MANAGEMENT_PROCEDURES.md) - Operational procedures for archive management
+- [Doc Coordinator Report](DOC_COORDINATOR_REPORT.md) - Documentation quality assessment and improvements
 
 ---
 
@@ -109,6 +108,7 @@ Insights, patterns, lessons learned, and best practices accumulated during devel
 - [Best Practices](knowledge/best-practices/best-practices.md) - Project-specific best practices
 - [Patterns](knowledge/patterns/patterns.md) - Architectural and design patterns
 - [API Patterns](knowledge/patterns/api-patterns.md) - Reusable API patterns
+- [SSOT Configuration Pattern](knowledge/architecture/ssot-configuration-pattern.md) - Single Source of Truth configuration pattern
 - [Code Conventions](knowledge/best-practices/code-conventions.md) - Project-specific code conventions
 
 ---
@@ -160,18 +160,6 @@ Insights, patterns, lessons learned, and best practices accumulated during devel
 - [Data Import](../README.md#quick-start) - CSV import process
 - [Data Validation](../README.md#quick-start) - Data quality checks
 - [Data Download](../download_data.py) - Automated data download scripts
-
----
-
-## 🧠 Knowledge Base
-
-Practical knowledge, insights, and solutions beyond standard documentation.
-
-- [Knowledge Base](knowledge/README.md) - Main knowledge base index
-  - [Architecture Knowledge](knowledge/architecture/README.md) - Design decisions and technical insights
-  - [Operations Knowledge](knowledge/operations/README.md) - Operational procedures and wisdom
-  - [Troubleshooting Knowledge](knowledge/troubleshooting/README.md) - Diagnostic approaches and solutions
-  - [Best Practices](knowledge/best-practices/README.md) - Development and operational best practices
 
 ---
 

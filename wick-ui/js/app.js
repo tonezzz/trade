@@ -1,7 +1,7 @@
 // Trading UI Application
 // Connects to Trade API and implements Wick-inspired trading components
 
-const API_BASE_URL = 'http://tony-omen.local:8080/apps/trade/api/api';
+const API_BASE_URL = 'http://tony-omen.local:8080/apps/trade/api';
 
 class TradingDashboard {
     constructor() {
@@ -397,15 +397,17 @@ class TradingDashboard {
 
     formatOHLCV(data, priceField) {
         if (!data) return [];
-        
+
         return data.map(item => {
             const time = new Date(item.date).getTime() / 1000;
+            const price = item[priceField] || item.close || item.rate || item.value || item.price;
+
             return {
                 time: time,
-                open: item.open || item[priceField],
-                high: item.high || item[priceField],
-                low: item.low || item[priceField],
-                close: item.close || item[priceField],
+                open: item.open || price,
+                high: item.high || price,
+                low: item.low || price,
+                close: item.close || price,
             };
         }).sort((a, b) => a.time - b.time);
     }

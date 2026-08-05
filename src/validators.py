@@ -27,13 +27,14 @@ class DataValidator:
     VALID_COMMODITIES = {
         'GOLD', 'SILVER', 'PLATINUM', 'PALLADIUM',
         'OIL', 'WTI', 'BRENT', 'NATURAL_GAS',
-        'COPPER', 'ALUMINUM', 'ZINC', 'NICKEL', 'LEAD'
+        'COPPER', 'ALUMINUM', 'ZINC', 'NICKEL', 'LEAD',
+        'WHEAT', 'CORN', 'SOY'
     }
     
     # Valid units
     VALID_UNITS = {
         'oz', 'gram', 'kg', 'lb', 'barrel', 'gallon', 'liter', 'ton',
-        'metric_ton', 'bushel', 'share', 'contract'
+        'metric_ton', 'bushel', 'share', 'contract', 'mmbtu', 'btu'
     }
     
     @staticmethod
@@ -88,13 +89,13 @@ class DataValidator:
         return currency_upper
     
     @staticmethod
-    def validate_price(price_str: str, min_value: float = 0.0, max_value: float = 1000000.0) -> float:
+    def validate_price(price_str: str, min_value: float = -100.0, max_value: float = 1000000.0) -> float:
         """
         Validate and convert price string to float.
         
         Args:
             price_str: Price as string
-            min_value: Minimum acceptable value
+            min_value: Minimum acceptable value (default -100 for futures/derivatives)
             max_value: Maximum acceptable value
             
         Returns:
@@ -183,7 +184,8 @@ class DataValidator:
             return None
         
         symbol_upper = symbol.upper()
-        if not re.match(r'^[A-Z0-9]{1,20}$', symbol_upper):
+        # Allow alphanumeric and underscores, up to 30 characters
+        if not re.match(r'^[A-Z0-9_]{1,30}$', symbol_upper):
             raise ValidationError(f"Invalid symbol format: {symbol}")
         
         return symbol_upper

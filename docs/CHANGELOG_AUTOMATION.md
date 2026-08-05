@@ -131,5 +131,5 @@ You can also manually edit CHANGELOG.md following the Keep a Changelog format. T
 
 ---
 
-**Last Updated:** 2026-08-04  
+**Last Updated:** 2026-08-05
 **Maintainer:** trade documentation team

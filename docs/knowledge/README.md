@@ -78,7 +78,7 @@ External references, sources, or related reading.
 
 ---
 
-**Last Updated:** YYYY-MM-DD  
+**Last Updated:** 2026-08-05
 **Tags:** tag1, tag2, tag3
 **Category:** architecture/operations/troubleshooting/best-practices
 **Complexity:** low/medium/high
@@ -133,5 +133,5 @@ When you solve a complex problem or learn something valuable:
 
 ---
 
-**Last Updated: 2026-08-04
+**Last Updated:** 2026-08-05
 **Maintainer:** trade documentation team

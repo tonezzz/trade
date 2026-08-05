@@ -145,6 +145,6 @@ For issues or questions:
 
 ---
 
-**Last Updated:** 2026-08-04  
+**Last Updated:** 2026-08-05
 **Version:** 1.0  
 **Maintainer:** trade documentation team

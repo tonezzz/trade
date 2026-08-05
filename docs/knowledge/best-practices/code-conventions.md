@@ -1,7 +1,7 @@
 # Code Conventions
 
 **Category:** best-practices  
-**Last Updated: 2026-08-04
+**Last Updated:** 2026-08-05
 **Related Files:** src/, AGENTS.md  
 **Tags:** conventions, style, python
 
@@ -49,4 +49,4 @@ Follow these conventions when:
 
 ---
 
-**Last Updated: 2026-08-04
+**Last Updated:** 2026-08-05

@@ -1,7 +1,7 @@
 
 ---
 
-**Last Updated: 2026-08-04
+**Last Updated:** 2026-08-05
 # Quick Start Guide
 
 Get the trade system up and running in minutes.
@@ -176,6 +176,6 @@ cat .env
 
 ---
 
-**Last Updated:** 2026-08-04  
+**Last Updated:** 2026-08-05
 **Version:** 1.0  
 **Related:** [Main README](../../README.md)

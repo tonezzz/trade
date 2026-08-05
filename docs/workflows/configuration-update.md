@@ -1,3 +1,7 @@
+
+---
+
+**Last Updated:** 2026-08-05
 # Configuration Update Workflow
 
 ## Purpose
@@ -115,11 +119,9 @@ python3 scripts/generate-mcp-configs.py
 - [Infrastructure Documentation](../core/DEPLOYMENT.md)
 - [SSOT Configuration Pattern](../knowledge/architecture/ssot-configuration-pattern.md)
 
-## Last Updated
-2026-08-04
-
 ---
 
 **Tags:** configuration, ssot, deployment, infrastructure
 **Category:** infrastructure
 **Complexity:** low
+**Last Updated:** 2026-08-05

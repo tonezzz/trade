@@ -7,20 +7,20 @@ This document defines the standard for "Last Updated" fields across all project 
 All documentation files should use the following format for the "Last Updated" field:
 
 ```markdown
-**Last Updated:** YYYY-MM-DD
+**Last Updated:** 2026-08-05
 ```
 
 ### Placement
 
 - **Location**: At the end of the document, before any support/contact sections
 - **Format**: Bold text with colon, followed by date in ISO 8601 format (YYYY-MM-DD)
-- **Example**: `**Last Updated:** 2026-08-04`
+**Last Updated:** 2026-08-05
 
 ## Current Status
 
 As of 2026-08-04, the documentation system has:
 
-- **11 files** using the standard format: `**Last Updated:** 2026-08-04`
+**Last Updated:** 2026-08-05
 - **6 files** using section header format: `## Last Updated`
 - **Total**: 17 documentation files with "Last Updated" fields
 
@@ -52,7 +52,7 @@ To standardize a file:
    **Date:** 2026-08-04
    
    # After
-   **Last Updated:** 2026-08-04
+**Last Updated:** 2026-08-05
    ```
 
 3. **Update the date** to the current date if the file was recently modified
@@ -65,7 +65,7 @@ A script can be created to automate this standardization:
 #!/bin/bash
 # Standardize Last Updated fields
 
-find docs/ -name "*.md" -exec sed -i 's/## Last Updated/**Last Updated:**/g' {} +
+**Last Updated:** 2026-08-05
 find docs/ -name "*.md" -exec sed -i '/^## Last Updated$/d' {} +
 ```
 
@@ -113,5 +113,5 @@ grep -r "## Last Updated" docs/
 
 ---
 
-**Last Updated:** 2026-08-04  
+**Last Updated:** 2026-08-05
 **Maintainer:** trade documentation team

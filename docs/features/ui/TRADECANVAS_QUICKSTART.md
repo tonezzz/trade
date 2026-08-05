@@ -1,7 +1,7 @@
 
 ---
 
-**Last Updated: 2026-08-04
+**Last Updated:** 2026-08-05
 # TradeCanvas Quick Start Guide
 
 ## Getting Started with the Enhanced TradeCanvas UI

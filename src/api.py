@@ -476,18 +476,18 @@ async def get_exchange_rates(
                 base_currency='USD',
                 quote_currency=validated_currency,
                 rate=row['rate'],
-                open=row.get('open'),
-                high=row.get('high'),
-                low=row.get('low'),
-                close=row.get('close'),
+                open=row['open'],
+                high=row['high'],
+                low=row['low'],
+                close=row['close'],
                 volume=row.get('volume')
             )
             for _, row in df.iterrows()
         ]
-        
+
         # Apply pagination
         paginated = apply_pagination(data, limit, offset)
-        
+
         return PaginatedResponse(**paginated)
         
     except ValidationError as e:
@@ -522,10 +522,10 @@ async def get_latest_exchange_rate(currency: str, db: Session = Depends(get_db))
             base_currency=latest.base_currency,
             quote_currency=latest.quote_currency,
             rate=latest.rate,
-            open=latest.open_price,
-            high=latest.high_price,
-            low=latest.low_price,
-            close=latest.close_price,
+            open=latest.open_price if latest.open_price is not None else latest.rate,
+            high=latest.high_price if latest.high_price is not None else latest.rate,
+            low=latest.low_price if latest.low_price is not None else latest.rate,
+            close=latest.close_price if latest.close_price is not None else latest.rate,
             volume=latest.volume
         )
         
@@ -585,10 +585,10 @@ async def get_dollar_index(
             DollarIndexResponse(
                 date=row['date'],
                 value=row['value'],
-                open=row.get('open'),
-                high=row.get('high'),
-                low=row.get('low'),
-                close=row.get('close'),
+                open=row['open'],
+                high=row['high'],
+                low=row['low'],
+                close=row['close'],
                 volume=row.get('volume')
             )
             for _, row in df.iterrows()
@@ -627,10 +627,10 @@ async def get_latest_dollar_index(db: Session = Depends(get_db)):
         return DollarIndexResponse(
             date=latest.date,
             value=latest.value,
-            open=latest.open_price,
-            high=latest.high_price,
-            low=latest.low_price,
-            close=latest.close_price,
+            open=latest.open_price if latest.open_price is not None else latest.value,
+            high=latest.high_price if latest.high_price is not None else latest.value,
+            low=latest.low_price if latest.low_price is not None else latest.value,
+            close=latest.close_price if latest.close_price is not None else latest.value,
             volume=latest.volume
         )
         
@@ -692,10 +692,10 @@ async def get_commodity_prices(
                 symbol=row.get('symbol'),
                 price=row['price'],
                 unit=row.get('unit'),
-                open=row.get('open'),
-                high=row.get('high'),
-                low=row.get('low'),
-                close=row.get('close'),
+                open=row['open'],
+                high=row['high'],
+                low=row['low'],
+                close=row['close'],
                 volume=row.get('volume')
             )
             for _, row in df.iterrows()
@@ -739,10 +739,10 @@ async def get_latest_commodity_price(commodity: str, db: Session = Depends(get_d
             symbol=latest.symbol,
             price=latest.price,
             unit=latest.unit,
-            open=latest.open_price,
-            high=latest.high_price,
-            low=latest.low_price,
-            close=latest.close_price,
+            open=latest.open_price if latest.open_price is not None else latest.price,
+            high=latest.high_price if latest.high_price is not None else latest.price,
+            low=latest.low_price if latest.low_price is not None else latest.price,
+            close=latest.close_price if latest.close_price is not None else latest.price,
             volume=latest.volume
         )
         
@@ -1344,12 +1344,6 @@ async def run_backtest(request: BacktestRequest, db: Session = Depends(get_db)):
             data = queries.get_exchange_rates(symbol, start_dt, end_dt)
             if not data.empty:
                 data = data.rename(columns={'rate': 'close'})
-                if 'open_price' in data.columns:
-                    data = data.rename(columns={'open_price': 'open'})
-                if 'high_price' in data.columns:
-                    data = data.rename(columns={'high_price': 'high'})
-                if 'low_price' in data.columns:
-                    data = data.rename(columns={'low_price': 'low'})
         else:
             data = pd.DataFrame()
 
@@ -1358,12 +1352,6 @@ async def run_backtest(request: BacktestRequest, db: Session = Depends(get_db)):
             data = queries.get_commodity_prices(symbol=symbol, start_date=start_dt, end_date=end_dt)
             if not data.empty:
                 data = data.rename(columns={'price': 'close'})
-                if 'open_price' in data.columns:
-                    data = data.rename(columns={'open_price': 'open'})
-                if 'high_price' in data.columns:
-                    data = data.rename(columns={'high_price': 'high'})
-                if 'low_price' in data.columns:
-                    data = data.rename(columns={'low_price': 'low'})
 
         if data.empty:
             raise HTTPException(
@@ -1683,12 +1671,6 @@ async def optimize_strategy(request: OptimizeRequest, db: Session = Depends(get_
             data = queries.get_exchange_rates(symbol, start_dt, end_dt)
             if not data.empty:
                 data = data.rename(columns={'rate': 'close'})
-                if 'open_price' in data.columns:
-                    data = data.rename(columns={'open_price': 'open'})
-                if 'high_price' in data.columns:
-                    data = data.rename(columns={'high_price': 'high'})
-                if 'low_price' in data.columns:
-                    data = data.rename(columns={'low_price': 'low'})
         else:
             data = pd.DataFrame()
 
@@ -1696,12 +1678,6 @@ async def optimize_strategy(request: OptimizeRequest, db: Session = Depends(get_
             data = queries.get_commodity_prices(symbol=symbol, start_date=start_dt, end_date=end_dt)
             if not data.empty:
                 data = data.rename(columns={'price': 'close'})
-                if 'open_price' in data.columns:
-                    data = data.rename(columns={'open_price': 'open'})
-                if 'high_price' in data.columns:
-                    data = data.rename(columns={'high_price': 'high'})
-                if 'low_price' in data.columns:
-                    data = data.rename(columns={'low_price': 'low'})
 
         if data.empty:
             raise HTTPException(
@@ -1812,12 +1788,6 @@ async def compare_strategies(request: CompareRequest, db: Session = Depends(get_
             data = queries.get_exchange_rates(symbol, start_dt, end_dt)
             if not data.empty:
                 data = data.rename(columns={'rate': 'close'})
-                if 'open_price' in data.columns:
-                    data = data.rename(columns={'open_price': 'open'})
-                if 'high_price' in data.columns:
-                    data = data.rename(columns={'high_price': 'high'})
-                if 'low_price' in data.columns:
-                    data = data.rename(columns={'low_price': 'low'})
         else:
             data = pd.DataFrame()
 
@@ -1825,12 +1795,6 @@ async def compare_strategies(request: CompareRequest, db: Session = Depends(get_
             data = queries.get_commodity_prices(symbol=symbol, start_date=start_dt, end_date=end_dt)
             if not data.empty:
                 data = data.rename(columns={'price': 'close'})
-                if 'open_price' in data.columns:
-                    data = data.rename(columns={'open_price': 'open'})
-                if 'high_price' in data.columns:
-                    data = data.rename(columns={'high_price': 'high'})
-                if 'low_price' in data.columns:
-                    data = data.rename(columns={'low_price': 'low'})
 
         if data.empty:
             raise HTTPException(

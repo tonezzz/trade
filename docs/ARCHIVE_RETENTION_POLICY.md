@@ -236,6 +236,6 @@ This retention policy should be reviewed:
 ---
 
 **Policy Version:** 1.0  
-**Last Updated:** 2026-08-04  
+**Last Updated:** 2026-08-05
 **Next Review:** 2027-08-04  
 **Maintainer:** trade documentation team

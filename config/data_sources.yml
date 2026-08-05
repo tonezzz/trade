@@ -67,7 +67,7 @@ data_sources:
     # Data source identifier for database
     source: "automated_wti"
     # Enable/disable this source
-    enabled: true
+    enabled: false  # Disabled due to data quality issues
     # Custom formatter function (optional)
     formatter: "format_wti_data"
 
@@ -89,7 +89,7 @@ data_sources:
     # Data source identifier for database
     source: "automated_brent"
     # Enable/disable this source
-    enabled: true
+    enabled: false  # Disabled due to data quality issues
     # Custom formatter function (optional)
     formatter: "format_brent_data"
 
@@ -108,7 +108,7 @@ data_sources:
     # Data source identifier for database
     source: "automated_ecb"
     # Enable/disable this source
-    enabled: true
+    enabled: false  # Disabled due to limited currency coverage
     # Custom formatter function (optional)
     formatter: "format_ecb_data"
     # Base currency for ECB data
@@ -204,7 +204,7 @@ data_sources:
     # Data source identifier for database
     source: "automated_dxy"
     # Enable/disable this source
-    enabled: true
+    enabled: false  # Disabled due to data quality issues
     # Custom formatter function (optional)
     formatter: "format_dxy_data"
 

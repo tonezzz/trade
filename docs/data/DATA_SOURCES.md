@@ -1,7 +1,7 @@
 
 ---
 
-**Last Updated: 2026-08-04
+**Last Updated:** 2026-08-05
 # Historical Data Sources for Dollar Price Database
 
 This guide provides comprehensive sources for downloading historical dollar price data that can be imported into your database.
