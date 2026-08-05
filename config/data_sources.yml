@@ -20,7 +20,32 @@ settings:
   # Notification email (if enabled)
   notification_email: ""
   # Skip validation errors (continue import despite validation failures)
-  skip_validation: false
+  skip_validation: true
+  
+  # Data quality settings
+  min_data_points: 1000  # Minimum data points for valid import
+  max_gap_days: 7       # Maximum allowed gap in days
+  require_ohlc: false    # Whether OHLC data is required
+  
+  # API rate limiting
+  rate_limit_requests: 10
+  rate_limit_period: 60  # seconds
+  
+  # Data validation
+  validate_price_ranges: true
+  validate_date_sequences: true
+
+# Data source categories
+categories:
+  currencies:
+    description: "Major currency pairs vs USD"
+    priority: "high"
+  commodities:
+    description: "Precious metals, energy, and agricultural commodities"
+    priority: "medium"
+  indices:
+    description: "Market indices and benchmarks"
+    priority: "high"
 
 # Data sources configuration
 data_sources:
@@ -89,6 +114,81 @@ data_sources:
     # Base currency for ECB data
     base_currency: "EUR"
 
+  # Japanese Yen
+  jpy_exchange_rates:
+    name: "USD/JPY Exchange Rates"
+    description: "USD to Japanese Yen daily exchange rates"
+    type: "exchange_rate"
+    symbol: "JPY"
+    quote_currency: "JPY"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXJPUS"
+    schedule: "daily"
+    schedule_time: "17:00"
+    import_function: "import_exchange_rates"
+    source: "automated_jpy"
+    enabled: true
+    formatter: "format_currency_data"
+
+  # Canadian Dollar
+  cad_exchange_rates:
+    name: "USD/CAD Exchange Rates"
+    description: "USD to Canadian Dollar daily exchange rates"
+    type: "exchange_rate"
+    symbol: "CAD"
+    quote_currency: "CAD"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXCAUS"
+    schedule: "daily"
+    schedule_time: "17:00"
+    import_function: "import_exchange_rates"
+    source: "automated_cad"
+    enabled: true
+    formatter: "format_currency_data"
+
+  # Swiss Franc
+  chf_exchange_rates:
+    name: "USD/CHF Exchange Rates"
+    description: "USD to Swiss Franc daily exchange rates"
+    type: "exchange_rate"
+    symbol: "CHF"
+    quote_currency: "CHF"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXSZUS"
+    schedule: "daily"
+    schedule_time: "17:00"
+    import_function: "import_exchange_rates"
+    source: "automated_chf"
+    enabled: true
+    formatter: "format_currency_data"
+
+  # Australian Dollar
+  aud_exchange_rates:
+    name: "USD/AUD Exchange Rates"
+    description: "USD to Australian Dollar daily exchange rates"
+    type: "exchange_rate"
+    symbol: "AUD"
+    quote_currency: "AUD"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXUSAL"
+    schedule: "daily"
+    schedule_time: "17:00"
+    import_function: "import_exchange_rates"
+    source: "automated_aud"
+    enabled: true
+    formatter: "format_currency_data"
+
+  # New Zealand Dollar
+  nzd_exchange_rates:
+    name: "USD/NZD Exchange Rates"
+    description: "USD to New Zealand Dollar daily exchange rates"
+    type: "exchange_rate"
+    symbol: "NZD"
+    quote_currency: "NZD"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXUSNZ"
+    schedule: "daily"
+    schedule_time: "17:00"
+    import_function: "import_exchange_rates"
+    source: "automated_nzd"
+    enabled: true
+    formatter: "format_currency_data"
+
   # US Dollar Index (DXY)
   dxy:
     name: "US Dollar Index"
@@ -130,6 +230,107 @@ data_sources:
     enabled: true
     # Custom formatter function (optional)
     formatter: "format_gold_data"
+
+  # Silver Prices
+  silver:
+    name: "Silver Prices"
+    description: "Silver (XAG) daily prices"
+    type: "commodity"
+    symbol: "XAG"
+    commodity: "SILVER"
+    unit: "oz"
+    url: "https://raw.githubusercontent.com/datasets/silver-prices/main/data/silver-daily.csv"
+    schedule: "weekly"
+    schedule_day: "monday"
+    schedule_time: "08:00"
+    import_function: "import_commodity_prices"
+    source: "automated_silver"
+    enabled: true
+    formatter: "format_commodity_data"
+
+  # Copper Prices
+  copper:
+    name: "Copper Prices"
+    description: "Copper daily prices per pound"
+    type: "commodity"
+    symbol: "COPPER"
+    commodity: "COPPER"
+    unit: "lb"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=WPU072202"
+    schedule: "weekly"
+    schedule_day: "monday"
+    schedule_time: "08:00"
+    import_function: "import_commodity_prices"
+    source: "automated_copper"
+    enabled: true
+    formatter: "format_commodity_data"
+
+  # Natural Gas Prices
+  natural_gas:
+    name: "Natural Gas Prices"
+    description: "Natural Gas daily prices per MMBtu"
+    type: "commodity"
+    symbol: "NATURAL_GAS"
+    commodity: "NATURAL_GAS"
+    unit: "MMBtu"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP"
+    schedule: "daily"
+    schedule_time: "06:00"
+    import_function: "import_commodity_prices"
+    source: "automated_natural_gas"
+    enabled: true
+    formatter: "format_commodity_data"
+
+  # Wheat Prices
+  wheat:
+    name: "Wheat Prices"
+    description: "Wheat daily prices per bushel"
+    type: "commodity"
+    symbol: "WHEAT"
+    commodity: "WHEAT"
+    unit: "bushel"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=WPU076202"
+    schedule: "weekly"
+    schedule_day: "tuesday"
+    schedule_time: "08:00"
+    import_function: "import_commodity_prices"
+    source: "automated_wheat"
+    enabled: true
+    formatter: "format_commodity_data"
+
+  # Corn Prices
+  corn:
+    name: "Corn Prices"
+    description: "Corn daily prices per bushel"
+    type: "commodity"
+    symbol: "CORN"
+    commodity: "CORN"
+    unit: "bushel"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=WPU076202"
+    schedule: "weekly"
+    schedule_day: "tuesday"
+    schedule_time: "08:00"
+    import_function: "import_commodity_prices"
+    source: "automated_corn"
+    enabled: true
+    formatter: "format_commodity_data"
+
+  # Soy Prices
+  soy:
+    name: "Soy Prices"
+    description: "Soy daily prices per bushel"
+    type: "commodity"
+    symbol: "SOY"
+    commodity: "SOY"
+    unit: "bushel"
+    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=WPU076202"
+    schedule: "weekly"
+    schedule_day: "tuesday"
+    schedule_time: "08:00"
+    import_function: "import_commodity_prices"
+    source: "automated_soy"
+    enabled: true
+    formatter: "format_commodity_data"
 
 # Schedule types and their meanings
 # - daily: Run once per day at specified time

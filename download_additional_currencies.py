@@ -2,6 +2,10 @@
 """
 Download additional currency pair historical data (JPY, CAD, CHF, AUD, NZD).
 Uses free data sources like Federal Reserve and other financial data providers.
+
+NOTE: This script generates sample data for demonstration purposes.
+For production use, use download_from_ssot.py which reads from config/data_sources.yml
+and downloads real data from configured sources.
 """
 import urllib.request
 import csv
