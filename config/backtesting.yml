@@ -1,0 +1,113 @@
+# Backtesting Configuration
+
+# Initial capital settings
+initial_capital:
+  default: 100000.0  # Default starting capital in USD
+  min: 1000.0  # Minimum allowed capital
+  max: 10000000.0  # Maximum allowed capital
+
+# Commission and fee settings
+commission:
+  enabled: true
+  type: "percentage"  # Options: percentage, fixed, tiered
+  value: 0.001  # 0.1% per trade
+  min_commission: 1.0  # Minimum commission per trade
+  max_commission: 100.0  # Maximum commission per trade
+
+# Slippage settings
+slippage:
+  enabled: true
+  type: "percentage"  # Options: percentage, fixed, random
+  value: 0.0001  # 0.01% slippage
+  buy_slippage: 0.0001  # Additional slippage for buy orders
+  sell_slippage: 0.0001  # Additional slippage for sell orders
+
+# Risk management parameters
+risk_management:
+  max_position_size: 0.2  # Maximum position size as percentage of capital
+  max_total_exposure: 1.0  # Maximum total exposure (1.0 = 100%)
+  max_drawdown_limit: 0.5  # Stop trading if drawdown exceeds 50%
+  max_daily_loss: 0.1  # Stop trading if daily loss exceeds 10%
+  max_consecutive_losses: 5  # Stop trading after N consecutive losses
+
+# Default stop-loss and take-profit settings
+default_stops:
+  stop_loss:
+    enabled: true
+    type: "percentage"  # Options: percentage, fixed, atr
+    value: 0.05  # 5% stop loss
+    trailing:
+      enabled: false
+      distance: 0.02  # 2% trailing stop
+      activation: 0.01  # Activate after 1% profit
+
+  take_profit:
+    enabled: true
+    type: "percentage"  # Options: percentage, fixed, risk_reward
+    value: 0.10  # 10% take profit
+    risk_reward_ratio: 2.0  # Risk/reward ratio for dynamic TP
+
+# Position sizing
+position_sizing:
+  method: "fixed"  # Options: fixed, percentage, risk_based, kelly, volatility
+  default_size: 1000.0  # Default position size
+  percentage: 0.1  # 10% of capital per trade
+  risk_per_trade: 0.02  # 2% risk per trade for risk-based sizing
+  max_positions: 5  # Maximum number of concurrent positions
+
+# Execution settings
+execution:
+  order_type: "market"  # Options: market, limit, stop_limit
+  fill_at_close: false  # Fill orders at close price
+  delay: 0  # Execution delay in seconds
+  partial_fills: false  # Allow partial order fills
+
+# Data settings
+data:
+  required_columns: ["date", "open", "high", "low", "close", "volume"]
+  handle_missing: "forward_fill"  # Options: forward_fill, drop, interpolate
+  adjust_splits: true  # Adjust for stock splits
+  adjust_dividends: true  # Adjust for dividends
+
+# Performance metrics settings
+metrics:
+  risk_free_rate: 0.02  # 2% annual risk-free rate for Sharpe ratio
+  periods_per_year: 252  # Trading days per year
+  benchmark: "buy_and_hold"  # Default benchmark for comparison
+
+# Optimization settings
+optimization:
+  enabled: true
+  method: "grid"  # Options: grid, random, bayesian, genetic
+  max_iterations: 100
+  cv_splits: 5  # Number of cross-validation splits
+  metric: "sharpe_ratio"  # Metric to optimize for
+  early_stopping:
+    enabled: true
+    patience: 10  # Stop after N iterations without improvement
+
+# Walk-forward analysis settings
+walk_forward:
+  enabled: true
+  train_size: 0.6  # 60% of data for training
+  test_size: 0.2  # 20% of data for testing
+  step_size: 0.1  # 10% step for rolling window
+  min_train_periods: 252  # Minimum training periods (1 year)
+
+# Reporting settings
+reporting:
+  generate_charts: true
+  chart_format: "html"  # Options: html, png, json
+  include_trades: true
+  include_equity_curve: true
+  include_drawdown_chart: true
+  include_returns_distribution: true
+  save_results: true
+  results_dir: "backtest_results"
+
+# Logging
+logging:
+  level: "INFO"
+  log_trades: true
+  log_signals: true
+  log_performance: true

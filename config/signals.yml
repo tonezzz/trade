@@ -1,0 +1,255 @@
+# Trading Signal System Configuration
+# This file defines indicator parameters, signal generation rules, and alert settings
+
+# Technical Indicator Parameters
+indicators:
+  # Simple Moving Average (SMA)
+  sma:
+    short_period: 20
+    long_period: 50
+    very_long_period: 200
+  
+  # Exponential Moving Average (EMA)
+  ema:
+    short_period: 12
+    long_period: 26
+    very_long_period: 50
+  
+  # Relative Strength Index (RSI)
+  rsi:
+    period: 14
+    oversold: 30
+    overbought: 70
+    extreme_oversold: 20
+    extreme_overbought: 80
+  
+  # MACD (Moving Average Convergence Divergence)
+  macd:
+    fast_period: 12
+    slow_period: 26
+    signal_period: 9
+    histogram_threshold: 0.1
+  
+  # Bollinger Bands
+  bollinger_bands:
+    period: 20
+    std_dev: 2.0
+    squeeze_threshold: 0.1  # Bandwidth squeeze detection
+  
+  # ADX (Average Directional Index)
+  adx:
+    period: 14
+    threshold: 25  # Trend strength threshold
+    strong_trend: 40  # Strong trend threshold
+    weak_trend: 20  # Weak trend threshold
+  
+  # Volume Indicators
+  volume:
+    period: 20
+    high_ratio: 1.5  # Volume above average
+    very_high_ratio: 2.0  # Very high volume
+    low_ratio: 0.5  # Volume below average
+
+# Signal Generation Rules
+signal_rules:
+  # Buy Signal Conditions
+  buy_conditions:
+    rsi_oversold: true
+    rsi_extreme_oversold: true
+    macd_crossover: true
+    macd_histogram_positive: true
+    price_above_sma_short: true
+    price_above_sma_long: true
+    sma_crossover: true  # Short SMA crosses above long SMA
+    price_below_bb_lower: true
+    adx_strong_trend: true
+    volume_confirmation: true
+    obv_rising: true
+  
+  # Sell Signal Conditions
+  sell_conditions:
+    rsi_overbought: true
+    rsi_extreme_overbought: true
+    macd_crossover: true
+    macd_histogram_negative: true
+    price_below_sma_short: true
+    price_below_sma_long: true
+    sma_crossover: true  # Short SMA crosses below long SMA
+    price_above_bb_upper: true
+    adx_strong_trend: true
+    volume_confirmation: true
+    obv_falling: true
+  
+  # Signal Confidence Thresholds
+  min_confidence: 0.6  # Minimum confidence to generate a signal
+  strength_thresholds:
+    weak: 0.6
+    moderate: 0.75
+    strong: 0.85
+  
+  # Signal Weights (for scoring)
+  weights:
+    rsi: 2.0
+    macd: 2.0
+    moving_averages: 1.5
+    bollinger_bands: 1.0
+    adx: 1.0
+    volume: 1.0
+    support_resistance: 0.5
+
+# Timeframe Settings
+timeframes:
+  - "1d"  # Daily
+  - "1w"  # Weekly
+  - "1m"  # Monthly
+default_timeframe: "1d"
+
+# Minimum Data Requirements
+data_requirements:
+  min_data_points: 50
+  recommended_data_points: 200
+  min_data_points_backtest: 500
+
+# Alert System Configuration
+alerts:
+  enabled: true
+  
+  # Alert Conditions
+  conditions:
+    strong_signal:
+      enabled: true
+      strength: "strong"
+    
+    high_confidence:
+      enabled: true
+      threshold: 0.9
+    
+    extreme_rsi:
+      enabled: true
+      oversold: 20
+      overbought: 80
+    
+    strong_trend:
+      enabled: true
+      adx_threshold: 40
+    
+    volume_spike:
+      enabled: true
+      ratio_threshold: 2.0
+    
+    bollinger_squeeze:
+      enabled: true
+      bandwidth_threshold: 0.1
+  
+  # Alert Channels (for future implementation)
+  channels:
+    email:
+      enabled: false
+      recipients: []
+    
+    webhook:
+      enabled: false
+      url: ""
+    
+    console:
+      enabled: true
+
+# Backtesting Configuration
+backtesting:
+  default_initial_capital: 10000.0
+  default_commission: 0.001  # 0.1%
+  default_slippage: 0.0001  # 0.01%
+  
+  # Performance Metrics
+  metrics:
+    - total_return
+    - max_drawdown
+    - sharpe_ratio
+    - sortino_ratio
+    - win_rate
+    - profit_factor
+    - avg_win
+    - avg_loss
+    - total_trades
+  
+  # Reporting
+  generate_equity_curve: true
+  generate_trade_log: true
+  save_to_database: true
+
+# Signal Validation Rules
+validation:
+  # Data Quality Checks
+  data_quality:
+    check_nulls: true
+    check_duplicates: true
+    check_negative_prices: true
+    check_outliers: true
+    outlier_std_threshold: 3.0
+  
+  # Signal Consistency Checks
+  consistency:
+    check_conflicting_indicators: true
+    check_low_adx_signals: true
+    check_volume_confirmation: true
+  
+  # Risk Checks
+  risk:
+    max_signals_per_day: 10
+    min_time_between_signals: 3600  # seconds
+    max_position_size: 0.2  # 20% of capital
+
+# Asset-Specific Settings (overrides)
+asset_settings:
+  # Currency Pairs
+  currencies:
+    default:
+      adx_threshold: 25
+      volume_confirmation: false  # Forex has less reliable volume data
+    
+    EUR:
+      adx_threshold: 20
+      rsi_period: 14
+    
+    GBP:
+      adx_threshold: 22
+      rsi_period: 14
+    
+    JPY:
+      adx_threshold: 28
+      rsi_period: 14
+  
+  # Commodities
+  commodities:
+    default:
+      adx_threshold: 30
+      volume_confirmation: true
+    
+    GOLD:
+      adx_threshold: 25
+      bollinger_std_dev: 2.5
+    
+    OIL:
+      adx_threshold: 35
+      bollinger_std_dev: 2.2
+  
+  # Dollar Index
+  dollar_index:
+    adx_threshold: 25
+    rsi_period: 14
+    volume_confirmation: false
+
+# Logging
+logging:
+  level: "INFO"
+  log_signals: true
+  log_indicators: true
+  log_backtests: true
+  log_alerts: true
+
+# Performance Optimization
+performance:
+  cache_indicators: true
+  cache_ttl: 300  # 5 minutes
+  parallel_processing: false
+  batch_size: 1000

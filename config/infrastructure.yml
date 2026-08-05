@@ -1,0 +1,248 @@
+# Infrastructure Configuration
+# Single Source of Truth for all infrastructure components, servers, and remote services
+#
+# IMPORTANT: This file is the DOCUMENTATION SSOT (Single Source of Truth) for infrastructure.
+# Runtime configurations exist in their respective locations:
+# - Remote server config: /home/tony/mcp-remote-exec/config.yaml (on tony-dell)
+# - Devin CLI MCP client config: /home/tony/.config/devin/mcp_config.json
+#
+# Use the scripts in scripts/ directory to sync runtime configs with this SSOT:
+# - deploy-mcp-config.sh: Deploys config to remote server
+# - generate-mcp-configs.py: Generates Devin CLI MCP config
+# - validate-configs.sh: Validates consistency between SSOT and runtime configs
+
+# Global infrastructure settings
+settings:
+  # Environment (development, staging, production)
+  environment: "development"
+  # Default timeout for remote operations (seconds)
+  default_timeout: 300
+  # Maximum retry attempts for failed remote operations
+  max_retries: 3
+  # Enable/disable infrastructure monitoring
+  monitoring_enabled: true
+  # Log file path for infrastructure operations
+  log_file: "logs/infrastructure.log"
+
+# Machine definitions
+machines:
+  tony_omen:
+    name: "tony-omen"
+    description: "Primary development machine"
+    role: "primary"
+    hostname: "localhost"
+    ip_address: "127.0.0.1"
+    os: "Linux"
+    capabilities:
+      - "development"
+      - "api_server"
+      - "database"
+      - "mcp_client"
+    status: "active"
+    
+  tony_dell:
+    name: "tony-dell"
+    description: "Secondary machine for work offloading"
+    role: "secondary"
+    hostname: "tony-dell"
+    ip_address: "192.168.1.42"
+    os: "Linux"
+    capabilities:
+      - "remote_execution"
+      - "browser_automation"
+      - "gpu_compute"
+    status: "active"
+    ssh_config:
+      host: "192.168.1.42"
+      user: "tony"
+      strict_host_key_checking: false
+      server_alive_interval: 60
+
+# MCP servers configuration
+mcp_servers:
+  remote_exec_tony_dell:
+    name: "remote-exec-tony-dell"
+    description: "Remote execution MCP server on tony-dell"
+    machine: "tony_dell"
+    transport: "stdio"
+    enabled: true
+    
+    # Server configuration
+    server:
+      host: "0.0.0.0"
+      port: 8080
+      log_level: "INFO"
+    
+    # Security settings
+    security:
+      enable_command_whitelist: false
+      enable_path_validation: true
+      max_execution_time: 300
+      max_output_size: 10485760  # 10MB
+    
+    # Allowed directories for file operations
+    allowed_directories:
+      - "/home/tony"
+      - "/tmp"
+      - "/home/tony/CascadeProjects"
+    
+    # Command whitelist (if enabled)
+    allowed_commands:
+      - "/usr/bin/python3"
+      - "/usr/bin/node"
+      - "/usr/bin/npm"
+      - "/usr/bin/git"
+      - "/usr/bin/ls"
+      - "/usr/bin/cat"
+      - "/usr/bin/grep"
+      - "/usr/bin/find"
+      - "/usr/bin/tail"
+      - "/usr/bin/head"
+      - "/usr/bin/wc"
+      - "/usr/bin/sort"
+      - "/usr/bin/uniq"
+      - "/usr/bin/cut"
+      - "/usr/bin/sed"
+      - "/usr/bin/awk"
+      - "/usr/bin/curl"
+      - "/usr/bin/wget"
+      - "/usr/bin/mkdir"
+      - "/usr/bin/rm"
+      - "/usr/bin/cp"
+      - "/usr/bin/mv"
+      - "/usr/bin/chmod"
+      - "/usr/bin/chown"
+      - "/usr/bin/tar"
+      - "/usr/bin/zip"
+      - "/usr/bin/unzip"
+      - "/usr/bin/bash"
+      - "/usr/bin/sh"
+      - "/usr/bin/echo"
+      - "/bin/echo"
+    
+    # Available tools
+    tools:
+      - name: "remote_exec"
+        description: "Execute commands on remote machine"
+        enabled: true
+      - name: "remote_read"
+        description: "Read files from remote machine"
+        enabled: true
+      - name: "remote_write"
+        description: "Write files to remote machine"
+        enabled: true
+      - name: "remote_list"
+        description: "List directory contents on remote machine"
+        enabled: true
+      - name: "get_status"
+        description: "Get remote machine status"
+        enabled: true
+    
+    # Client configuration
+    client:
+      wrapper_script: "/home/tony/CascadeProjects/trade/.devin/remote-exec-wrapper.sh"
+      config_file: "/home/tony/.config/devin/mcp_config.json"
+    
+    # Deployment information
+    deployment:
+      remote_path: "/home/tony/mcp-remote-exec"
+      files:
+        - "mcp_server.py"
+        - "http_server.py"
+        - "config.yaml"
+        - "requirements.txt"
+        - "start.sh"
+        - "mcp-remote-exec.service"
+      systemd_service: "mcp-remote-exec.service"
+      
+  playlive_tony_dell:
+    name: "playlive.tony-dell"
+    description: "Browser automation MCP server on tony-dell"
+    machine: "tony_dell"
+    transport: "stdio"
+    enabled: true
+    endpoint: "http://192.168.1.42:9230"
+    capabilities:
+      - "chrome_automation"
+      - "playwright"
+      - "browser_testing"
+      
+  mcp_gpu:
+    name: "mcp-gpu"
+    description: "GPU compute MCP server"
+    machine: "tony_omen"
+    transport: "stdio"
+    enabled: true
+    capabilities:
+      - "gpu_compute"
+      - "imagen"
+      - "llama"
+    environment:
+      IMAGEN_URL: "http://localhost:8080/apps/imagen2/api"
+      LLAMA_URL: "http://localhost:8001"
+
+# Network configuration
+network:
+  # SSH connection defaults
+  ssh:
+    default_timeout: 30
+    connection_retries: 3
+    keep_alive_interval: 60
+    
+  # HTTP client defaults
+  http:
+    default_timeout: 30
+    connection_pool_size: 10
+    max_retries: 3
+    
+  # Firewall rules (documentation only)
+  firewall_rules:
+    - source: "tony-omen"
+      destination: "tony-dell"
+      port: 22
+      protocol: "tcp"
+      description: "SSH for MCP server communication"
+    - source: "tony-omen"
+      destination: "tony-dell"
+      port: 8080
+      protocol: "tcp"
+      description: "HTTP API for MCP server (alternative)"
+    - source: "tony-omen"
+      destination: "tony-dell"
+      port: 9230
+      protocol: "tcp"
+      description: "PlayLive browser automation"
+
+# Monitoring and health checks
+monitoring:
+  enabled: true
+  checks:
+    - name: "ssh_connectivity_tony_dell"
+      type: "ssh"
+      target: "tony_dell"
+      interval: 300  # 5 minutes
+      timeout: 10
+      
+    - name: "mcp_server_remote_exec"
+      type: "mcp"
+      server: "remote_exec_tony_dell"
+      interval: 600  # 10 minutes
+      timeout: 30
+      
+    - name: "disk_space_tony_dell"
+      type: "system"
+      target: "tony_dell"
+      metric: "disk_usage"
+      threshold: 90  # percent
+      interval: 3600  # 1 hour
+
+# Backup and recovery
+backup:
+  enabled: false
+  schedules:
+    - name: "mcp_server_config"
+      target: "tony_dell"
+      path: "/home/tony/mcp-remote-exec"
+      schedule: "daily"
+      time: "02:00"
+      retention_days: 7

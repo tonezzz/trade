@@ -1,0 +1,138 @@
+# Data Sources Configuration for Automated Download and Import
+# This file defines all data sources, their download URLs, and scheduling information
+
+# Global settings
+settings:
+  # Directory for downloaded data files
+  download_dir: "data/archive"
+  # Directory for formatted/import-ready data files
+  import_dir: "data/imported"
+  # Number of retry attempts for failed downloads
+  max_retries: 3
+  # Initial retry delay in seconds (will use exponential backoff)
+  retry_delay: 5
+  # Enable/disable dry run mode (no actual downloads/imports)
+  dry_run: false
+  # Log file path for automation logs
+  log_file: "logs/automation.log"
+  # Enable email notifications on errors
+  enable_notifications: false
+  # Notification email (if enabled)
+  notification_email: ""
+  # Skip validation errors (continue import despite validation failures)
+  skip_validation: false
+
+# Data sources configuration
+data_sources:
+  # WTI Crude Oil Data
+  wti_oil:
+    name: "WTI Crude Oil"
+    description: "West Texas Intermediate crude oil daily prices"
+    type: "commodity"
+    symbol: "WTI"
+    commodity: "OIL"
+    unit: "barrel"
+    # Download URL for raw data
+    url: "https://raw.githubusercontent.com/datasets/oil-prices/main/data/wti-daily.csv"
+    # Schedule: daily at 6:00 AM
+    schedule: "daily"
+    schedule_time: "06:00"
+    # Import function to use
+    import_function: "import_commodity_prices"
+    # Data source identifier for database
+    source: "automated_wti"
+    # Enable/disable this source
+    enabled: true
+    # Custom formatter function (optional)
+    formatter: "format_wti_data"
+
+  # Brent Crude Oil Data
+  brent_oil:
+    name: "Brent Crude Oil"
+    description: "Brent crude oil daily prices"
+    type: "commodity"
+    symbol: "BRENT"
+    commodity: "OIL"
+    unit: "barrel"
+    # Download URL for raw data
+    url: "https://raw.githubusercontent.com/datasets/oil-prices/main/data/brent-daily.csv"
+    # Schedule: daily at 6:00 AM
+    schedule: "daily"
+    schedule_time: "06:00"
+    # Import function to use
+    import_function: "import_commodity_prices"
+    # Data source identifier for database
+    source: "automated_brent"
+    # Enable/disable this source
+    enabled: true
+    # Custom formatter function (optional)
+    formatter: "format_brent_data"
+
+  # ECB Exchange Rates
+  ecb_exchange_rates:
+    name: "ECB Exchange Rates"
+    description: "European Central Bank daily reference exchange rates"
+    type: "exchange_rate"
+    # Download URL for ECB data
+    url: "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
+    # Schedule: daily at 5:00 PM (after ECB release)
+    schedule: "daily"
+    schedule_time: "17:00"
+    # Import function to use
+    import_function: "import_exchange_rates"
+    # Data source identifier for database
+    source: "automated_ecb"
+    # Enable/disable this source
+    enabled: true
+    # Custom formatter function (optional)
+    formatter: "format_ecb_data"
+    # Base currency for ECB data
+    base_currency: "EUR"
+
+  # US Dollar Index (DXY)
+  dxy:
+    name: "US Dollar Index"
+    description: "US Dollar Index (DXY) daily values"
+    type: "dollar_index"
+    # Download URL for DXY data (using Federal Reserve data)
+    url: "https://raw.githubusercontent.com/datasets/finance-vix/master/data/vix-daily.csv"
+    # Schedule: daily at 6:00 PM
+    schedule: "daily"
+    schedule_time: "18:00"
+    # Import function to use
+    import_function: "import_dollar_index"
+    # Data source identifier for database
+    source: "automated_dxy"
+    # Enable/disable this source
+    enabled: true
+    # Custom formatter function (optional)
+    formatter: "format_dxy_data"
+
+  # Gold Prices
+  gold:
+    name: "Gold Prices"
+    description: "Gold (XAU) daily prices"
+    type: "commodity"
+    symbol: "XAU"
+    commodity: "GOLD"
+    unit: "oz"
+    # Download URL for gold data
+    url: "https://raw.githubusercontent.com/datasets/gold-prices/main/data/gold-daily.csv"
+    # Schedule: weekly on Monday at 8:00 AM
+    schedule: "weekly"
+    schedule_day: "monday"
+    schedule_time: "08:00"
+    # Import function to use
+    import_function: "import_commodity_prices"
+    # Data source identifier for database
+    source: "automated_gold"
+    # Enable/disable this source
+    enabled: true
+    # Custom formatter function (optional)
+    formatter: "format_gold_data"
+
+# Schedule types and their meanings
+# - daily: Run once per day at specified time
+# - weekly: Run once per week on specified day at specified time
+# - hourly: Run every hour
+# - interval: Run at specified interval in minutes

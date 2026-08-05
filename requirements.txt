@@ -1,0 +1,41 @@
+# Database
+psycopg2-binary>=2.9.0
+sqlalchemy>=2.0.0
+
+# Configuration
+pyyaml>=6.0
+
+# Data processing
+pandas>=2.1.4
+numpy>=1.26.2
+TA-Lib>=0.4.28
+
+# Visualization
+plotly>=5.18.0
+kaleido>=0.2.1
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Date handling
+python-dateutil>=2.8.2
+
+# Data validation
+pydantic>=2.5.2
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Scheduling
+schedule>=1.2.0
+
+# Monitoring
+psutil>=5.9.0
+
+# FastAPI
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic-settings>=2.1.0
+websockets>=12.0
+aiohttp>=3.9.0
