@@ -1,7 +1,7 @@
 
 ---
 
-**Last Updated:** 2026-08-04
+**Last Updated:** 2026-08-06
 # Sub-Agent Guidelines for Trade Project
 
 ## Overview
@@ -113,12 +113,67 @@ Make the changes directly - this is implementation work."
 - **Remote Operations**: tony-dell via MCP server, service management
 - **Feature Development**: Signals, backtesting, automation, UI integration
 - **System Configuration**: Screen timeout, power management, notification systems
+- **External Data Integration**: Alpha Vantage MCP for financial data, commodity price validation
 
 ### Existing Skills That Can Delegate:
 - **trade-verify**: Can delegate parallel health checks to sub-agents
 - **remote-access**: Can delegate remote troubleshooting to sub-agents
 - **config-helper**: Can delegate complex configuration updates to sub-agents
 - **browser-helper**: Can delegate UI testing to sub-agents
+- **deployment-sync**: Can delegate deployment investigation and file synchronization to sub-agents
+
+## MCP Server Integration
+
+### Alpha Vantage MCP Server
+The project uses the Alpha Vantage MCP server for financial data access and validation:
+
+**Configuration**: Located in `~/.config/devin/mcp_config.json`
+```json
+"alphavantage": {
+  "url": "https://mcp.alphavantage.co/mcp?apikey=KUTH6I3J1OORWZI8",
+  "disabled": false
+}
+```
+
+**Available Tools**: 100+ Alpha Vantage functions including:
+- Stock market data (TIME_SERIES_DAILY, TIME_SERIES_INTRADAY, etc.)
+- Commodity prices (WTI, BRENT, WHEAT, CORN, COPPER, etc.)
+- Forex rates (FX_DAILY, CURRENCY_EXCHANGE_RATE)
+- Technical indicators (SMA, EMA, RSI, MACD, etc.)
+- Economic indicators (GDP, CPI, UNEMPLOYMENT, etc.)
+
+**Usage in Data Quality Agent**:
+- `scripts/data_quality_agent.py` uses Alpha Vantage API for commodity price validation
+- Maps internal symbols to Alpha Vantage function names (e.g., WHEAT→WHEAT, WTI→WTI)
+- Falls back to MetalPrices API for precious metals (XAU, XAG) not directly available via Alpha Vantage commodities
+- Provides real-time price validation against database values
+
+**Key Functions Used**:
+- `WTI` - Crude Oil WTI prices
+- `BRENT` - Brent Crude prices  
+- `WHEAT` - Global Wheat prices
+- `CORN` - Corn prices
+- `COPPER` - Copper prices
+- `NATURAL_GAS` - Natural Gas prices
+
+**Benefits**:
+- Unified API access to 100+ financial data endpoints
+- Automatic function discovery via MCP
+- Consistent error handling and rate limiting
+- No hardcoded API function names
+- Future-proof access to new Alpha Vantage features
+
+**Limitations**:
+- Precious metals (GOLD/XAU, SILVER/XAG) not available via commodity functions
+- Requires fallback to MetalPrices API for precious metals validation
+- Free tier has rate limits (25 requests/day for direct API, higher via MCP)
+
+**Integration Status**: ✅ Completed (2026-08-06)
+- MCP server successfully configured and tested
+- Data quality agent updated to use correct Alpha Vantage API functions
+- Commodity price validation working for WHEAT, CORN, BRENT
+- Precious metals using MetalPrices API fallback
+- Validation success rate: 29.4% (existing data quality issues, not MCP-related)
 
 ## Verification
 

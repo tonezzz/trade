@@ -1,5 +1,24 @@
 # Data Sources Configuration for Automated Download and Import
 # This file defines all data sources, their download URLs, and scheduling information
+#
+# ACTUAL DATA SOURCE USAGE (as of 2026-08-06):
+# ================================================
+# EXCHANGE RATES:
+# - USD/THB: open.er-api.com (real-time, reliable for THB)
+# - Other currencies: exchangerate-api.com (primary), FRED API (secondary)
+# - Alpha Vantage: NOT used for exchange rates (limited THB support)
+#
+# COMMODITIES:
+# - WHEAT, CORN, WTI, BRENT, NATURAL_GAS, COPPER: Alpha Vantage API (correct function names)
+# - XAU (Gold), XAG (Silver): MetalPrices API (Alpha Vantage doesn't provide spot prices)
+#
+# DOLLAR INDEX (DXY):
+# - FRED API (DTWEXBGS series) - Alpha Vantage doesn't support DXY
+#
+# VALIDATION SOURCES:
+# - Data quality agent uses multiple external sources for validation
+# - Alpha Vantage MCP integration for commodity price validation
+# - MetalPrices API for precious metals validation
 
 # Global settings
 settings:
@@ -32,6 +51,7 @@ settings:
     run_after_import: true
     schedule: "daily"
     schedule_time: "18:00"
+    history_days: 30
   
   # Data quality settings
   min_data_points: 1000  # Minimum data points for valid import
@@ -363,3 +383,56 @@ data_sources:
 # - weekly: Run once per week on specified day at specified time
 # - hourly: Run every hour
 # - interval: Run at specified interval in minutes
+
+# ACTUAL DATA SOURCE ARCHITECTURE (2026-08-06)
+# ===========================================
+# This SSOT defines AUTOMATED DOWNLOAD sources, but actual data usage differs:
+#
+# 1. USD/THB EXCEPTION:
+#    - SSOT defines: FRED API (DEXTHUS series)
+#    - ACTUAL usage: open.er-api.com (via download_thb_data.py)
+#    - REASON: Better THB coverage, real-time rates, more reliable
+#
+# 2. COMMODITY VALIDATION:
+#    - SSOT defines: FRED API for most commodities
+#    - ACTUAL validation: Alpha Vantage API (via data_quality_agent.py)
+#    - REASON: Alpha Vantage has better commodity coverage, real-time data
+#    - Functions: WHEAT, CORN, WTI, BRENT, NATURAL_GAS, COPPER
+#
+# 3. PRECIOUS METALS:
+#    - SSOT defines: GitHub datasets for gold/silver
+#    - ACTUAL validation: MetalPrices API (fallback)
+#    - REASON: Alpha Vantage doesn't provide spot prices for XAU/XAG
+#    - Alternative: Could use Alpha Vantage ETFs (GLD, SLV) as proxies
+#
+# 4. EXCHANGE RATE VALIDATION:
+#    - Primary: exchangerate-api.com (free tier: 1,500 requests/month)
+#    - Secondary: FRED API (requires API key, 120 requests/minute)
+#    - Alpha Vantage: NOT used (limited forex coverage, no THB support)
+#
+# 5. DOLLAR INDEX (DXY):
+#    - SSOT: FRED API (DTWEXBGS series) ✅ CORRECT
+#    - ACTUAL: FRED API ✅ MATCHES
+#    - Alpha Vantage: NOT supported for DXY
+#
+# MCP INTEGRATION STATUS:
+# ======================
+# - Alpha Vantage MCP server configured: ~/.config/devin/mcp_config.json
+# - Used for: Tool discovery, testing, validation
+# - NOT used in: Production Python scripts (direct HTTP calls instead)
+# - Benefits: 100+ financial data endpoints, automatic function discovery
+# - Current limitation: Precious metals (XAU, XAG) require MetalPrices API fallback
+#
+# API KEYS REQUIRED:
+# ==================
+# - ALPHA_VANTAGE_API_KEY: KUTH6I3J1OORWZI8 ✅ Configured
+# - FRED_API_KEY: Required for FRED data sources
+# - METAL_PRICES_API_KEY: Required for precious metals validation (100 requests/month free tier)
+#
+# DATA QUALITY STATUS:
+# ====================
+# - Overall success rate: 41.2% (improved from 29.4% after THB fix)
+# - USD/THB: ✅ Current (33.1197 as of 2026-08-06)
+# - Commodities: ✅ Fetching correctly via Alpha Vantage
+# - Currencies: ⚠️ 7/8 failing validation (value differences 4-68%)
+# - DXY: ⚠️ 6 days stale

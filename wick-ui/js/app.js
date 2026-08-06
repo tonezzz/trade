@@ -13,6 +13,7 @@ class TradingDashboard {
         this.depthSeries = null;
         this.initialChartLoad = false; // Track if this is the initial chart load
         this.markers = []; // Store chart markers
+        this.syncTimeout = null; // Debounce timeout for sync operations
         this.data = {
             exchangeRates: {},
             dollarIndex: [],
@@ -20,6 +21,14 @@ class TradingDashboard {
         };
         
         this.init();
+    }
+
+    debouncedSync(callback, delay = 50) {
+        // Debounce sync operations to improve performance
+        clearTimeout(this.syncTimeout);
+        this.syncTimeout = setTimeout(() => {
+            callback();
+        }, delay);
     }
 
     async init() {
@@ -135,19 +144,25 @@ class TradingDashboard {
             priceScaleId: '',
         });
 
-        // Sync time scale with main chart
+        // Sync time scale with main chart (debounced for performance)
         this.chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
             if (range) {
-                this.depthChart.timeScale().setVisibleLogicalRange(range);
+                this.debouncedSync(() => {
+                    this.depthChart.timeScale().setVisibleLogicalRange(range);
+                });
             }
         });
 
-        // Sync zoom from depth chart to main chart
+        // Sync zoom from depth chart to main chart (debounced for performance)
         this.depthChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
             if (range) {
-                this.chart.timeScale().setVisibleLogicalRange(range);
+                this.debouncedSync(() => {
+                    this.chart.timeScale().setVisibleLogicalRange(range);
+                });
             }
         });
+
+        // Price scale synchronization removed - API method not available
 
         // Sync crosshair from depth chart to main chart
         this.depthChart.subscribeCrosshairMove(param => {
@@ -157,14 +172,18 @@ class TradingDashboard {
             this.chart.setCrosshairPosition(param.point, param.time, this.depthSeries);
         });
 
-        // Handle resize
+        // Handle resize with debouncing for performance
+        let resizeTimeout;
         window.addEventListener('resize', () => {
-            this.chart.applyOptions({
-                width: candlestickContainer.clientWidth,
-            });
-            this.depthChart.applyOptions({
-                width: depthContainer.clientWidth,
-            });
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const chartWidth = candlestickContainer.clientWidth;
+                const depthWidth = depthContainer.clientWidth;
+
+                // Apply proportional resizing
+                this.chart.applyOptions({ width: chartWidth });
+                this.depthChart.applyOptions({ width: depthWidth });
+            }, 100); // 100ms debounce for performance
         });
 
         // Crosshair move handler
