@@ -1,0 +1,97 @@
+{
+  "report_date": "2026-08-05T15:09:56.771734",
+  "period_days": 7,
+  "total_checks": 7,
+  "average_success_rate": 37.81512605042017,
+  "average_failures": 10.571428571428571,
+  "trend_percentage_points": 41.17647058823529,
+  "trend_direction": "improving",
+  "recent_success_rate": 41.17647058823529,
+  "earliest_success_rate": 0.0,
+  "data_points": [
+    {
+      "timestamp": "2026-08-05T13:42:47.658670",
+      "duration_seconds": 5.588615,
+      "total_validations": 17,
+      "failed_validations": 17,
+      "success_rate": 0.0,
+      "exchange_rates_validated": 8,
+      "commodities_validated": 8,
+      "dollar_index_validated": 1,
+      "tolerance_pct": 5.0,
+      "max_freshness_days": 2
+    },
+    {
+      "timestamp": "2026-08-05T13:43:15.914336",
+      "duration_seconds": 6.806617,
+      "total_validations": 17,
+      "failed_validations": 10,
+      "success_rate": 41.17647058823529,
+      "exchange_rates_validated": 8,
+      "commodities_validated": 8,
+      "dollar_index_validated": 1,
+      "tolerance_pct": 5.0,
+      "max_freshness_days": 2
+    },
+    {
+      "timestamp": "2026-08-05T13:43:28.356887",
+      "duration_seconds": 6.156917,
+      "total_validations": 17,
+      "failed_validations": 7,
+      "success_rate": 58.82352941176471,
+      "exchange_rates_validated": 8,
+      "commodities_validated": 8,
+      "dollar_index_validated": 1,
+      "tolerance_pct": 15.0,
+      "max_freshness_days": 10
+    },
+    {
+      "timestamp": "2026-08-05T13:48:43.382018",
+      "duration_seconds": 5.765722,
+      "total_validations": 17,
+      "failed_validations": 10,
+      "success_rate": 41.17647058823529,
+      "exchange_rates_validated": 8,
+      "commodities_validated": 8,
+      "dollar_index_validated": 1,
+      "tolerance_pct": 2.0,
+      "max_freshness_days": 2
+    },
+    {
+      "timestamp": "2026-08-05T13:48:45.383036",
+      "duration_seconds": 5.830008,
+      "total_validations": 17,
+      "failed_validations": 10,
+      "success_rate": 41.17647058823529,
+      "exchange_rates_validated": 8,
+      "commodities_validated": 8,
+      "dollar_index_validated": 1,
+      "tolerance_pct": 2.0,
+      "max_freshness_days": 2
+    },
+    {
+      "timestamp": "2026-08-05T14:04:41.851658",
+      "duration_seconds": 7.053579,
+      "total_validations": 17,
+      "failed_validations": 10,
+      "success_rate": 41.17647058823529,
+      "exchange_rates_validated": 8,
+      "commodities_validated": 8,
+      "dollar_index_validated": 1,
+      "tolerance_pct": 2.0,
+      "max_freshness_days": 2
+    },
+    {
+      "timestamp": "2026-08-05T15:09:56.761631",
+      "duration_seconds": 6.022562,
+      "total_validations": 17,
+      "failed_validations": 10,
+      "success_rate": 41.17647058823529,
+      "exchange_rates_validated": 8,
+      "commodities_validated": 8,
+      "dollar_index_validated": 1,
+      "tolerance_pct": 2.0,
+      "max_freshness_days": 2
+    }
+  ]
+}

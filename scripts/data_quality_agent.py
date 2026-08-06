@@ -149,70 +149,83 @@ class DataQualityAgent:
         return None, 'none'
     
     def _get_commodity_price_from_external(self, symbol: str) -> Tuple[Optional[float], str]:
-        """Get current commodity price from external sources."""
+        """Get current commodity price from external sources using Alpha Vantage API."""
         
-        # Source 1: Alpha Vantage API (free tier: 25 requests/day)
-        alpha_vantage_key = os.getenv('ALPHA_VANTAGE_API_KEY')
-        if alpha_vantage_key:
-            try:
-                # Map symbols to Alpha Vantage format
-                av_symbol_map = {
-                    'GOLD': 'XAU',
-                    'SILVER': 'XAG',
-                    'COPPER': 'HG',  # Copper futures
-                    'OIL': 'WTI',    # Crude Oil
-                    'NATURAL_GAS': 'NG',
-                    'WHEAT': 'W',
-                    'CORN': 'ZC',
-                    'SOY': 'ZS'
+        # Map symbols to Alpha Vantage function names
+        av_function_map = {
+            'GOLD': None,  # Gold - use fallback
+            'SILVER': None,  # Silver - use fallback  
+            'COPPER': 'COPPER',
+            'OIL': 'WTI',    # Crude Oil WTI
+            'BRENT': 'BRENT',  # Brent Crude
+            'NATURAL_GAS': 'NATURAL_GAS',
+            'WHEAT': 'WHEAT',
+            'CORN': 'CORN',
+            'SOY': 'SOYBEANS',
+            'ALUMINUM': 'ALUMINUM',
+            'SUGAR': 'SUGAR',
+            'COFFEE': 'COFFEE',
+            'COTTON': 'COTTON'
+        }
+        
+        # Map internal symbols to AV function names
+        symbol_to_function = {
+            'XAU': None,  # Gold - use fallback
+            'XAG': None,  # Silver - use fallback
+            'HG': 'COPPER',
+            'WTI': 'WTI',
+            'BRENT': 'BRENT', 
+            'NG': 'NATURAL_GAS',
+            'W': 'WHEAT',
+            'ZC': 'CORN',
+            'ZS': 'SOYBEANS'
+        }
+        
+        # Get the function name for this symbol
+        function_name = symbol_to_function.get(symbol, av_function_map.get(symbol))
+        
+        if not function_name:
+            logger.info(f"Using fallback for precious metals symbol: {symbol}")
+            # Fallback to MetalPrices API for precious metals
+            return self._get_precious_metals_from_fallback(symbol)
+        
+        try:
+            # Use Alpha Vantage API directly with correct function names
+            alpha_vantage_key = os.getenv('ALPHA_VANTAGE_API_KEY')
+            if alpha_vantage_key:
+                url = "https://www.alphavantage.co/query"
+                params = {
+                    'function': function_name,
+                    'apikey': alpha_vantage_key
                 }
                 
-                av_symbol = av_symbol_map.get(symbol, symbol)
+                response = requests.get(url, params=params, timeout=10)
                 
-                # Use commodity exchange rate function for precious metals
-                if symbol in ['GOLD', 'SILVER']:
-                    url = "https://www.alphavantage.co/query"
-                    params = {
-                        'function': 'COMMODITY_EXCHANGE_RATE',
-                        'from_currency': 'USD',
-                        'to_currency': av_symbol,
-                        'apikey': alpha_vantage_key
-                    }
-                    
-                    response = requests.get(url, params=params, timeout=10)
-                    
-                    if response.status_code == 200:
-                        data = response.json()
-                        price = data.get('5. Exchange Rate')
-                        if price:
-                            return float(price), 'alpha-vantage'
-                
-                # Use GLOBAL_QUOTE for other commodities
-                else:
-                    url = "https://www.alphavantage.co/query"
-                    params = {
-                        'function': 'GLOBAL_QUOTE',
-                        'symbol': av_symbol,
-                        'apikey': alpha_vantage_key
-                    }
-                    
-                    response = requests.get(url, params=params, timeout=10)
-                    
-                    if response.status_code == 200:
-                        data = response.json()
-                        quote = data.get('Global Quote', {})
-                        price = quote.get('05. price')
-                        if price:
-                            return float(price), 'alpha-vantage'
+                if response.status_code == 200:
+                    data = response.json()
+                    # Parse the data - Alpha Vantage returns different formats
+                    if 'data' in data and len(data['data']) > 0:
+                        # Get the most recent value
+                        latest_data = data['data'][0]
+                        value = latest_data.get('value')
+                        if value and value != '.':
+                            logger.info(f"Successfully fetched {symbol} from Alpha Vantage: {value}")
+                            return float(value), 'alpha-vantage-api'
             
-            except Exception as e:
-                logger.warning(f"Failed to get commodity price from Alpha Vantage: {e}")
+        except Exception as e:
+            logger.warning(f"Failed to get commodity price from Alpha Vantage API: {e}")
+        
+        # Fallback to alternative sources
+        return self._get_precious_metals_from_fallback(symbol)
+    
+    def _get_precious_metals_from_fallback(self, symbol: str) -> Tuple[Optional[float], str]:
+        """Fallback method for precious metals using alternative APIs."""
         
         # Source 2: MetalPrices API (free tier: 100 requests/month)
         metal_prices_key = os.getenv('METAL_PRICES_API_KEY')
-        if metal_prices_key and symbol in ['GOLD', 'SILVER']:
+        if metal_prices_key and symbol in ['GOLD', 'SILVER', 'XAU', 'XAG']:
             try:
-                metal_map = {'GOLD': 'XAU', 'SILVER': 'XAG'}
+                metal_map = {'GOLD': 'XAU', 'SILVER': 'XAG', 'XAU': 'XAU', 'XAG': 'XAG'}
                 metal_symbol = metal_map.get(symbol, symbol)
                 
                 url = f"https://api.metalpriceapi.com/v1/latest"

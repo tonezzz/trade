@@ -1,0 +1,280 @@
+{
+  "summary": {
+    "timestamp": "2026-08-05T15:16:32.179090",
+    "duration_seconds": 10.694413,
+    "total_validations": 17,
+    "failed_validations": 12,
+    "success_rate": 29.411764705882355,
+    "exchange_rates_validated": 8,
+    "commodities_validated": 8,
+    "dollar_index_validated": 1,
+    "tolerance_pct": 2.0,
+    "max_freshness_days": 2
+  },
+  "detailed_results": [
+    {
+      "symbol": "EUR",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 15:16:21.549965",
+      "db_value": 0.987,
+      "external_value": 0.868,
+      "difference_pct": 13.709677419354838,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54955680902499,
+      "issues": [
+        "Value difference 13.71% exceeds tolerance 2.0%",
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "exchangerate-api.com"
+    },
+    {
+      "symbol": "NZD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 15:16:22.374044",
+      "db_value": 1.47764,
+      "external_value": 1.7,
+      "difference_pct": 13.079999999999995,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54955680902499,
+      "issues": [
+        "Value difference 13.08% exceeds tolerance 2.0%",
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "exchangerate-api.com"
+    },
+    {
+      "symbol": "JPY",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 15:16:23.055289",
+      "db_value": 112.02379,
+      "external_value": 157.62,
+      "difference_pct": 28.92793427230047,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54955680902499,
+      "issues": [
+        "Value difference 28.93% exceeds tolerance 2.0%",
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "exchangerate-api.com"
+    },
+    {
+      "symbol": "AUD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 15:16:23.836502",
+      "db_value": 1.357145,
+      "external_value": 1.42,
+      "difference_pct": 4.426408450704217,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54955680902499,
+      "issues": [
+        "Value difference 4.43% exceeds tolerance 2.0%",
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "exchangerate-api.com"
+    },
+    {
+      "symbol": "GBP",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 15:16:24.550663",
+      "db_value": 1.2535,
+      "external_value": 0.744,
+      "difference_pct": 68.48118279569894,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54955680902499,
+      "issues": [
+        "Value difference 68.48% exceeds tolerance 2.0%",
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "exchangerate-api.com"
+    },
+    {
+      "symbol": "CHF",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 15:16:25.306675",
+      "db_value": 0.883039,
+      "external_value": 0.809,
+      "difference_pct": 9.151915945611862,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54955680902499,
+      "issues": [
+        "Value difference 9.15% exceeds tolerance 2.0%",
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "exchangerate-api.com"
+    },
+    {
+      "symbol": "THB",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 15:16:26.118130",
+      "db_value": 33.42,
+      "external_value": 33.29,
+      "difference_pct": 0.390507659957953,
+      "is_accurate": false,
+      "freshness_days": 5,
+      "completeness_pct": 228.99778181084898,
+      "issues": [
+        "Data is 5 days old (max: 2)"
+      ],
+      "external_source": "exchangerate-api.com"
+    },
+    {
+      "symbol": "CAD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-05 15:16:26.936252",
+      "db_value": 1.255127,
+      "external_value": 1.41,
+      "difference_pct": 10.983900709219846,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54955680902499,
+      "issues": [
+        "Value difference 10.98% exceeds tolerance 2.0%",
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "exchangerate-api.com"
+    },
+    {
+      "symbol": "WHEAT",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 15:16:27.622964",
+      "db_value": 6.148992,
+      "external_value": 116.08,
+      "difference_pct": 94.70279807029634,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [
+        "Value difference 94.70% exceeds tolerance 2.0%"
+      ],
+      "external_source": "alpha-vantage"
+    },
+    {
+      "symbol": "SOY",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 15:16:28.486430",
+      "db_value": 12.869266,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "CORN",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 15:16:29.449345",
+      "db_value": 5.059757,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "COPPER",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 15:16:29.863861",
+      "db_value": 4.095568,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "BRENT",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 15:16:30.170828",
+      "db_value": 91.82,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 9,
+      "completeness_pct": null,
+      "issues": [
+        "Data is 9 days old (max: 2)",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "XAU",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 15:16:30.490129",
+      "db_value": 1946.62,
+      "external_value": 15.75,
+      "difference_pct": 12259.492063492062,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [
+        "Value difference 12259.49% exceeds tolerance 2.0%"
+      ],
+      "external_source": "alpha-vantage"
+    },
+    {
+      "symbol": "NATURAL_GAS",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 15:16:30.832574",
+      "db_value": 2.940313,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "XAG",
+      "data_type": "commodities",
+      "timestamp": "2026-08-05 15:16:31.137411",
+      "db_value": 10.10419,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    },
+    {
+      "symbol": "DXY",
+      "data_type": "dollar_index",
+      "timestamp": "2026-08-05 15:16:31.450293",
+      "db_value": 119.7034,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 5,
+      "completeness_pct": null,
+      "issues": [
+        "Data is 5 days old (max: 2)",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    }
+  ]
+}
