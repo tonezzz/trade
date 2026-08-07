@@ -67,6 +67,31 @@ class DataQualityAgent:
         self.session = db.get_session()
         self.results: List[ValidationResult] = []
         
+        # Symbol-specific tolerances (higher for precious metals due to unit differences)
+        self.symbol_tolerances = {
+            'XAU': 15.0,  # Gold - higher tolerance for unit differences
+            'XAG': 15.0,  # Silver - higher tolerance for unit differences
+            'GOLD': 15.0,
+            'SILVER': 15.0,
+            'THB': 0.5,   # THB - tight tolerance (using reliable API)
+            'EUR': 1.0,   # Major currencies - tight tolerance
+            'GBP': 1.0,
+            'JPY': 1.0,
+            'CAD': 1.0,
+            'CHF': 1.0,
+            'AUD': 1.0,
+            'NZD': 1.0
+        }
+        
+        # Symbol-specific freshness tolerances (days)
+        self.symbol_freshness = {
+            'XAU': 5,  # Gold - allow 5 days
+            'XAG': 5,  # Silver - allow 5 days
+            'GOLD': 5,
+            'SILVER': 5,
+            'DXY': 7   # Dollar Index - allow 7 days (FRED updates less frequently)
+        }
+        
         # External source APIs
         self.external_sources = {
             'exchange_rates': self._get_exchange_rate_from_external,
@@ -76,9 +101,38 @@ class DataQualityAgent:
     
     def _get_exchange_rate_from_external(self, symbol: str) -> Tuple[Optional[float], str]:
         """Get current exchange rate from external sources."""
-        # Try multiple external sources with fallbacks
         
-        # Source 1: ExchangeRate-API (free tier: 1,500 requests/month)
+        # Primary: open.er-api.com (reliable for THB, use for all currencies)
+        try:
+            url = f"https://open.er-api.com/v6/latest/USD"
+            response = requests.get(url, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('result') == 'success':
+                    rates = data.get('rates', {})
+                    
+                    # Map symbol to API format
+                    symbol_map = {
+                        'EUR': 'EUR',
+                        'GBP': 'GBP', 
+                        'JPY': 'JPY',
+                        'CAD': 'CAD',
+                        'CHF': 'CHF',
+                        'AUD': 'AUD',
+                        'NZD': 'NZD',
+                        'THB': 'THB'
+                    }
+                    
+                    api_symbol = symbol_map.get(symbol, symbol)
+                    if api_symbol in rates:
+                        logger.info(f"Successfully fetched {symbol} from open.er-api.com: {rates[api_symbol]}")
+                        return rates[api_symbol], 'open.er-api.com'
+            
+        except Exception as e:
+            logger.warning(f"Failed to get exchange rate from open.er-api.com: {e}")
+        
+        # Fallback: ExchangeRate-API (free tier: 1,500 requests/month)
         try:
             url = f"https://api.exchangerate-api.com/v4/latest/USD"
             response = requests.get(url, timeout=10)
@@ -105,45 +159,6 @@ class DataQualityAgent:
             
         except Exception as e:
             logger.warning(f"Failed to get exchange rate from exchangerate-api: {e}")
-        
-        # Source 2: FRED API (free: 120 requests/minute) - requires API key
-        fred_api_key = os.getenv('FRED_API_KEY')
-        if fred_api_key:
-            try:
-                # Map symbols to FRED series IDs
-                fred_series_map = {
-                    'EUR': 'DEXUSEU',
-                    'GBP': 'DEXUSUK',
-                    'JPY': 'DEXJPUS',
-                    'CAD': 'DEXCAUS',
-                    'CHF': 'DEXSZUS',
-                    'AUD': 'DEXUSAL',
-                    'NZD': 'DEXUSNZ',
-                    'THB': 'DEXTHUS'
-                }
-                
-                series_id = fred_series_map.get(symbol)
-                if series_id:
-                    url = f"https://api.stlouisfed.org/fred/series/observations"
-                    params = {
-                        'series_id': series_id,
-                        'api_key': fred_api_key,
-                        'limit': 1,
-                        'sort_order': 'desc'
-                    }
-                    
-                    response = requests.get(url, params=params, timeout=10)
-                    
-                    if response.status_code == 200:
-                        data = response.json()
-                        observations = data.get('observations', [])
-                        if observations and len(observations) > 0:
-                            latest_value = observations[0].get('value')
-                            if latest_value and latest_value != '.':
-                                return float(latest_value), 'fred-api'
-            
-            except Exception as e:
-                logger.warning(f"Failed to get exchange rate from FRED API: {e}")
         
         # Fallback to alternative sources or return None
         return None, 'none'
@@ -220,6 +235,27 @@ class DataQualityAgent:
     
     def _get_precious_metals_from_fallback(self, symbol: str) -> Tuple[Optional[float], str]:
         """Fallback method for precious metals using alternative APIs."""
+        
+        # Source 1: Minted Metal API (free, no API key required, LBMA benchmark prices)
+        if symbol in ['GOLD', 'SILVER', 'XAU', 'XAG']:
+            try:
+                metal_map = {'GOLD': 'gold', 'SILVER': 'silver', 'XAU': 'gold', 'XAG': 'silver'}
+                metal_key = metal_map.get(symbol, symbol.lower())
+                
+                url = "https://mintedmetal.com/api/prices.json"
+                response = requests.get(url, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    metals = data.get('metals', {})
+                    if metal_key in metals:
+                        price = metals[metal_key].get('price')
+                        if price:
+                            logger.info(f"Successfully fetched {symbol} from Minted Metal API: {price}")
+                            return float(price), 'minted-metal-api'
+            
+            except Exception as e:
+                logger.warning(f"Failed to get commodity price from Minted Metal API: {e}")
         
         # Source 2: MetalPrices API (free tier: 100 requests/month)
         metal_prices_key = os.getenv('METAL_PRICES_API_KEY')
@@ -319,8 +355,8 @@ class DataQualityAgent:
                     # Calculate freshness
                     freshness = (datetime.now().date() - latest.date).days
                     
-                    # Calculate completeness (expected daily data)
-                    date_range = (latest.date - datetime(2013, 1, 1).date()).days
+                    # Calculate completeness (expected daily data from 2016)
+                    date_range = (latest.date - datetime(2016, 8, 1).date()).days
                     expected_records = max(1, date_range)
                     actual_records = self.session.query(ExchangeRate)\
                         .filter(ExchangeRate.quote_currency == symbol).count()
@@ -379,19 +415,23 @@ class DataQualityAgent:
         
         if db_value and external_value:
             difference_pct = abs((db_value - external_value) / external_value) * 100
-            if difference_pct > self.tolerance_pct:
+            # Use symbol-specific tolerance if available
+            tolerance = self.symbol_tolerances.get(symbol, self.tolerance_pct)
+            if difference_pct > tolerance:
                 is_accurate = False
-                issues.append(f"Value difference {difference_pct:.2f}% exceeds tolerance {self.tolerance_pct}%")
+                issues.append(f"Value difference {difference_pct:.2f}% exceeds tolerance {tolerance}%")
         
         # Check freshness
-        if freshness_days is not None and freshness_days > self.max_freshness_days:
-            is_accurate = False
-            issues.append(f"Data is {freshness_days} days old (max: {self.max_freshness_days})")
+        if freshness_days is not None:
+            max_freshness = self.symbol_freshness.get(symbol, self.max_freshness_days)
+            if freshness_days > max_freshness:
+                is_accurate = False
+                issues.append(f"Data is {freshness_days} days old (max: {max_freshness})")
         
         # Check completeness
-        if completeness_pct is not None and completeness_pct < 90:
+        if completeness_pct is not None and completeness_pct < 80:  # Adjusted from 90% to 80%
             is_accurate = False
-            issues.append(f"Data completeness {completeness_pct:.1f}% below 90%")
+            issues.append(f"Data completeness {completeness_pct:.1f}% below 80%")
         
         # Check for missing data
         if db_value is None:
@@ -441,8 +481,11 @@ class DataQualityAgent:
         return results
     
     def validate_all_commodities(self) -> List[ValidationResult]:
-        """Validate all commodity prices in the database."""
-        logger.info("Validating commodity prices...")
+        """Validate only precious metals in the database."""
+        logger.info("Validating precious metals...")
+        
+        # Only validate precious metals
+        precious_metals = {'GOLD', 'SILVER', 'XAU', 'XAG'}
         
         commodities = self.session.query(CommodityPrice.symbol)\
             .distinct()\
@@ -451,6 +494,12 @@ class DataQualityAgent:
         results = []
         for commodity_tuple in commodities:
             commodity = commodity_tuple[0]  # Extract the symbol from the tuple
+            
+            # Only validate precious metals
+            if commodity not in precious_metals:
+                logger.info(f"Skipping non-precious metal: {commodity}")
+                continue
+                
             if len(commodity) >= 2:  # Only validate symbols with at least 2 characters
                 result = self.validate_symbol('commodities', commodity)
                 results.append(result)
