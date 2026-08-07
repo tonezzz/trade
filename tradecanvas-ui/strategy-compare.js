@@ -1,6 +1,8 @@
 // Strategy engine for the Compare page backtest panel
 // Loads ssot.ui.yml and lets the user run a quick client-side backtest
 // against the data already loaded by ChartLoader.
+// Now uses modular strategy system from strategies.js
+// Version 12
 
 class StrategyPanel {
     constructor(chartLoader, config) {
@@ -9,46 +11,106 @@ class StrategyPanel {
         this.data = chartLoader.data || [];
         this.controlsContainer = document.getElementById('strategy-controls');
         this.resultContainer = document.getElementById('strategy-results');
+        this.strategyInstances = new Map(); // Cache strategy instances
     }
 
     init() {
         window.runAllBacktest = this.runAll.bind(this);
+        window.runAllWithFeedback = () => {
+            const status = document.getElementById('single-result');
+            try {
+                if (status) status.innerHTML = '<p style="color:#a8d5ff; font-size:11px;">Running all strategies...</p>';
+                if (typeof window.runAllBacktest !== 'function') {
+                    if (status) status.innerHTML = '<p style="color:#da3633; font-size:11px;">Run All not ready yet.</p>';
+                    return;
+                }
+                window.runAllBacktest();
+            } catch (e) {
+                if (status) status.innerHTML = '<p style="color:#da3633; font-size:11px;">' + e.message + '</p>';
+                console.error(e);
+            }
+        };
+        
+        // Add toggle functionality for parameters
+        const toggleBtn = document.getElementById('toggle-params');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => this.toggleParams());
+        }
+        
         this.buildControls();
-        this.resultContainer.innerHTML = '<div id="single-result" style="margin-bottom:10px;"><p style="color:#8b949e; font-size:13px; margin-top:6px;">Click "Run Backtest" or "Run All" to see results.</p></div><div id="compare-table"></div>';
+        this.resultContainer.innerHTML = '<div id="single-result" style="margin-bottom:4px;"><p style="color:#a8d5ff; font-size:11px; margin-top:2px;">Click "Run Backtest" or "Run All" to see results.</p></div><div id="compare-table"></div>';
         this.singleResult = document.getElementById('single-result');
         this.compareTable = document.getElementById('compare-table');
         this.backtests = [];
+        
+        // Manual perfect strategy state
+        this.manualBuyPoints = [];
+        this.manualSellPoints = [];
+        this.chartClickEnabled = false;
+        this.chartClickHandler = null;
+        this.autoDetect = false;
+    }
+    
+    toggleParams() {
+        const paramsContainer = document.getElementById('strategy-params');
+        const toggleBtn = document.getElementById('toggle-params');
+        if (paramsContainer) {
+            paramsContainer.style.display = paramsContainer.style.display === 'none' ? 'block' : 'none';
+            toggleBtn.textContent = paramsContainer.style.display === 'none' ? '▶' : '▼';
+        }
     }
 
     buildControls() {
         const strategies = this.config.strategies;
 
-        let html = '<div class="setting-group" style="margin-bottom:10px;">';
-        html += '<label>Strategy:</label>';
-        html += '<select id="strategy-select" class="selector">';
+        let html = '<div class="setting-group" style="margin-bottom:6px;">';
+        html += '<label style="font-size:11px; color:#a8d5ff; display:block; margin-bottom:2px;">Strategy:</label>';
+        html += '<select id="strategy-select" class="selector" style="width:100%; padding:4px; font-size:12px; background:#21262d; border:1px solid #30363d; border-radius:3px; color:#e6edf3;">';
         for (const [key, strat] of Object.entries(strategies)) {
             html += `<option value="${key}" ${strat.enabled ? 'selected' : ''}>${strat.label}</option>`;
         }
         html += '</select></div>';
 
-        html += '<div id="strategy-params" style="margin-bottom:10px;"></div>';
+        html += '<div id="strategy-params" style="margin-bottom:6px;"></div>';
 
         const exec = this.config.execution;
-        html += this.numberInput('Capital', 'strategy-capital', exec.initial_capital, 1);
-        html += this.numberInput('Position %', 'strategy-position', exec.position_sizing.value, 0.01);
-        html += this.numberInput('Stop %', 'strategy-stop', exec.stop_loss.value, 0.001);
-        html += this.numberInput('Take Profit %', 'strategy-tp', exec.take_profit.value, 0.001);
-        html += this.numberInput('Commission', 'strategy-commission', exec.commission, 0.0001);
-        html += this.numberInput('Slippage', 'strategy-slippage', exec.slippage, 0.0001);
+        html += '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-bottom:4px;">';
+        html += this.compactNumberInput('Capital', 'strategy-capital', exec.initial_capital, 1);
+        html += this.compactNumberInput('Pos %', 'strategy-position', exec.position_sizing.value, 0.01);
+        html += this.compactNumberInput('Stop %', 'strategy-stop', exec.stop_loss.value, 0.001);
+        html += this.compactNumberInput('TP %', 'strategy-tp', exec.take_profit.value, 0.001);
+        html += this.compactNumberInput('Comm', 'strategy-commission', exec.commission, 0.0001);
+        html += this.compactNumberInput('Slip', 'strategy-slippage', exec.slippage, 0.0001);
+        html += '</div>';
 
-        html += '<button id="run-backtest" class="btn" style="width:100%; margin-top:10px;">Run Backtest</button>';
-        html += '<button id="run-all" class="btn" style="width:100%; margin-top:6px;" onclick="window.runAllBacktest()">Run All & Compare</button>';
+        html += '<button id="run-backtest" class="btn" style="width:100%; margin-top:6px; padding:8px; font-size:12px;">Run Backtest</button>';
+        html += '<button id="run-all" class="btn" style="width:100%; margin-top:4px; padding:8px; font-size:12px;" onclick="window.runAllWithFeedback()">Run All & Compare</button>';
 
         this.controlsContainer.innerHTML = html;
 
-        document.getElementById('strategy-select').addEventListener('change', () => this.renderParams());
+        document.getElementById('strategy-select').addEventListener('change', () => {
+            this.renderParams();
+            // Handle chart clicking for manual strategy
+            const key = document.getElementById('strategy-select').value;
+            if (key === 'manual_perfect') {
+                this.enableChartClicking();
+            } else {
+                this.disableChartClicking();
+                // Clear manual point markers when switching away
+                if (this.chartLoader.candlestickSeries) {
+                    this.chartLoader.candlestickSeries.setMarkers([]);
+                }
+            }
+        });
         this.renderParams();
         document.getElementById('run-backtest').addEventListener('click', () => this.runBacktest());
+    }
+    
+    compactNumberInput(label, id, value, step) {
+        return `<div class="setting-group" style="display:flex; gap:4px; align-items:center;">
+            <label style="min-width:35px; font-size:11px; color:#a8d5ff;">${label}:</label>
+            <input type="number" id="${id}" step="${step}" value="${value}" style="flex:1; padding:4px; font-size:11px; background:#21262d; border:1px solid #30363d; border-radius:3px; color:#e6edf3;">
+        </div>`;
     }
 
     numberInput(label, id, value, step) {
@@ -62,19 +124,106 @@ class StrategyPanel {
         const key = document.getElementById('strategy-select').value;
         const strat = this.config.strategies[key];
         const container = document.getElementById('strategy-params');
-        let html = '<div style="display:flex; flex-direction:column; gap:6px;">';
+        
+        // Special handling for manual perfect strategy
+        if (key === 'manual_perfect') {
+            this.renderManualPerfectParams(container);
+            return;
+        }
+        
+        let html = '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">';
         for (const [pkey, pval] of Object.entries(strat.parameters)) {
-            html += `<div class="setting-group">
-                <label>${pkey}:</label>
-                <input type="number" class="strategy-param" data-key="${pkey}" step="any" value="${pval}">
+            html += `<div class="setting-group" style="display:flex; gap:4px; align-items:center;">
+                <label style="min-width:50px; font-size:11px; color:#a8d5ff;">${pkey}:</label>
+                <input type="number" class="strategy-param" data-key="${pkey}" step="any" value="${pval}" style="flex:1; padding:4px; font-size:11px; background:#21262d; border:1px solid #30363d; border-radius:3px; color:#e6edf3;">
             </div>`;
         }
         html += '</div>';
         container.innerHTML = html;
     }
 
+    renderManualPerfectParams(container) {
+        let html = '<div style="font-size:11px; color:#a8d5ff; margin-bottom:4px;">';
+        html += '<p style="margin:0 0 4px 0;">🎯 <strong>Perfect Mode:</strong> 100% win rate with hindsight</p>';
+        html += '<p style="margin:0 0 4px 0;">• Auto-detect: Buy at local lows, sell at next higher local high</p>';
+        html += '<p style="margin:0 0 4px 0;">• Processing all historical data (1981-2026)</p>';
+        html += '<p style="margin:0 0 8px 0;">• Manual: Click chart to set buy/sell points</p>';
+        html += '</div>';
+        
+        html += '<div style="display:flex; gap:8px; align-items:center; margin-bottom:4px;">';
+        html += `<input type="checkbox" id="auto-detect" style="width:auto; margin:0;">
+            <label for="auto-detect" style="font-size:11px; color:#a8d5ff; margin:0;">Auto-detect all points</label>
+        </div>`;
+        
+        html += '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-bottom:4px;">';
+        html += `<div class="setting-group" style="display:flex; gap:4px; align-items:center;">
+            <label style="min-width:50px; font-size:11px; color:#a8d5ff;">Buy pts:</label>
+            <span id="buy-count" style="flex:1; padding:4px; font-size:11px; background:#21262d; border:1px solid #30363d; border-radius:3px; color:#e6edf3;">0</span>
+        </div>`;
+        html += `<div class="setting-group" style="display:flex; gap:4px; align-items:center;">
+            <label style="min-width:50px; font-size:11px; color:#a8d5ff;">Sell pts:</label>
+            <span id="sell-count" style="flex:1; padding:4px; font-size:11px; background:#21262d; border:1px solid #30363d; border-radius:3px; color:#e6edf3;">0</span>
+        </div>`;
+        html += '</div>';
+        
+        html += '<div id="auto-detect-status" style="font-size:10px; color:#8b949e; margin-bottom:4px; display:none;">Processing...</div>';
+        
+        html += '<button id="clear-points" class="btn" style="width:100%; padding:6px; font-size:11px; background:#da3633; border-color:#da3633;">Clear All Points</button>';
+        
+        container.innerHTML = html;
+        
+        // Setup event listeners
+        document.getElementById('clear-points').addEventListener('click', () => this.clearManualPoints());
+        document.getElementById('auto-detect').addEventListener('change', (e) => {
+            this.autoDetect = e.target.checked;
+            const statusEl = document.getElementById('auto-detect-status');
+            
+            if (this.autoDetect) {
+                statusEl.style.display = 'block';
+                statusEl.textContent = 'Analyzing data...';
+                
+                // Use setTimeout to allow UI to update before heavy processing
+                setTimeout(() => {
+                    this.disableChartClicking();
+                    statusEl.textContent = 'Finding optimal trades...';
+                    
+                    setTimeout(() => {
+                        this.updateManualPointCounts();
+                        statusEl.textContent = `Found ${this.manualBuyPoints.length} winning trades`;
+                        setTimeout(() => statusEl.style.display = 'none', 2000);
+                    }, 100);
+                }, 50);
+            } else {
+                this.enableChartClicking();
+                statusEl.style.display = 'none';
+            }
+        });
+        
+        // Update counts with current points
+        this.updateManualPointCounts();
+        
+        // Enable chart clicking for manual strategy (unless auto-detect is on)
+        if (!this.autoDetect) {
+            this.enableChartClicking();
+        }
+    }
+
     getSelected() {
         const key = document.getElementById('strategy-select').value;
+        
+        // Special handling for manual perfect strategy
+        if (key === 'manual_perfect') {
+            const autoDetect = document.getElementById('auto-detect')?.checked || false;
+            return { 
+                key, 
+                params: {
+                    buy_points: this.manualBuyPoints,
+                    sell_points: this.manualSellPoints,
+                    auto_detect: autoDetect
+                }
+            };
+        }
+        
         const inputs = document.querySelectorAll('.strategy-param');
         const params = {};
         inputs.forEach(input => {
@@ -100,92 +249,72 @@ class StrategyPanel {
             slippage: parseFloat(document.getElementById('strategy-slippage').value) || 0.0001
         };
 
-        const { result, metrics } = this.runStrategy(key, params, settings);
-        this.updateResults(metrics);
-        this.addBacktest(key, params, settings, result, metrics);
-        this.renderComparisonTable();
+        // Special handling for Perfect strategy with auto-detect
+        if (key === 'manual_perfect' && params.auto_detect) {
+            // Create a temporary strategy instance to run auto-detect
+            const tempStrategy = new ManualPerfectStrategy(params);
+            tempStrategy.setData(this.data);
+            tempStrategy.calculateIndicators(this.data); // This triggers auto-detect
+            
+            // Get the auto-detected points
+            const autoParams = {
+                buy_points: tempStrategy.buyPoints,
+                sell_points: tempStrategy.sellPoints,
+                auto_detect: true
+            };
+            
+            const { result, metrics } = this.runStrategy(key, autoParams, settings);
+            this.updateResults(metrics);
+            this.addBacktest(key, autoParams, settings, result, metrics);
+            this.renderComparisonTable();
 
-        if (this.config.display.show_chart_markers && this.chartLoader.candlestickSeries) {
-            this.setMarkers(result.trades);
+            if (this.config.display.show_chart_markers && this.chartLoader.candlestickSeries) {
+                this.setMarkers(result.trades);
+            }
+        } else {
+            const { result, metrics } = this.runStrategy(key, params, settings);
+            this.updateResults(metrics);
+            this.addBacktest(key, params, settings, result, metrics);
+            this.renderComparisonTable();
+
+            if (this.config.display.show_chart_markers && this.chartLoader.candlestickSeries) {
+                this.setMarkers(result.trades);
+            }
         }
+    }
+
+    getStrategy(key, params) {
+        // Get or create strategy instance
+        const cacheKey = `${key}_${JSON.stringify(params)}`;
+        if (!this.strategyInstances.has(cacheKey)) {
+            const strategy = StrategyFactory.create(key, params);
+            // Set data for strategies that need it (like Bollinger)
+            if (strategy.setData) {
+                strategy.setData(this.data);
+            }
+            this.strategyInstances.set(cacheKey, strategy);
+        } else {
+            // Update data if it has changed
+            const strategy = this.strategyInstances.get(cacheKey);
+            if (strategy.setData) {
+                strategy.setData(this.data);
+            }
+            // Update points for manual strategy
+            if (key === 'manual_perfect' && strategy.updatePoints) {
+                strategy.updatePoints(params);
+            }
+        }
+        return this.strategyInstances.get(cacheKey);
     }
 
     getIndicators(key, params) {
-        switch (key) {
-            case 'sma_crossover':
-                return {
-                    short: this.calculateSMA(this.data, params.short_period),
-                    long: this.calculateSMA(this.data, params.long_period)
-                };
-            case 'ema_crossover':
-                return {
-                    short: this.calculateEMA(this.data, params.short_period),
-                    long: this.calculateEMA(this.data, params.long_period)
-                };
-            case 'rsi_reversal':
-                return { rsi: this.calculateRSI(this.data, params.period) };
-            case 'macd_crossover': {
-                const ema12 = this.calculateEMA(this.data, params.fast);
-                const ema26 = this.calculateEMA(this.data, params.slow);
-                const macd = ema12.map((v, i) => v - ema26[i]);
-                const signal = this.calculateEMARaw(macd, params.signal);
-                return { macd, signal };
-            }
-            case 'bollinger_reversion':
-                return this.calculateBollingerBands(this.data, params.period, params.std_dev);
-            default:
-                return {};
-        }
+        const strategy = this.getStrategy(key, params);
+        return strategy.calculateIndicators(this.data);
     }
 
     getSignal(i, key, params, inds) {
-        const prev = i - 1;
-        if (prev < 0) return { buy: false, sell: false };
-
-        switch (key) {
-            case 'sma_crossover':
-            case 'ema_crossover': {
-                const s = inds.short, l = inds.long;
-                if (s[i] == null || s[prev] == null || l[i] == null || l[prev] == null) {
-                    return { buy: false, sell: false };
-                }
-                return {
-                    buy: s[i] > l[i] && s[prev] <= l[prev],
-                    sell: s[i] < l[i] && s[prev] >= l[prev]
-                };
-            }
-            case 'rsi_reversal': {
-                const r = inds.rsi;
-                if (r[i] == null || r[prev] == null) return { buy: false, sell: false };
-                return {
-                    buy: r[i] <= params.oversold && r[prev] > params.oversold,
-                    sell: r[i] >= params.overbought && r[prev] < params.overbought
-                };
-            }
-            case 'macd_crossover': {
-                const m = inds.macd, s = inds.signal;
-                if (m[i] == null || m[prev] == null || s[i] == null || s[prev] == null) {
-                    return { buy: false, sell: false };
-                }
-                return {
-                    buy: m[i] > s[i] && m[prev] <= s[prev],
-                    sell: m[i] < s[i] && m[prev] >= s[prev]
-                };
-            }
-            case 'bollinger_reversion': {
-                const u = inds.upper, l = inds.lower;
-                if (u[i] == null || u[prev] == null || l[i] == null || l[prev] == null) {
-                    return { buy: false, sell: false };
-                }
-                const c = this.data;
-                return {
-                    buy: c[i].close <= l[i] && c[prev].close > l[prev],
-                    sell: c[i].close >= u[i] && c[prev].close < u[prev]
-                };
-            }
-            default:
-                return { buy: false, sell: false };
-        }
+        const strategy = this.getStrategy(key, params);
+        return strategy.getSignal(i, inds);
     }
 
     simulate(key, params, settings) {
@@ -369,11 +498,31 @@ class StrategyPanel {
         };
         this.backtests = [];
         for (const [key, strat] of Object.entries(this.config.strategies)) {
-            const params = { ...strat.parameters };
+            let params = { ...strat.parameters };
+            
+            // Special handling for Perfect strategy with auto-detect
+            if (key === 'manual_perfect') {
+                // Enable auto-detect for Perfect strategy in run all
+                params.auto_detect = true;
+                
+                // Create a temporary strategy instance to run auto-detect
+                const tempStrategy = new ManualPerfectStrategy(params);
+                tempStrategy.setData(this.data);
+                tempStrategy.calculateIndicators(this.data); // This triggers auto-detect
+                
+                // Update params with auto-detected points
+                params = {
+                    buy_points: tempStrategy.buyPoints,
+                    sell_points: tempStrategy.sellPoints,
+                    auto_detect: true
+                };
+            }
+            
             const { result, metrics } = this.runStrategy(key, params, settings);
             this.addBacktest(key, params, settings, result, metrics);
         }
-        this.singleResult.innerHTML = `<p style="color:#8b949e; font-size:13px; margin-top:6px;">Ran ${this.backtests.length} strategies. See comparison below.</p>`;
+        this.singleResult.innerHTML = `<p style="color:#a8d5ff; font-size:10px; margin-top:2px;">Ran ${this.backtests.length} strategies. See comparison below.</p>`;
+        this.renderComparisonTable();
         if (this.config.display.show_chart_markers && this.chartLoader.candlestickSeries && this.backtests.length) {
             this.setMarkers(this.backtests[0].result.trades);
         }
@@ -387,7 +536,7 @@ class StrategyPanel {
         if (!this.compareTable) return;
         const order = this.config.metrics;
         const labels = {
-            total_return: 'Total Return %',
+            total_return: 'Return %',
             total_trades: 'Trades',
             win_rate: 'Win %',
             profit_factor: 'P/F',
@@ -407,37 +556,37 @@ class StrategyPanel {
                 best[key] = null;
             }
         }
-        let html = '<h4 style="margin:8px 0 4px 0; font-size:14px;">Backtest Comparison</h4>';
-        html += '<div style="overflow-x:auto;"><table style="width:100%; font-size:12px; border-collapse:collapse;">';
-        html += '<thead><tr style="text-align:left; border-bottom:1px solid #30363d;"><th>Strategy</th>';
+        let html = '<div style="margin:4px 0; padding:6px; background:#21262d; border-radius:4px; border:1px solid #30363d;">';
+        html += '<div style="overflow-x:auto;"><table style="width:100%; font-size:10px; border-collapse:collapse;">';
+        html += '<thead><tr style="text-align:left; border-bottom:1px solid #30363d;"><th style="padding:2px 3px;">Strategy</th>';
         for (const key of order) {
-            html += `<th style='padding:4px 6px;'>${labels[key] || key}</th>`;
+            html += `<th style='padding:2px 3px;'>${labels[key] || key}</th>`;
         }
         html += '</tr></thead><tbody>';
         for (const b of this.backtests) {
             html += `<tr style='border-bottom:1px solid #21262d;'>`;
-            html += `<td style='padding:4px 6px;'><strong>${b.label}</strong><br><span style='font-size:10px;color:#8b949e;'>${Object.entries(b.params).map(([k,v])=>`${k}=${v}`).join(', ')}</span></td>`;
+            html += `<td style='padding:2px 3px;'><strong style="font-size:10px;">${b.label}</strong></td>`;
             for (const key of order) {
                 const v = b.metrics[key];
                 const isBest = best[key] !== null && Math.abs(v - best[key]) < 1e-9;
                 let text;
                 if (['total_return', 'max_drawdown', 'win_rate'].includes(key)) {
-                    text = (v * 100).toFixed(2) + '%';
+                    text = (v * 100).toFixed(1) + '%';
                 } else if (key === 'total_trades') {
                     text = String(v);
                 } else if (key === 'profit_factor') {
-                    text = v.toFixed(2);
+                    text = v.toFixed(1);
                 } else if (['avg_win', 'avg_loss', 'final_capital'].includes(key)) {
-                    text = v.toFixed(2);
+                    text = v.toFixed(0);
                 } else {
-                    text = typeof v === 'number' ? v.toFixed(2) : v;
+                    text = typeof v === 'number' ? v.toFixed(1) : v;
                 }
                 const color = isBest ? '#3fb950' : 'inherit';
-                html += `<td style='padding:4px 6px; color:${color};'>${text}</td>`;
+                html += `<td style='padding:2px 3px; color:${color};'>${text}</td>`;
             }
             html += '</tr>';
         }
-        html += '</tbody></table></div>';
+        html += '</tbody></table></div></div>';
         this.compareTable.innerHTML = html;
     }
 
@@ -465,84 +614,145 @@ class StrategyPanel {
         this.chartLoader.candlestickSeries.setMarkers(markers);
     }
 
-    calculateSMA(data, period) {
-        const out = new Array(data.length).fill(null);
-        for (let i = period - 1; i < data.length; i++) {
-            let sum = 0;
-            for (let j = i - period + 1; j <= i; j++) sum += data[j].close;
-            out[i] = sum / period;
+    // Manual perfect strategy methods
+    enableChartClicking() {
+        if (!this.chartLoader.candlestickSeries) {
+            console.warn('Chart series not available for clicking');
+            return;
         }
-        return out;
-    }
 
-    calculateEMA(data, period) {
-        const out = new Array(data.length).fill(null);
-        if (data.length === 0) return out;
-        const mult = 2 / (period + 1);
-        out[0] = data[0].close;
-        for (let i = 1; i < data.length; i++) {
-            out[i] = (data[i].close - out[i - 1]) * mult + out[i - 1];
+        this.chartClickEnabled = true;
+        
+        // Remove existing handler if any
+        if (this.chartClickHandler) {
+            this.chartLoader.chart.subscribeClick(this.chartClickHandler);
         }
-        return out;
-    }
 
-    calculateEMARaw(values, period) {
-        const out = new Array(values.length).fill(null);
-        if (values.length === 0 || values[0] == null) return out;
-        const mult = 2 / (period + 1);
-        out[0] = values[0];
-        for (let i = 1; i < values.length; i++) {
-            if (values[i] == null) continue;
-            const prev = out[i - 1] || values[i];
-            out[i] = (values[i] - prev) * mult + prev;
-        }
-        return out;
-    }
+        // Add click handler
+        this.chartClickHandler = (param) => {
+            if (!this.chartClickEnabled) return;
+            
+            const key = document.getElementById('strategy-select').value;
+            if (key !== 'manual_perfect') return;
 
-    calculateRSI(data, period) {
-        const out = new Array(data.length).fill(null);
-        if (data.length <= period) return out;
-        let gains = 0;
-        let losses = 0;
-        for (let i = 1; i <= period; i++) {
-            const ch = data[i].close - data[i - 1].close;
-            if (ch > 0) gains += ch;
-            else losses -= ch;
-        }
-        let avgGain = gains / period;
-        let avgLoss = losses / period;
+            // Find the data point closest to the click
+            const time = param.time;
+            const dataIndex = this.data.findIndex(d => d.time === time);
+            
+            if (dataIndex === -1) return;
 
-        for (let i = period; i < data.length; i++) {
-            const ch = data[i].close - data[i - 1].close;
-            const gain = ch > 0 ? ch : 0;
-            const loss = ch < 0 ? -ch : 0;
-            avgGain = (avgGain * (period - 1) + gain) / period;
-            avgLoss = (avgLoss * (period - 1) + loss) / period;
-            if (avgLoss === 0) {
-                out[i] = 100;
+            // Check if shift key is pressed for sell point
+            const isSell = param.shiftKey;
+
+            if (isSell) {
+                this.toggleManualPoint(dataIndex, 'sell');
             } else {
-                const rs = avgGain / avgLoss;
-                out[i] = 100 - (100 / (1 + rs));
+                this.toggleManualPoint(dataIndex, 'buy');
             }
-        }
-        return out;
+
+            this.updateManualPointCounts();
+            this.updateManualPointMarkers();
+        };
+
+        this.chartLoader.chart.subscribeClick(this.chartClickHandler);
     }
 
-    calculateBollingerBands(data, period, stdDev) {
-        const middle = this.calculateSMA(data, period);
-        const upper = new Array(data.length).fill(null);
-        const lower = new Array(data.length).fill(null);
-        for (let i = period - 1; i < data.length; i++) {
-            const mean = middle[i];
-            let sumSq = 0;
-            for (let j = i - period + 1; j <= i; j++) {
-                sumSq += Math.pow(data[j].close - mean, 2);
-            }
-            const sd = Math.sqrt(sumSq / period) * stdDev;
-            upper[i] = mean + sd;
-            lower[i] = mean - sd;
+    disableChartClicking() {
+        this.chartClickEnabled = false;
+        if (this.chartClickHandler && this.chartLoader.chart) {
+            this.chartLoader.chart.unsubscribeClick(this.chartClickHandler);
         }
-        return { middle, upper, lower };
+    }
+
+    toggleManualPoint(index, type) {
+        if (type === 'buy') {
+            const buyIndex = this.manualBuyPoints.indexOf(index);
+            if (buyIndex !== -1) {
+                // Remove existing buy point
+                this.manualBuyPoints.splice(buyIndex, 1);
+            } else {
+                // Add buy point (remove from sell if exists)
+                const sellIndex = this.manualSellPoints.indexOf(index);
+                if (sellIndex !== -1) {
+                    this.manualSellPoints.splice(sellIndex, 1);
+                }
+                this.manualBuyPoints.push(index);
+                this.manualBuyPoints.sort((a, b) => a - b);
+            }
+        } else {
+            const sellIndex = this.manualSellPoints.indexOf(index);
+            if (sellIndex !== -1) {
+                // Remove existing sell point
+                this.manualSellPoints.splice(sellIndex, 1);
+            } else {
+                // Add sell point (remove from buy if exists)
+                const buyIndex = this.manualBuyPoints.indexOf(index);
+                if (buyIndex !== -1) {
+                    this.manualBuyPoints.splice(buyIndex, 1);
+                }
+                this.manualSellPoints.push(index);
+                this.manualSellPoints.sort((a, b) => a - b);
+            }
+        }
+        this.updateManualPointCounts();
+        this.updateManualPointMarkers();
+    }
+
+    clearManualPoints() {
+        this.manualBuyPoints = [];
+        this.manualSellPoints = [];
+        this.updateManualPointCounts();
+        this.updateManualPointMarkers();
+    }
+
+    updateManualPointCounts() {
+        const buyCount = document.getElementById('buy-count');
+        const sellCount = document.getElementById('sell-count');
+        
+        // If auto-detect is enabled, get points from strategy
+        if (this.autoDetect && this.chartLoader && this.chartLoader.data) {
+            const params = { auto_detect: true };
+            const tempStrategy = StrategyFactory.create('manual_perfect', params);
+            tempStrategy.setData(this.chartLoader.data);
+            tempStrategy.calculateIndicators(this.chartLoader.data);
+            this.manualBuyPoints = tempStrategy.buyPoints;
+            this.manualSellPoints = tempStrategy.sellPoints;
+        }
+        
+        if (buyCount) buyCount.textContent = this.manualBuyPoints.length;
+        if (sellCount) sellCount.textContent = this.manualSellPoints.length;
+    }
+
+    updateManualPointMarkers() {
+        if (!this.chartLoader.candlestickSeries) return;
+
+        const markers = [];
+        
+        // Add buy point markers
+        for (const index of this.manualBuyPoints) {
+            markers.push({
+                time: this.data[index].time,
+                position: 'belowBar',
+                color: '#238636',
+                shape: 'circle',
+                text: 'B',
+                size: 2
+            });
+        }
+
+        // Add sell point markers
+        for (const index of this.manualSellPoints) {
+            markers.push({
+                time: this.data[index].time,
+                position: 'aboveBar',
+                color: '#da3633',
+                shape: 'circle',
+                text: 'S',
+                size: 2
+            });
+        }
+
+        this.chartLoader.candlestickSeries.setMarkers(markers);
     }
 }
 

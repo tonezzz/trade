@@ -14,90 +14,62 @@
 </head>
 <body>
     <div class="container">
-        <!-- Navigation Menu -->
-        <nav class="nav-menu">
-            <ul class="nav-list">
-                <li class="nav-item"><a href="index.html" class="nav-link">Trading Dashboard</a></li>
-                <li class="nav-item"><a href="compare.html" class="nav-link">Compare</a></li>
-                <li class="nav-item"><a href="compare2.html" class="nav-link active">Compare2</a></li>
-            </ul>
-        </nav>
-
-        <header class="header">
-            <h1>TradeCanvas - Compare</h1>
-            <div class="header-controls">
-                <span>USD/THB</span>
+        <!-- Compact Header with Navigation -->
+        <header class="header-compact">
+            <div class="header-left">
+                <h1>TradeCanvas</h1>
+                <nav class="nav-compact">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="compare.html" class="nav-link">Compare</a>
+                    <a href="compare2.html?v=5" class="nav-link active">Compare2</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <span class="pair-label">USD/THB</span>
+                <span id="current-price" class="price-display">--</span>
+                <span id="price-change" class="price-change">--</span>
+                <span id="connection-status" class="status-dot disconnected"></span>
             </div>
         </header>
 
-        <div class="main-content">
-            <div class="chart-section">
-                <div class="chart-header">
-                    <h2>USD/THB - 1 Year</h2>
-                    <div class="chart-info">
-                        <span id="current-price">--</span>
-                        <span id="price-change">--</span>
-                        <span id="connection-status" class="status disconnected">Disconnected</span>
-                    </div>
-                </div>
-                <div id="main-chart" class="chart-container"></div>
-
+        <div class="main-content-compact">
+            <div class="chart-section-compact">
+                <div id="main-chart" class="chart-container-compact"></div>
             </div>
 
-            <div class="side-panel">
-                <div class="panel-section">
-                    <h3>Market Summary</h3>
-                    <div class="summary-stats">
-                        <div class="stat-row">
-                            <span class="stat-label">Open:</span>
-                            <span class="stat-value" id="stat-open">--</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">High:</span>
-                            <span class="stat-value" id="stat-high">--</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Low:</span>
-                            <span class="stat-value" id="stat-low">--</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Close:</span>
-                            <span class="stat-value" id="stat-close">--</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Change %:</span>
-                            <span class="stat-value" id="stat-change">--</span>
-                        </div>
+            <div class="side-panel-compact">
+                <div class="panel-section-compact" id="strategy-panel">
+                    <div class="panel-header">
+                        <h3>Strategy Comparison</h3>
+                        <button id="toggle-params" class="toggle-btn">▼</button>
                     </div>
-                </div>
-
-                <div class="panel-section" id="strategy-panel">
-                    <h3>Strategy Control & Results</h3>
-                    <div id="strategy-controls">Loading strategies...</div>
-                    <div id="strategy-results" style="margin-top: 10px;"></div>
+                    <div id="strategy-controls" class="strategy-controls-compact">Loading strategies...</div>
+                    <div id="strategy-results" class="strategy-results-compact"></div>
                 </div>
             </div>
         </div>
 
-        <footer class="footer">
-            <p>Data provided by Trade API | <span id="last-update">Last update: --</span></p>
+        <footer class="footer-compact">
+            <span id="last-update">Last update: --</span>
         </footer>
     </div>
 
-    <script src="chart-loader.js"></script>
-    <script src="strategy-compare.js?v=2"></script>
+    <script src="chart-loader.js?v=13"></script>
+    <script src="strategies.js?v=8"></script>
+    <script src="strategy-compare.js?v=12"></script>
+    <script src="ssot.ui.yml?v=5"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize chart with shared loader
             const chartLoader = new ChartLoader({
                 containerId: 'main-chart',
                 symbol: 'THB',
-                timeframe: 'all',
-                showVolume: false,
+                timeframe: '1Y',
+                showVolume: true,
                 showIndicators: false,
-                enableControls: false,
+                enableControls: true,
                 enableWebSocket: false,
-                enableMarkers: false,
+                enableMarkers: true,
                 autoRefresh: false
             });
 
