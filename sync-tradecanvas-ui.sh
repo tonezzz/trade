@@ -8,7 +8,7 @@ DEV_DIR="/home/tony/CascadeProjects/trade/tradecanvas-ui"
 DEPLOY_DIR="/home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui"
 
 # Files to sync (excluding development-only files)
-SYNC_FILES="app.js chart-loader.js compare.html compare2.html compare.js favicon.svg index.html nav.js styles.css strategy-compare.js strategy-engine.js ssot.ui.yml test.html ui-renderer.js"
+SYNC_FILES="app.js chart-loader.js compare-new.html compare.html compare2.html compare.js favicon.svg hindsight-strategies-new.js hindsight-strategies.js index.html nav.js styles.css strategy-compare-new.js strategy-compare.js strategies-new.js strategies.js ssot.ui.yml test.html test-strategies.html ui-renderer.js"
 
 echo "Syncing TradeCanvas UI files..."
 echo "From: $DEV_DIR"

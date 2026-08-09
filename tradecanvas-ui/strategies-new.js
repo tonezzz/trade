@@ -606,6 +606,7 @@ class StrategyFactory {
         'macd_crossover': MACDCrossoverStrategy,
         'bollinger_reversion': BollingerReversionStrategy,
         'manual_perfect': ManualPerfectStrategy
+        // Hindsight strategies will be registered dynamically
     };
 
     static create(key, parameters) {
