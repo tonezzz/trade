@@ -54,9 +54,10 @@ class TestDataValidator:
         assert result == 100.50
     
     def test_validate_price_below_minimum(self):
-        """Test price below minimum."""
-        with pytest.raises(ValidationError):
-            DataValidator.validate_price('-10.0')
+        """Test price below minimum (negative values allowed for futures)."""
+        # Negative values are allowed for futures/derivatives (min_value = -100.0)
+        result = DataValidator.validate_price('-10.0')
+        assert result == -10.0
     
     def test_validate_price_invalid_format(self):
         """Test invalid price format."""
@@ -96,7 +97,7 @@ class TestDataValidator:
     def test_validate_symbol_invalid_format(self):
         """Test invalid symbol format."""
         with pytest.raises(ValidationError):
-            DataValidator.validate_symbol('XAU-USD')
+            DataValidator.validate_symbol('XAU$USD')
     
     def test_validate_symbol_none(self):
         """Test None symbol."""

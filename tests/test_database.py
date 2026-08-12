@@ -9,8 +9,15 @@ from src.database import DatabaseConfig, Database, db
 class TestDatabaseConfig:
     """Test DatabaseConfig class."""
     
-    def test_database_config_defaults(self):
+    def test_database_config_defaults(self, monkeypatch):
         """Test default configuration values."""
+        # Clear environment to test actual defaults
+        monkeypatch.delenv('DB_HOST', raising=False)
+        monkeypatch.delenv('DB_PORT', raising=False)
+        monkeypatch.delenv('DB_NAME', raising=False)
+        monkeypatch.delenv('DB_USER', raising=False)
+        monkeypatch.delenv('DB_PASSWORD', raising=False)
+        
         config = DatabaseConfig()
         
         assert config.db_host == 'localhost'
@@ -35,8 +42,15 @@ class TestDatabaseConfig:
         assert config.db_user == 'testuser'
         assert config.db_password == 'testpass'
     
-    def test_database_url_construction(self):
+    def test_database_url_construction(self, monkeypatch):
         """Test database URL construction."""
+        # Set known environment values for predictable test
+        monkeypatch.setenv('DB_HOST', 'localhost')
+        monkeypatch.setenv('DB_PORT', '5432')
+        monkeypatch.setenv('DB_NAME', 'dollar_prices')
+        monkeypatch.setenv('DB_USER', 'postgres')
+        monkeypatch.setenv('DB_PASSWORD', 'password')
+        
         config = DatabaseConfig()
         url = config.database_url
         
