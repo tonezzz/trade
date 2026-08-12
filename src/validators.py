@@ -27,14 +27,17 @@ class DataValidator:
     VALID_COMMODITIES = {
         'GOLD', 'SILVER', 'PLATINUM', 'PALLADIUM',
         'OIL', 'WTI', 'BRENT', 'NATURAL_GAS',
-        'COPPER', 'ALUMINUM', 'ZINC', 'NICKEL', 'LEAD',
-        'WHEAT', 'CORN', 'SOY'
+        'COPPER', 'ALUMINUM', 'ZINC', 'NICKEL', 'LEAD'
+        # WHEAT, CORN, SOY removed on 2026-08-10 due to Alpha Vantage limitations
     }
     
     # Valid units
     VALID_UNITS = {
         'oz', 'gram', 'kg', 'lb', 'barrel', 'gallon', 'liter', 'ton',
-        'metric_ton', 'bushel', 'share', 'contract', 'mmbtu', 'btu'
+        'metric_ton', 'bushel', 'share', 'contract', 'mmbtu', 'btu', 'baht',
+        'dollar per metric ton', 'dollars per barrel', 'dollars per million BTU',
+        'usd/ton', 'usd/barrel', 'usd/bushel', 'usd/mmbtu',
+        'troy oz', 'troy ounce'
     }
     
     @staticmethod
@@ -184,8 +187,8 @@ class DataValidator:
             return None
         
         symbol_upper = symbol.upper()
-        # Allow alphanumeric and underscores, up to 30 characters
-        if not re.match(r'^[A-Z0-9_]{1,30}$', symbol_upper):
+        # Allow alphanumeric, underscores, and hyphens (for currency pairs like XAU-THB), up to 30 characters
+        if not re.match(r'^[A-Z0-9_-]{1,30}$', symbol_upper):
             raise ValidationError(f"Invalid symbol format: {symbol}")
         
         return symbol_upper
@@ -352,7 +355,9 @@ class CommodityPriceValidator(DataValidator):
             if 'price' not in row:
                 errors.append("Missing required field: price")
             else:
-                CommodityPriceValidator.validate_price(row['price'], min_value=0.01, max_value=100000.0)
+                # Thai gold prices can be higher (140,000+ THB), so increase max_value
+                max_val = 200000.0 if row.get('symbol') == 'XAU-THB' else 100000.0
+                CommodityPriceValidator.validate_price(row['price'], min_value=0.01, max_value=max_val)
             
             # Validate optional fields
             if 'symbol' in row and row['symbol']:
@@ -361,17 +366,20 @@ class CommodityPriceValidator(DataValidator):
             if 'unit' in row and row['unit']:
                 CommodityPriceValidator.validate_unit(row['unit'])
             
+            # Thai gold prices can be higher, so adjust validation accordingly
+            max_val = 200000.0 if row.get('symbol') == 'XAU-THB' else 100000.0
+            
             if 'open_price' in row and row['open_price']:
-                CommodityPriceValidator.validate_price(row['open_price'])
+                CommodityPriceValidator.validate_price(row['open_price'], max_value=max_val)
             
             if 'high_price' in row and row['high_price']:
-                CommodityPriceValidator.validate_price(row['high_price'])
+                CommodityPriceValidator.validate_price(row['high_price'], max_value=max_val)
             
             if 'low_price' in row and row['low_price']:
-                CommodityPriceValidator.validate_price(row['low_price'])
+                CommodityPriceValidator.validate_price(row['low_price'], max_value=max_val)
             
             if 'close_price' in row and row['close_price']:
-                CommodityPriceValidator.validate_price(row['close_price'])
+                CommodityPriceValidator.validate_price(row['close_price'], max_value=max_val)
             
             if 'volume' in row and row['volume']:
                 CommodityPriceValidator.validate_volume(row['volume'])

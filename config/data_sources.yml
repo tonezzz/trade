@@ -1,7 +1,7 @@
 # Data Sources Configuration for Automated Download and Import
 # This file defines all data sources, their download URLs, and scheduling information
 #
-# ACTUAL DATA SOURCE USAGE (as of 2026-08-06):
+# ACTUAL DATA SOURCE USAGE (as of 2026-08-07):
 # ================================================
 # EXCHANGE RATES:
 # - USD/THB: open.er-api.com (real-time, reliable for THB)
@@ -17,8 +17,9 @@
 #
 # VALIDATION SOURCES:
 # - Data quality agent uses multiple external sources for validation
-# - Alpha Vantage MCP integration for commodity price validation
-# - MetalPrices API for precious metals validation
+# - Alpha Vantage MCP integration for commodity price validation (WTI, BRENT, WHEAT, CORN, COPPER, NATURAL_GAS)
+# - Minted Metal API for precious metals validation (GOLD/XAU, SILVER/XAG) - LBMA benchmark prices, free, no API key
+# - MetalPrices API as backup for precious metals validation
 
 # Global settings
 settings:
@@ -57,6 +58,21 @@ settings:
   min_data_points: 1000  # Minimum data points for valid import
   max_gap_days: 7       # Maximum allowed gap in days
   require_ohlc: false    # Whether OHLC data is required
+  
+  # Tolerance settings for intermittent availability
+  # These define how many days of staleness is acceptable for each data source
+  tolerance:
+    thb: 2          # THB data: 2 days acceptable
+    dxy: 30         # DXY data: 30 days acceptable (FRED API limitation)
+    commodities: 90 # Commodity data: 90 days acceptable (monthly updates)
+    currencies: 7  # Currency data: 7 days acceptable
+  
+  # Catch-up settings for intermittent availability
+  catch_up:
+    enabled: true
+    on_startup: true
+    max_gap_days: 30
+    check_interval_hours: 6
   
   # API rate limiting
   rate_limit_requests: 10
@@ -227,13 +243,13 @@ data_sources:
     type: "exchange_rate"
     symbol: "THB"
     quote_currency: "THB"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXTHUS"
+    url: "https://open.er-api.com/v6/latest/USD"
     schedule: "daily"
     schedule_time: "17:00"
     import_function: "import_exchange_rates"
     source: "automated_thb"
     enabled: true
-    formatter: "format_currency_data"
+    formatter: "format_thb_data"
 
   # US Dollar Index (DXY)
   dxy:
@@ -250,9 +266,8 @@ data_sources:
     # Data source identifier for database
     source: "automated_dxy"
     # Enable/disable this source
-    enabled: true  # Fixed data source to use FRED API
-    # Custom formatter function (optional)
-    formatter: "format_dxy_data"
+    enabled: true
+    formatter: "format_dxy_data"  # Fixed data source to use FRED API
 
   # Gold Prices
   gold:
@@ -277,6 +292,40 @@ data_sources:
     # Custom formatter function (optional)
     formatter: "format_gold_data"
 
+  # Thai Gold Prices (XAU/THB) - GoldAPI.io
+  thai_gold:
+    name: "Thai Gold Prices"
+    description: "Gold prices in Thai Baht (XAU/THB) via GoldAPI.io"
+    type: "commodity"
+    symbol: "XAU-THB"
+    commodity: "GOLD"
+    unit: "oz"
+    # API endpoint for Thai gold data
+    url: "https://www.goldapi.io/api/XAU/THB"
+    # Historical endpoint pattern: https://www.goldapi.io/api/XAU/THB/YYYYMMDD
+    historical_url_pattern: "https://www.goldapi.io/api/XAU/THB/{date}"
+    # Schedule: disabled for now - using manual historical fetch to build dataset
+    schedule: "manual"
+    # Only run on weekdays (Thai gold markets closed weekends)
+    weekdays_only: true
+    # Import function to use
+    import_function: "import_commodity_prices"
+    # Data source identifier for database
+    source: "goldapi_thai_gold"
+    # Enable/disable this source
+    enabled: false  # Disabled until we build historical dataset
+    # Custom formatter function (optional)
+    formatter: "format_thai_gold_data"
+    # API rate limiting (100 calls/month free tier)
+    rate_limit:
+      max_calls_per_month: 100
+      require_api_key: true
+      cache_duration_hours: 24
+      use_cache_first: true
+    # Fallback to free Thai Gold API if limit reached
+    fallback_api: "https://api.chnwt.dev/thai-gold-api/latest"
+    # Note: Use download_thai_gold.py --mode historical for manual data fetching
+
   # Silver Prices
   silver:
     name: "Silver Prices"
@@ -294,89 +343,44 @@ data_sources:
     enabled: true
     formatter: "format_commodity_data"
 
-  # Copper Prices
+  # Copper Prices (Alpha Vantage)
   copper:
     name: "Copper Prices"
-    description: "Copper daily prices per pound"
+    description: "Copper monthly prices per metric ton (Alpha Vantage)"
     type: "commodity"
     symbol: "COPPER"
     commodity: "COPPER"
-    unit: "lb"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=WPU072202"
-    schedule: "weekly"
-    schedule_day: "monday"
-    schedule_time: "08:00"
+    unit: "metric_ton"
+    url: "https://www.alphavantage.co/query?function=COPPER&apikey=KUTH6I3J1OORWZI8"
+    schedule: "monthly"
+    schedule_time: "06:00"
     import_function: "import_commodity_prices"
-    source: "automated_copper"
-    enabled: true
-    formatter: "format_commodity_data"
+    source: "alphavantage_copper"
+    enabled: true  # Using Alpha Vantage API instead of FRED
+    formatter: "format_alpha_vantage_commodity"
 
-  # Natural Gas Prices
+  # Natural Gas Prices (Alpha Vantage)
   natural_gas:
     name: "Natural Gas Prices"
-    description: "Natural Gas daily prices per MMBtu"
+    description: "Natural Gas monthly prices per million BTU (Alpha Vantage)"
     type: "commodity"
     symbol: "NATURAL_GAS"
     commodity: "NATURAL_GAS"
     unit: "MMBtu"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP"
-    schedule: "daily"
+    url: "https://www.alphavantage.co/query?function=NATURAL_GAS&apikey=KUTH6I3J1OORWZI8"
+    schedule: "monthly"
     schedule_time: "06:00"
     import_function: "import_commodity_prices"
-    source: "automated_natural_gas"
-    enabled: true
-    formatter: "format_commodity_data"
+    source: "alphavantage_natural_gas"
+    enabled: true  # Using Alpha Vantage API instead of FRED
+    formatter: "format_alpha_vantage_commodity"
 
-  # Wheat Prices
-  wheat:
-    name: "Wheat Prices"
-    description: "Wheat daily prices per bushel"
-    type: "commodity"
-    symbol: "WHEAT"
-    commodity: "WHEAT"
-    unit: "bushel"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=WPU076202"
-    schedule: "weekly"
-    schedule_day: "tuesday"
-    schedule_time: "08:00"
-    import_function: "import_commodity_prices"
-    source: "automated_wheat"
-    enabled: true
-    formatter: "format_commodity_data"
-
-  # Corn Prices
-  corn:
-    name: "Corn Prices"
-    description: "Corn daily prices per bushel"
-    type: "commodity"
-    symbol: "CORN"
-    commodity: "CORN"
-    unit: "bushel"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=WPU076202"
-    schedule: "weekly"
-    schedule_day: "tuesday"
-    schedule_time: "08:00"
-    import_function: "import_commodity_prices"
-    source: "automated_corn"
-    enabled: true
-    formatter: "format_commodity_data"
-
-  # Soy Prices
-  soy:
-    name: "Soy Prices"
-    description: "Soy daily prices per bushel"
-    type: "commodity"
-    symbol: "SOY"
-    commodity: "SOY"
-    unit: "bushel"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=WPU076202"
-    schedule: "weekly"
-    schedule_day: "tuesday"
-    schedule_time: "08:00"
-    import_function: "import_commodity_prices"
-    source: "automated_soy"
-    enabled: true
-    formatter: "format_commodity_data"
+  # Commodity Data Sources Removed
+  # Wheat, Corn, and Soy have been removed from the system
+  # Reason: Alpha Vantage API limitations and data quality issues
+  # Wheat and Corn were disabled due to monthly data staleness (70+ days)
+  # Soy was disabled because Alpha Vantage doesn't have SOY function
+  # Data removed from database on 2026-08-10
 
 # Schedule types and their meanings
 # - daily: Run once per day at specified time
@@ -401,8 +405,10 @@ data_sources:
 #
 # 3. PRECIOUS METALS:
 #    - SSOT defines: GitHub datasets for gold/silver
-#    - ACTUAL validation: MetalPrices API (fallback)
+#    - ACTUAL validation: Minted Metal API (primary), MetalPrices API (fallback)
 #    - REASON: Alpha Vantage doesn't provide spot prices for XAU/XAG
+#    - Minted Metal: LBMA benchmark prices, free, no API key, updates twice daily
+#    - MetalPrices API: Backup source (100 requests/month free tier)
 #    - Alternative: Could use Alpha Vantage ETFs (GLD, SLV) as proxies
 #
 # 4. EXCHANGE RATE VALIDATION:
@@ -427,7 +433,8 @@ data_sources:
 # ==================
 # - ALPHA_VANTAGE_API_KEY: KUTH6I3J1OORWZI8 ✅ Configured
 # - FRED_API_KEY: Required for FRED data sources
-# - METAL_PRICES_API_KEY: Required for precious metals validation (100 requests/month free tier)
+# - METAL_PRICES_API_KEY: Optional backup for precious metals validation (100 requests/month free tier)
+# - Minted Metal API: No API key required (free, LBMA benchmark prices)
 #
 # DATA QUALITY STATUS:
 # ====================
@@ -436,3 +443,16 @@ data_sources:
 # - Commodities: ✅ Fetching correctly via Alpha Vantage
 # - Currencies: ⚠️ 7/8 failing validation (value differences 4-68%)
 # - DXY: ⚠️ 6 days stale
+#
+# VALIDATION SOURCE CONFIGURATION:
+# ================================
+# Minted Metal API (Primary for Precious Metals):
+# - Endpoint: https://mintedmetal.com/api/prices.json
+# - Coverage: GOLD (XAU), SILVER (XAG), PLATINUM (XPT), PALLADIUM (XPD), RHODIUM
+# - Source: LBMA benchmark prices (authoritative)
+# - Update Schedule: Twice daily at 11:00 and 16:00 UTC (Mon-Fri)
+# - Rate Limit: No hard limit, but poll no more than once every 15 minutes
+# - Cost: Free, no API key required
+# - License: CC BY 4.0 (attribution required: "Cite: Minted Metal (mintedmetal.com)")
+# - Data Format: JSON with CORS enabled
+# - Integration: Added to data_quality_agent.py as primary validation source for precious metals

@@ -1,0 +1,76 @@
+title: Trade Project Health Check Configuration
+description: Health check endpoints and monitoring for trade services
+version: 2
+
+services:
+  # Trade API Service
+  - id: trade-api
+    name: Trade API
+    type: container
+    container: trade-api
+    expected_state: running
+    timeout: 10
+    category: api
+    url: http://localhost:9000/api/health
+    expected_status: 200
+    note: Docker Compose container, SQLite database, updated 2026-08-10
+
+  # Trade Automation Service
+  - id: trade-automation
+    name: Trade Automation
+    type: container
+    container: trade-automation
+    expected_state: running
+    timeout: 10
+    category: api
+    note: Docker Compose container, data update scheduler, may be unhealthy due to DNS issues
+
+  # Database Health (SQLite)
+  - id: trade-database
+    name: Trade Database
+    type: file
+    path: ./data/dollar_prices.db
+    expected_state: exists
+    timeout: 5
+    category: datastore
+    note: SQLite database (26MB), 179K+ records across 3 tables, WHEAT/CORN removed 2026-08-10, OIL negative price removed 2026-08-10
+
+# Recovery suggestions for common failure modes
+recovery_actions:
+  container_down: "Check docker compose status: `docker compose ps`, Restart container: `docker compose restart <container>`, Check logs: `docker compose logs <container>`"
+  http_error: "Check if service is running: `docker compose ps`, Check service logs for errors, Verify port is accessible: `curl -v <url>`, Restart service if needed"
+  database_missing: "Check if database file exists: `ls -la data/dollar_prices.db`, Restore from backup if needed, Reinitialize database: `python scripts/setup_database.py`"
+  dns_resolution: "FRED API has DNS issues in containers, use Alpha Vantage API instead, Check network connectivity: `docker exec <container> python -c 'import socket; print(socket.gethostbyname(\"google.com\"))'`"
+  data_freshness: "THB updated 2026-08-12 (current), DXY at 2026-08-07 (5 days old, within 30-day tolerance), Commodities (COPPER, NATURAL_GAS) at 2026-08-05 (7 days old, within 90-day tolerance), FRED currencies (JPY, CAD, CHF, AUD, NZD) at 2026-08-07 (5 days old, within 7-day tolerance), Health check now includes type-specific gap detection with tolerance settings from config/data_sources.yml"
+
+# Testing and debugging guidance
+debugging_guidance:
+  local_testing:
+    - Use direct localhost URLs for local testing
+    - Test API endpoints: `curl http://localhost:9000/api/health`
+    - Check data quality: `curl http://localhost:9000/api/data_quality`
+    - Check container logs: `docker compose logs -f trade-api`
+    - Verify database connectivity: `docker exec trade-api python -c "from src.database import get_db; print('DB OK')"`
+
+  service_testing:
+    - 'Check all services: `docker compose ps`'
+    - 'Restart specific service: `docker compose restart trade-api`'
+    - 'View logs: `docker compose logs -f`'
+    - 'Rebuild service: `docker compose up -d --build trade-api`'
+    - 'Test data import: `docker exec trade-api python -c "from src.importer import DataImporter; from src.database import get_db; ..."`'
+
+  data_validation:
+    - 'Check data quality: `curl http://localhost:9000/api/data_quality`'
+    - 'Verify THB data: `curl http://localhost:9000/api/exchange_rates/THB`'
+    - 'Check commodity data: `curl http://localhost:9000/api/commodity_prices/COPPER`'
+    - 'Run manual data update: `python download_data.py format_alpha_vantage_commodity`'
+    - 'Note: OIL outlier threshold is 100% (vs 50%) due to high volatility'
+    - 'Run freshness monitor: `docker exec trade-api python scripts/data_freshness_monitor.py`'
+
+# Data source configuration notes
+data_sources:
+  thb: "open.er-api.com (JSON format, reliable, current as of 2026-08-10)"
+  dxy: "FRED API (DTWEXBGS series, latest 2026-07-31, DNS issues in containers)"
+  commodities: "Alpha Vantage API (COPPER, NATURAL_GAS, OIL, monthly data, reliable) - WHEAT/CORN removed 2026-08-10"
+  currencies: "FRED API (EUR, JPY, CAD, CHF, AUD, NZD, etc., DNS issues in containers)"
+  precious_metals: "MetalPrices API fallback (GOLD/XAU, SILVER/XAG when Alpha Vantage unavailable)"
