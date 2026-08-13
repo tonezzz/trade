@@ -305,22 +305,32 @@ trade_system:
   docker_compose:
     project_name: "trade"
     compose_file: "docker-compose.yml"
-    network: "trade-network"
+    network: "web_default"
+    network_external: true
     services:
       trade-api:
+        build:
+          context: "."
+          dockerfile: "Dockerfile"
         image: "trade-trade-api"
         container_name: "trade-api"
         ports:
           - "9000:9000"
+        env_file:
+          - .env
         environment:
-          - DB_TYPE=sqlite
-          - DB_NAME=/app/data/dollar_prices.db
+          - DB_TYPE=postgresql
+          - DB_HOST=postgres
+          - DB_PORT=5432
+          - DB_NAME=dollar_prices
+          - DB_USER=chaba
           - DATA_QUALITY_ENABLED=true
-          - ALPHA_VANTAGE_API_KEY=KUTH6I3J1OORWZI8
         volumes:
           - ./data:/app/data
           - ./config:/app/config
           - ./logs:/app/logs
+        networks:
+          - web_default
         restart: unless-stopped
         healthcheck:
           test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
@@ -330,31 +340,46 @@ trade_system:
           start_period: 40s
       
       trade-automation:
-        image: "trade-trade-automation"
+        image: "trade-trade-api"
         container_name: "trade-automation"
+        env_file:
+          - .env
         environment:
-          - DB_TYPE=sqlite
-          - DB_NAME=/app/data/dollar_prices.db
+          - DB_TYPE=postgresql
+          - DB_HOST=postgres
+          - DB_PORT=5432
+          - DB_NAME=dollar_prices
+          - DB_USER=chaba
           - DATA_QUALITY_ENABLED=true
-          - ALPHA_VANTAGE_API_KEY=KUTH6I3J1OORWZI8
+          - AUTOMATION_ENABLED=true
         volumes:
           - ./data:/app/data
           - ./config:/app/config
           - ./logs:/app/logs
         command: ["python", "scripts/auto_update.py", "--scheduled"]
+        networks:
+          - web_default
         restart: unless-stopped
         depends_on:
           - trade-api
+        healthcheck:
+          disable: true
   
   # Database configuration
   database:
-    type: "sqlite"
-    path: "./data/dollar_prices.db"
-    size: "26MB"
+    type: "postgresql"
+    host: "postgres"
+    port: 5432
+    name: "dollar_prices"
+    user: "chaba"
+    shared_instance: true
+    shared_with:
+      - "weaviate"
+      - "chaba web stack"
     tables:
-      - exchange_rates: 145,061 records (23 currencies)
-      - dollar_index: 13,478 records (1973-2026)
-      - commodity_prices: 828 records (WHEAT, CORN)
+      - exchange_rates
+      - dollar_index
+      - commodity_prices
     backup_enabled: false
     backup_schedule: "daily"
     backup_retention: 7

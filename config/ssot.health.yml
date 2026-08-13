@@ -13,7 +13,7 @@ services:
     category: api
     url: http://localhost:9000/api/health
     expected_status: 200
-    note: Docker Compose container, SQLite database, updated 2026-08-10
+    note: Docker Compose container, PostgreSQL database (dollar_prices), updated 2026-08-13
 
   # Trade Automation Service
   - id: trade-automation
@@ -23,17 +23,20 @@ services:
     expected_state: running
     timeout: 10
     category: api
-    note: Docker Compose container, data update scheduler, may be unhealthy due to DNS issues
+    note: Docker Compose container, data update scheduler, PostgreSQL (dollar_prices), disabled HTTP healthcheck, updated 2026-08-13
 
-  # Database Health (SQLite)
+  # Database Health (PostgreSQL)
   - id: trade-database
     name: Trade Database
-    type: file
-    path: ./data/dollar_prices.db
-    expected_state: exists
+    type: postgresql
+    host: postgres
+    port: 5432
+    database: dollar_prices
+    user: chaba
+    expected_state: reachable
     timeout: 5
     category: datastore
-    note: SQLite database (26MB), 179K+ records across 3 tables, WHEAT/CORN removed 2026-08-10, OIL negative price removed 2026-08-10
+    note: PostgreSQL database shared with chaba web stack, created 2026-08-13, tables created via SQLAlchemy
 
 # Recovery suggestions for common failure modes
 recovery_actions:
@@ -47,10 +50,10 @@ recovery_actions:
 debugging_guidance:
   local_testing:
     - Use direct localhost URLs for local testing
-    - Test API endpoints: `curl http://localhost:9000/api/health`
-    - Check data quality: `curl http://localhost:9000/api/data_quality`
-    - Check container logs: `docker compose logs -f trade-api`
-    - Verify database connectivity: `docker exec trade-api python -c "from src.database import get_db; print('DB OK')"`
+    - "Test API endpoints: `curl http://localhost:9000/api/health`"
+    - "Check data quality: `curl http://localhost:9000/api/data_quality`"
+    - "Check container logs: `docker compose logs -f trade-api`"
+    - "Verify database connectivity: `docker exec trade-api python -c \"from src.database import get_db; print('DB OK')\"`"
 
   service_testing:
     - 'Check all services: `docker compose ps`'
