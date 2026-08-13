@@ -1,5 +1,7 @@
 # Data Quality Monitoring System
 
+**Last Updated:** 2026-08-07
+
 ## Overview
 The Data Quality Monitoring System is designed to prevent data accuracy issues like the USD/THB problem we encountered. It provides automated validation, historical tracking, and alerting for all data in the trade database.
 
@@ -98,8 +100,10 @@ python scripts/data_quality_alerts.py --type warning --test-email
 - Compares database values against external API sources
 - Calculates percentage difference
 - Flags differences exceeding configured tolerance
-- Currently uses exchangerate-api.com for exchange rates
-- Placeholder for commodity and DXY external sources
+- **Exchange Rates**: Uses exchangerate-api.com (primary) and FRED API (secondary)
+- **Commodities**: Uses Alpha Vantage API for WTI, BRENT, WHEAT, CORN, COPPER, NATURAL_GAS
+- **Precious Metals**: Uses Minted Metal API (primary) and MetalPrices API (fallback) for GOLD/XAU, SILVER/XAG
+- **Dollar Index**: Uses FRED API (DTWEXBGS series)
 
 ### 2. Freshness Validation
 - Checks data age against current date
@@ -160,25 +164,30 @@ This system would have prevented the USD/THB issue by:
 
 ## Future Enhancements
 
-### Immediate Improvements
-1. **External API Integration**: Add real API keys for:
-   - **Alpha Vantage** (commodities, forex, stocks)
-     - Free tier: 25 requests/day, 5 requests/minute
-     - Premium: $12.50/month for higher limits
-     - Supports: Gold, Silver, Copper, Oil, Natural Gas, Wheat, Corn, Soy
-     - API endpoint: `https://www.alphavantage.co/query?function=COMMODITY_EXCHANGE_RATE&from_symbol=USD&to_symbol=XAU&apikey=YOUR_KEY`
-   
+### Completed Improvements (as of 2026-08-07)
+1. **✅ Alpha Vantage API Integration** (commodities, oil prices)
+   - **Status**: Fully implemented and tested
+   - **Free tier**: 25 requests/day, 5 requests/minute
+   - **Supports**: WTI, BRENT, WHEAT, CORN, COPPER, NATURAL_GAS
+   - **Integration**: MCP server configured and working
+   - **Usage**: Primary validation source for oil and agricultural commodities
+
+2. **✅ Minted Metal API Integration** (precious metals validation)
+   - **Status**: Fully implemented and tested
+   - **Free**: No API key required, LBMA benchmark prices
+   - **Supports**: GOLD (XAU), SILVER (XAG), PLATINUM, PALLADIUM, RHODIUM
+   - **Update Schedule**: Twice daily at 11:00 and 16:00 UTC (Mon-Fri)
+   - **License**: CC BY 4.0 (attribution required)
+   - **Integration**: Primary validation source for precious metals
+   - **Fallback**: MetalPrices API as secondary source
+
+### Remaining Improvements
+1. **Additional External API Integration**:
    - **Quandl** (financial data, economic indicators)
      - Free tier: 50,000 calls/day
      - Premium: $50/month for additional datasets
      - Supports: DXY, economic indicators, commodity prices
      - API endpoint: `https://www.quandl.com/api/v3/datasets/FRED/DEXUSJP.json?api_key=YOUR_KEY`
-   
-   - **MetalPrices API** (precious metals)
-     - Free tier: 100 requests/month
-     - Premium: $9.99/month for higher limits
-     - Supports: Gold, Silver, Platinum, Palladium
-     - API endpoint: `https://api.metalpriceapi.com/v1/latest?api_key=YOUR_KEY&base=USD&currencies=XAU,XAG`
    
    - **FRED API** (Federal Reserve Economic Data)
      - Free: 120 requests/minute
@@ -233,7 +242,8 @@ QUALITY_COMPLETENESS_PCT=90.0
 # External API Keys for Data Quality Validation
 FRED_API_KEY=your_fred_api_key_here
 ALPHA_VANTAGE_API_KEY=your_alpha_vantage_key_here
-METAL_PRICES_API_KEY=your_metal_prices_key_here
+METAL_PRICES_API_KEY=your_metal_prices_key_here  # Optional backup for precious metals
+# Minted Metal API: No API key required (free, LBMA benchmark prices)
 
 # Alert Configuration
 ALERT_EMAIL_ENABLED=false
@@ -249,23 +259,33 @@ ALERT_THRESHOLD=3
 
 ### Getting API Keys
 
-**FRED API (Free):**
-1. Go to https://fred.stlouisfed.org/docs/api/api_key.html
-2. Request a free API key (no account required)
-3. 120 requests/minute limit
-4. Add to `.env`: `FRED_API_KEY=your_key`
-
-**Alpha Vantage (Free Tier):**
+**Alpha Vantage (Free Tier) - ✅ CONFIGURED:**
 1. Go to https://www.alphavantage.co/support/#api-key
 2. Sign up for free account
 3. 25 requests/day, 5 requests/minute
 4. Add to `.env`: `ALPHA_VANTAGE_API_KEY=your_key`
+5. **Current Status**: Configured and working for WTI, BRENT, WHEAT, CORN, COPPER, NATURAL_GAS
 
-**MetalPrices API (Free Tier):**
+**Minted Metal API (Free) - ✅ CONFIGURED:**
+1. No API key required
+2. Free LBMA benchmark prices
+3. Updates twice daily at 11:00 and 16:00 UTC
+4. Attribution required: "Cite: Minted Metal (mintedmetal.com)"
+5. **Current Status**: Integrated as primary source for precious metals validation
+
+**MetalPrices API (Free Tier) - Optional Backup:**
 1. Go to https://metalpriceapi.com/
 2. Sign up for free account
 3. 100 requests/month
 4. Add to `.env`: `METAL_PRICES_API_KEY=your_key`
+5. **Current Status**: Configured as fallback for precious metals
+
+**FRED API (Free) - Optional:**
+1. Go to https://fred.stlouisfed.org/docs/api/api_key.html
+2. Request a free API key (no account required)
+3. 120 requests/minute limit
+4. Add to `.env`: `FRED_API_KEY=your_key`
+5. **Current Status**: Optional for enhanced validation
 
 ## Monitoring and Maintenance
 

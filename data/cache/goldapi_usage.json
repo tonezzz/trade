@@ -1,0 +1,246 @@
+{
+  "calls": [
+    {
+      "timestamp": "2026-08-07T19:48:10.250626",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:15.650952",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260708",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:16.608876",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260709",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:17.569236",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260710",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:18.516920",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260711",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:19.470396",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260712",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:27.545288",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260601",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:28.421331",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260602",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:29.313360",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260603",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:30.562348",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260604",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:31.505212",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260605",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:32.360361",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260606",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:33.232519",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260607",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:34.102961",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260608",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:35.006594",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260609",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:36.003075",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260610",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:36.950238",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260611",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:37.889100",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260612",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:38.883087",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260613",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:39.897794",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260614",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:40.799184",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260615",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:45.692189",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260713",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:46.535229",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260714",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:47.429986",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260715",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:48.323703",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260716",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:49.294156",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260717",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:50.253792",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260718",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:51.149987",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260719",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:52.016702",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260720",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:52.923890",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260721",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:53.779011",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260722",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:54.640780",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260723",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:55.502329",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260724",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:56.397038",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260725",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:57.245812",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260726",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:58.167012",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260727",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:59.050673",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260728",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:48:59.956509",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260729",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:00.859320",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260730",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:01.761104",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260731",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:02.641503",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260801",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:07.933985",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260802",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:08.790649",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260803",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:09.647346",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260804",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:10.507842",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260805",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:11.353271",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260806",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:12.273523",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB/20260807",
+      "success": true
+    },
+    {
+      "timestamp": "2026-08-07T19:49:17.355385",
+      "endpoint": "https://www.goldapi.io/api/XAU/THB",
+      "success": true
+    }
+  ],
+  "monthly_count": 48,
+  "month": "2026-08"
+}

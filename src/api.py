@@ -2,7 +2,7 @@
 FastAPI backend for trading infrastructure.
 Provides REST endpoints for dollar price data types.
 """
-from datetime import datetime, date, timedelta
+from datetime import datetime, timezone, date, timedelta
 from typing import Optional, List, Dict, Any
 from contextlib import asynccontextmanager
 
@@ -32,13 +32,13 @@ class ErrorResponse(BaseModel):
     """Standard error response model."""
     error: str
     detail: Optional[str] = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class SuccessResponse(BaseModel):
     """Standard success response model."""
     success: bool = True
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ExchangeRateResponse(BaseModel):
@@ -288,6 +288,8 @@ async def lifespan(app: FastAPI):
 
 
 # Create FastAPI application
+import os
+root_path = os.getenv("ROOT_PATH", "")
 app = FastAPI(
     title="Trading Data API",
     description="REST API for dollar price data including exchange rates, dollar index, and commodity prices",
@@ -295,7 +297,8 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
-    lifespan=lifespan
+    lifespan=lifespan,
+    root_path=root_path
 )
 
 # CORS middleware configuration
@@ -1892,7 +1895,7 @@ async def websocket_exchange_rates(websocket: WebSocket, currency: str):
                 'low': latest.low_price,
                 'close': latest.close_price,
                 'volume': latest.volume,
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'message': 'Connected to exchange rate stream'
             }, client_id)
         
@@ -1913,7 +1916,7 @@ async def websocket_exchange_rates(websocket: WebSocket, currency: str):
             elif data.get('action') == 'ping':
                 await manager.send_personal_message({
                     'type': 'pong',
-                    'timestamp': datetime.utcnow().isoformat()
+                    'timestamp': datetime.now(timezone.utc).isoformat()
                 }, client_id)
             
     except ValidationError as e:
@@ -1964,7 +1967,7 @@ async def websocket_dollar_index(websocket: WebSocket):
                 'low': latest.low_price,
                 'close': latest.close_price,
                 'volume': latest.volume,
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'message': 'Connected to dollar index stream'
             }, client_id)
         
@@ -1985,7 +1988,7 @@ async def websocket_dollar_index(websocket: WebSocket):
             elif data.get('action') == 'ping':
                 await manager.send_personal_message({
                     'type': 'pong',
-                    'timestamp': datetime.utcnow().isoformat()
+                    'timestamp': datetime.now(timezone.utc).isoformat()
                 }, client_id)
             
     except Exception as e:
@@ -2041,7 +2044,7 @@ async def websocket_commodity_prices(websocket: WebSocket, commodity: str):
                 'low': latest.low_price,
                 'close': latest.close_price,
                 'volume': latest.volume,
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'message': f'Connected to {validated_commodity} stream'
             }, client_id)
         
@@ -2062,7 +2065,7 @@ async def websocket_commodity_prices(websocket: WebSocket, commodity: str):
             elif data.get('action') == 'ping':
                 await manager.send_personal_message({
                     'type': 'pong',
-                    'timestamp': datetime.utcnow().isoformat()
+                    'timestamp': datetime.now(timezone.utc).isoformat()
                 }, client_id)
             
     except Exception as e:
@@ -2097,7 +2100,7 @@ async def websocket_status():
                 for commodity in manager.subscriptions.get('commodity', {}).keys()
             }
         },
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -2109,7 +2112,7 @@ async def http_exception_handler(request, exc):
         status_code=exc.status_code,
         content={
             "error": exc.detail,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
     )
 
@@ -2122,7 +2125,7 @@ async def general_exception_handler(request, exc):
         content={
             "error": "Internal server error",
             "detail": str(exc),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
     )
 

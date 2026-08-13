@@ -1,7 +1,7 @@
 
 ---
 
-**Last Updated:** 2026-08-05
+**Last Updated:** 2026-08-07
 # Historical Data Sources for Dollar Price Database
 
 This guide provides comprehensive sources for downloading historical dollar price data that can be imported into your database.
@@ -147,6 +147,51 @@ This guide provides comprehensive sources for downloading historical dollar pric
 - **Data**: All timeframes available
 - **Note**: MT4/MT5 backtesting ready
 
+### Thai Gold Prices (XAU/THB)
+
+### 1. **GoldAPI.io** ⭐ RECOMMENDED
+- **URL**: https://www.goldapi.io/
+- **Coverage**: Gold prices in THB currency
+- **Format**: JSON API
+- **Endpoint**: `GET /api/XAU/THB` (latest), `GET /api/XAU/THB/YYYYMMDD` (historical)
+- **History**: Historical data available by date
+- **Cost**: Free tier available
+- **Data**: Real-time and historical spot prices
+- **Supports**: XAU, XAG, XPT, XPD in 31+ currencies including THB
+- **Note**: Requires API key, reliable and well-documented
+
+### 2. **Thai Gold API** (Free)
+- **URL**: https://api.chnwt.dev/thai-gold-api
+- **Endpoint**: `GET /latest`
+- **Coverage**: Official Thai gold prices (96.5% purity)
+- **Format**: JSON
+- **Data**: Buy/sell prices for gold and gold bars in THB
+- **Source**: Crawls from goldtraders.or.th (Gold Traders Association)
+- **Cost**: FREE
+- **Note**: Unofficial API, may have reliability issues
+
+### 3. **Gold Traders Association Thailand** (Official Source)
+- **Website**: goldtraders.or.th
+- **Coverage**: 96.5% Thai gold bullion and jewelry prices
+- **Data**: Buy/sell prices, historical data, member directory
+- **Status**: Primary domestic reference for Thai gold
+- **Note**: Official public website with JSON surface for latest prices
+
+### 4. **Thai Gold Price Tracker** (thai-gold.com)
+- **Source**: Hua Seng Heng (70+ years experience)
+- **Update Frequency**: Every 5 minutes during trading hours
+- **Data**: 96.5% purity gold prices, historical charts
+- **Features**: API access, mobile app, LINE integration
+- **Coverage**: Real-time tracking since 1952
+- **Note**: May require API access agreement
+
+### Yahoo Finance API Limitations
+- **Status**: No official API since 2017
+- **Access**: Only through unofficial scrapers (yfinance, etc.)
+- **Issues**: Unreliable, potential ToS violations, rate limits
+- **Gold Support**: Poor - XAU symbols have validation errors
+- **Recommendation**: Avoid for production use
+
 ### Crude Oil Prices
 
 ### 1. **DataHub.io - Oil Prices** ⭐ RECOMMENDED
@@ -208,7 +253,51 @@ This guide provides comprehensive sources for downloading historical dollar pric
 2. **FRED** for official economic data
 3. **GitHub datasets** for direct CSV access
 
-## 📥 Import Instructions
+## � Data Validation Sources (Real-time Price Verification)
+
+The system uses external APIs for real-time data quality validation:
+
+### ✅ Alpha Vantage API (Commodities & Oil)
+- **Status**: Fully configured and operational
+- **Coverage**: WTI, BRENT, WHEAT, CORN, COPPER, NATURAL_GAS
+- **Free Tier**: 25 requests/day, 5 requests/minute
+- **Integration**: MCP server configured for automated validation
+- **Usage**: Primary validation source for oil and agricultural commodities
+- **Historical Data**: 20+ years of historical data available
+- **API Key**: Configured (KUTH6I3J1OORWZI8)
+
+### ✅ Minted Metal API (Precious Metals)
+- **Status**: Fully configured and operational
+- **Coverage**: GOLD (XAU), SILVER (XAG), PLATINUM, PALLADIUM, RHODIUM
+- **Source**: LBMA benchmark prices (authoritative)
+- **Update Schedule**: Twice daily at 11:00 and 16:00 UTC (Mon-Fri)
+- **Cost**: Free, no API key required
+- **License**: CC BY 4.0 (attribution required: "Cite: Minted Metal (mintedmetal.com)")
+- **Usage**: Primary validation source for precious metals
+- **Fallback**: MetalPrices API as secondary source
+
+### 🔄 MetalPrices API (Precious Metals Backup)
+- **Status**: Configured as fallback
+- **Coverage**: GOLD (XAU), SILVER (XAG), PLATINUM, PALLADIUM
+- **Free Tier**: 100 requests/month
+- **Usage**: Backup validation source for precious metals
+- **API Key**: Optional (configure in .env if needed)
+
+### 📊 FRED API (Economic Data)
+- **Status**: Optional for enhanced validation
+- **Coverage**: Exchange rates, economic indicators, interest rates
+- **Free Tier**: 120 requests/minute
+- **Usage**: Secondary validation for exchange rates and DXY
+- **API Key**: Optional (configure in .env if needed)
+
+### 🔄 ExchangeRate-API (Current Exchange Rates)
+- **Status**: Primary validation for exchange rates
+- **Coverage**: 170+ currencies
+- **Free Tier**: 1,500 requests/month
+- **Usage**: Real-time exchange rate validation
+- **API Key**: Not required for free tier
+
+## �📥 Import Instructions
 
 ### Automated Download Scripts
 

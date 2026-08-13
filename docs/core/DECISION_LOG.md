@@ -1,7 +1,7 @@
 
 ---
 
-**Last Updated:** 2026-08-05
+**Last Updated:** 2026-08-07
 # Dollar Price Database - Decision Log
 
 This document records key technical decisions made during the development of the Dollar Price Database project, including technology choices, architecture decisions, and the rationale behind each decision.
@@ -356,6 +356,44 @@ Each decision entry includes:
 - Negative: Requires more integration work
 
 **Lessons Learned**: Using multiple free sources has worked well. The redundancy provides reliability, and the cost savings are significant. Data quality monitoring is important.
+
+---
+
+### D-011: Commodity Validation Sources Integration
+
+**Date**: 2026-08-07
+**Status**: Implemented
+
+**Decision**: Integrate Alpha Vantage API and Minted Metal API as primary validation sources for commodity price data quality monitoring.
+
+**Context**: Need authoritative, real-time price validation for commodity data (oil, agricultural commodities, precious metals) to ensure data quality and accuracy in the database.
+
+**Alternatives Considered**:
+- Single paid commodity API (e.g., Bloomberg, Reuters)
+- Web scraping of financial websites
+- Manual validation processes
+- No validation (rely on data source integrity)
+
+**Rationale**:
+- **Cost-Effective**: Both primary sources are free with no API keys required
+- **Authoritative Data**: Minted Metal provides LBMA benchmark prices (most authoritative for precious metals)
+- **Comprehensive Coverage**: Alpha Vantage covers oil (WTI, BRENT) and agricultural commodities (WHEAT, CORN, COPPER)
+- **Real-Time Validation**: Current prices for accurate data quality checks
+- **Redundancy**: Multiple sources with fallback options
+- **MCP Integration**: Alpha Vantage MCP server for automated tool discovery
+- **No Vendor Lock-in**: Free sources with easy alternatives
+
+**Consequences**:
+- Positive: High-quality validation with authoritative sources
+- Positive: No ongoing costs for validation
+- Positive: Comprehensive commodity coverage
+- Positive: Real-time price validation
+- Positive: LBMA benchmark prices for precious metals
+- Negative: Alpha Vantage rate limits (25 requests/day free tier)
+- Negative: Minted Metal updates only twice daily
+- Negative: Requires integration and maintenance
+
+**Lessons Learned**: The combination of Alpha Vantage and Minted Metal provides excellent validation coverage. LBMA benchmark prices give high confidence in precious metals validation. Rate limits require careful scheduling of validation checks.
 
 ---
 

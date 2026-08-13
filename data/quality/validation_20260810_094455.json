@@ -1,0 +1,399 @@
+{
+  "summary": {
+    "timestamp": "2026-08-10T09:44:55.969706",
+    "duration_seconds": 3.066767,
+    "total_validations": 24,
+    "failed_validations": 24,
+    "success_rate": 0.0,
+    "exchange_rates_validated": 23,
+    "commodities_validated": 0,
+    "dollar_index_validated": 1,
+    "tolerance_pct": 2.0,
+    "max_freshness_days": 2
+  },
+  "detailed_results": [
+    {
+      "symbol": "AUD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:52.961462",
+      "db_value": null,
+      "external_value": 1.416444,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "BRL",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.059336",
+      "db_value": null,
+      "external_value": 5.089081,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 130.21346469622333,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "CAD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.150888",
+      "db_value": null,
+      "external_value": 1.395428,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "CHF",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.232317",
+      "db_value": null,
+      "external_value": 0.80852,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "CNY",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.325352",
+      "db_value": null,
+      "external_value": 6.752312,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 149.50738916256157,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "CZK",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.413436",
+      "db_value": null,
+      "external_value": 20.995446,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "DKK",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.491406",
+      "db_value": null,
+      "external_value": 6.457903,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "EUR",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.584091",
+      "db_value": null,
+      "external_value": 0.865507,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "GBP",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.654137",
+      "db_value": null,
+      "external_value": 0.741549,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "HKD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.706883",
+      "db_value": null,
+      "external_value": 7.845552,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "HUF",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.759545",
+      "db_value": null,
+      "external_value": 314.849876,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "INR",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.821988",
+      "db_value": null,
+      "external_value": 95.253496,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 123.20744389709908,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "JPY",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.881617",
+      "db_value": null,
+      "external_value": 157.880961,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "KRW",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:53.937913",
+      "db_value": null,
+      "external_value": 1409.640365,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "MXN",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:54.000481",
+      "db_value": null,
+      "external_value": 17.140913,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 130.21346469622333,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "NOK",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:54.065026",
+      "db_value": null,
+      "external_value": 9.498365,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "NZD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:54.134566",
+      "db_value": null,
+      "external_value": 1.698185,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "PLN",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:54.207955",
+      "db_value": null,
+      "external_value": 3.720938,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "SEK",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:54.274231",
+      "db_value": null,
+      "external_value": 9.481468,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "SGD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:54.386806",
+      "db_value": null,
+      "external_value": 1.279137,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "THB",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:54.491554",
+      "db_value": 33.024294,
+      "external_value": 33.024294,
+      "difference_pct": 0.0,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 0.054629882545752524,
+      "issues": [
+        "Data completeness 0.1% below 80%"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "TRY",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:54.562841",
+      "db_value": null,
+      "external_value": 47.70582,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 151.20415982484948,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "ZAR",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-10 09:44:54.616221",
+      "db_value": null,
+      "external_value": 16.164503,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": 193.26765188834153,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "No data found in database"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "DXY",
+      "data_type": "dollar_index",
+      "timestamp": "2026-08-10 09:44:54.678620",
+      "db_value": 119.7034,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 10,
+      "completeness_pct": null,
+      "issues": [
+        "Data is 10 days old (max: 7)",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    }
+  ]
+}

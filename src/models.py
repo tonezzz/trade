@@ -3,7 +3,7 @@ Database models for dollar price data.
 """
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime, Date, Index, JSON, Text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import func
 
 Base = declarative_base()

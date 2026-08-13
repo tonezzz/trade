@@ -3,7 +3,7 @@ Base data source classes and interfaces.
 """
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any, List
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -43,7 +43,7 @@ class DataSourceResult:
     error: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
     source: str = ""
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     cached: bool = False
     records_count: int = 0
 
@@ -108,7 +108,7 @@ class BaseDataSource(ABC):
         if not self.config.rate_limit_per_minute and not self.config.rate_limit_per_day:
             return True
         
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         # Check per-minute limit
         if self.config.rate_limit_per_minute:
@@ -131,7 +131,7 @@ class BaseDataSource(ABC):
     def record_request(self):
         """Record a request for rate limiting."""
         self._request_count += 1
-        self._last_request_time = datetime.utcnow()
+        self._last_request_time = datetime.now(timezone.utc)
     
     def get_cache_key(self, symbol: str, start_date: Optional[date], end_date: Optional[date]) -> str:
         """

@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-08-07T19:49:17.357299",
+  "data": {
+    "source": "goldapi",
+    "api_data": {
+      "timestamp": 1786106955,
+      "metal": "XAU",
+      "currency": "THB",
+      "exchange": "IDC",
+      "symbol": "FX_IDC:XAUTHB",
+      "prev_close_price": 140283.07,
+      "open_price": 140355.27,
+      "low_price": 140034.11,
+      "high_price": 143803.55,
+      "open_time": 1786053600,
+      "price": 143609.85,
+      "ch": 3326.78,
+      "chp": 2.37,
+      "price_gram_24k": 4617.1639,
+      "price_gram_22k": 4232.4002,
+      "price_gram_21k": 4040.0184,
+      "price_gram_20k": 3847.6366,
+      "price_gram_18k": 3462.8729,
+      "price_gram_16k": 3078.1093,
+      "price_gram_14k": 2693.3456,
+      "price_gram_10k": 1923.8183
+    }
+  }
+}

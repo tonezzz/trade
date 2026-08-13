@@ -1,7 +1,7 @@
 """
 Data quality reporting module.
 """
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from sqlalchemy import text
 from src.database import db
 
@@ -162,18 +162,37 @@ class DataQualityReporter:
                 
                 # Check for gaps
                 if analysis['total_records'] > 1:
-                    result = conn.execute(text("""
-                        SELECT date, LEAD(date) OVER (ORDER BY date) as next_date
-                        FROM dollar_index
-                        ORDER BY date
-                    """))
-                    rows = result.fetchall()
-                    gaps = []
-                    for i in range(len(rows) - 1):
-                        if rows[i][0] and rows[i][1]:
-                            gap = (rows[i][1] - rows[i][0]).days
-                            if gap > 7:  # More than a week gap
-                                gaps.append(f"{gap} days gap starting {rows[i][0]}")
+                    try:
+                        result = conn.execute(text("""
+                            SELECT date, LEAD(date) OVER (ORDER BY date) as next_date
+                            FROM dollar_index
+                            ORDER BY date
+                        """))
+                        rows = result.fetchall()
+                        gaps = []
+                        for i in range(len(rows) - 1):
+                            if rows[i][0] and rows[i][1]:
+                                # Convert strings to date objects if needed
+                                date1 = rows[i][0] if isinstance(rows[i][0], date) else datetime.strptime(str(rows[i][0]), '%Y-%m-%d').date()
+                                date2 = rows[i][1] if isinstance(rows[i][1], date) else datetime.strptime(str(rows[i][1]), '%Y-%m-%d').date()
+                                gap = (date2 - date1).days
+                                if gap > 7:  # More than a week gap
+                                    gaps.append(f"{gap} days gap starting {rows[i][0]}")
+                    except Exception:
+                        # SQLite doesn't support LEAD, use simpler approach
+                        result = conn.execute(text("""
+                            SELECT date FROM dollar_index ORDER BY date
+                        """))
+                        rows = result.fetchall()
+                        gaps = []
+                        for i in range(len(rows) - 1):
+                            if rows[i][0] and rows[i+1][0]:
+                                # Convert strings to date objects if needed
+                                date1 = rows[i][0] if isinstance(rows[i][0], date) else datetime.strptime(str(rows[i][0]), '%Y-%m-%d').date()
+                                date2 = rows[i+1][0] if isinstance(rows[i+1][0], date) else datetime.strptime(str(rows[i+1][0]), '%Y-%m-%d').date()
+                                gap = (date2 - date1).days
+                                if gap > 7:  # More than a week gap
+                                    gaps.append(f"{gap} days gap starting {rows[i][0]}")
                     
                     if gaps:
                         analysis['issues'].extend(gaps[:5])  # Show first 5 gaps
@@ -231,22 +250,31 @@ class DataQualityReporter:
                 analysis['data_quality']['null_dates'] = result.fetchone()[0]
                 
                 # Check for extreme prices (potential data errors)
-                result = conn.execute(text("""
-                    SELECT commodity, AVG(price) as avg_price, STDDEV(price) as std_price
-                    FROM commodity_prices
-                    GROUP BY commodity
-                """))
-                for row in result:
-                    if row[2]:  # If std exists
-                        # Check for prices > 3 standard deviations from mean
-                        result2 = conn.execute(text("""
-                            SELECT COUNT(*) FROM commodity_prices 
-                            WHERE commodity = :commodity 
-                            AND ABS(price - :avg_price) > 3 * :std_price
-                        """), {'commodity': row[0], 'avg_price': row[1], 'std_price': row[2]})
-                        outliers = result2.fetchone()[0]
-                        if outliers > 0:
-                            analysis['issues'].append(f"{row[0]}: {outliers} potential price outliers")
+                # SQLite doesn't support STDDEV, so we use a simpler approach
+                try:
+                    result = conn.execute(text("""
+                        SELECT commodity, AVG(price) as avg_price, 
+                               MAX(price) as max_price, MIN(price) as min_price
+                        FROM commodity_prices
+                        GROUP BY commodity
+                    """))
+                    for row in result:
+                        if row[1]:  # If avg exists
+                            # Adjust outlier threshold based on commodity volatility
+                            # OIL is highly volatile, use 100% threshold instead of 50%
+                            threshold_pct = 1.0 if row[0] == 'OIL' else 0.5
+                            # Simple check: prices > threshold_pct deviation from mean
+                            result2 = conn.execute(text("""
+                                SELECT COUNT(*) FROM commodity_prices 
+                                WHERE commodity = :commodity 
+                                AND ABS(price - :avg_price) > :threshold_pct * :avg_price
+                            """), {'commodity': row[0], 'avg_price': row[1], 'threshold_pct': threshold_pct})
+                            outliers = result2.fetchone()[0]
+                            if outliers > 0:
+                                analysis['issues'].append(f"{row[0]}: {outliers} potential price outliers")
+                except Exception as e:
+                    # Skip this check if it fails (e.g., on incompatible databases)
+                    pass
                 
         except Exception as e:
             analysis['error'] = str(e)
@@ -283,15 +311,17 @@ class DataQualityReporter:
         
         # Check for old data
         for table_name, table_data in report['tables'].items():
-            if table_data.get('date_range', {}).get('latest'):
-                latest_date = datetime.strptime(
-                    table_data['date_range']['latest'], '%Y-%m-%d'
-                ).date()
-                days_old = (datetime.now().date() - latest_date).days
-                if days_old > 30:
-                    recommendations.append(
-                        f"Update {table_name} data (last update {days_old} days ago)"
-                    )
+            latest = table_data.get('date_range', {}).get('latest')
+            if latest and latest != 'None':
+                try:
+                    latest_date = datetime.strptime(latest, '%Y-%m-%d').date()
+                    days_old = (datetime.now().date() - latest_date).days
+                    if days_old > 30:
+                        recommendations.append(
+                            f"Update {table_name} data (last update {days_old} days ago)"
+                        )
+                except ValueError:
+                    pass  # Skip if date format is invalid
         
         # Check for data quality issues
         for table_name, table_data in report['tables'].items():

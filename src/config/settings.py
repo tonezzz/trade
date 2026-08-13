@@ -24,54 +24,51 @@ class Settings(BaseSettings):
     environment: str = "development"
     
     # Database
-    db_type: str = Field(default="postgresql", env="DB_TYPE")
-    db_host: str = Field(default="localhost", env="DB_HOST")
-    db_port: int = Field(default=5432, env="DB_PORT")
-    db_name: str = Field(default="dollar_prices", env="DB_NAME")
-    db_user: str = Field(default="postgres", env="DB_USER")
-    db_password: str = Field(default="password", env="DB_PASSWORD")
+    db_type: str = "postgresql"
+    db_host: str = "localhost"
+    db_port: int = 5432
+    db_name: str = "dollar_prices"
+    db_user: str = "postgres"
+    db_password: str = "password"
     
     # API Server
-    api_host: str = Field(default="0.0.0.0", env="API_HOST")
-    api_port: int = Field(default=9000, env="API_PORT")
-    api_workers: int = Field(default=1, env="API_WORKERS")
-    api_reload: bool = Field(default=False, env="API_RELOAD")
-    api_log_level: str = Field(default="info", env="API_LOG_LEVEL")
+    api_host: str = "0.0.0.0"
+    api_port: int = 9000
+    api_workers: int = 1
+    api_reload: bool = False
+    api_log_level: str = "info"
     
     # CORS
-    cors_enabled: bool = Field(default=True, env="CORS_ENABLED")
-    cors_origins: List[str] = Field(
-        default=["http://localhost:8080", "http://127.0.0.1:8080"],
-        env="CORS_ORIGINS"
-    )
+    cors_enabled: bool = True
+    cors_origins: List[str] = ["http://localhost:8080", "http://127.0.0.1:8080"]
     
     # Logging
-    log_level: str = Field(default="INFO", env="LOG_LEVEL")
-    log_file: Optional[str] = Field(default=None, env="LOG_FILE")
+    log_level: str = "INFO"
+    log_file: Optional[str] = None
     
     # Security
-    secret_key: str = Field(default="your-secret-key-here", env="SECRET_KEY")
-    access_token_expire_minutes: int = Field(default=30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    secret_key: str = "your-secret-key-here"
+    access_token_expire_minutes: int = 30
     
     # Data Quality
-    data_quality_enabled: bool = Field(default=True, env="DATA_QUALITY_ENABLED")
-    data_quality_tolerance_pct: float = Field(default=2.0, env="DATA_QUALITY_TOLERANCE_PCT")
-    data_quality_max_freshness_days: int = Field(default=2, env="DATA_QUALITY_MAX_FRESHNESS_DAYS")
+    data_quality_enabled: bool = True
+    data_quality_tolerance_pct: float = 2.0
+    data_quality_max_freshness_days: int = 2
     
     # Automation
-    automation_enabled: bool = Field(default=True, env="AUTOMATION_ENABLED")
-    automation_dry_run: bool = Field(default=False, env="AUTOMATION_DRY_RUN")
+    automation_enabled: bool = True
+    automation_dry_run: bool = False
     
     # External APIs
-    alpha_vantage_api_key: Optional[str] = Field(default=None, env="ALPHA_VANTAGE_API_KEY")
-    fred_api_key: Optional[str] = Field(default=None, env="FRED_API_KEY")
-    metal_prices_api_key: Optional[str] = Field(default=None, env="METAL_PRICES_API_KEY")
-    gold_api_key: Optional[str] = Field(default=None, env="GOLD_API_KEY")
+    alpha_vantage_api_key: Optional[str] = None
+    fred_api_key: Optional[str] = None
+    metal_prices_api_key: Optional[str] = None
+    gold_api_key: Optional[str] = None
     
     # Additional environment variables (for compatibility)
-    quality_tolerance: Optional[str] = Field(default=None, env="DATA_QUALITY_TOLERANCE_PCT")
-    quality_freshness_days: Optional[str] = Field(default=None, env="DATA_QUALITY_MAX_FRESHNESS_DAYS")
-    quality_completeness_pct: Optional[str] = Field(default=None, env="DATA_QUALITY_MIN_COMPLETENESS_PCT")
+    quality_tolerance: Optional[str] = None
+    quality_freshness_days: Optional[str] = None
+    quality_completeness_pct: Optional[str] = None
     
     if SettingsConfigDict:
         model_config = SettingsConfigDict(

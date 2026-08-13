@@ -7,7 +7,7 @@ import json
 import logging
 import yaml
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Set, Optional, Any
 from collections import defaultdict
 from dataclasses import dataclass, asdict
@@ -156,12 +156,12 @@ class ConnectionManager:
         # Store connection
         self.active_connections[client_id] = websocket
         self.ip_connections[client_ip] += 1
-        self.last_activity[client_id] = datetime.utcnow()
+        self.last_activity[client_id] = datetime.now(timezone.utc)
         
         # Store metadata
         self.connection_metadata[client_id] = {
             'ip': client_ip,
-            'connected_at': datetime.utcnow(),
+            'connected_at': datetime.now(timezone.utc),
             'subscriptions': 0
         }
         
@@ -253,7 +253,7 @@ class ConnectionManager:
             try:
                 websocket = self.active_connections[client_id]
                 await websocket.send_json(message)
-                self.last_activity[client_id] = datetime.utcnow()
+                self.last_activity[client_id] = datetime.now(timezone.utc)
             except Exception as e:
                 logger.error(f"Error sending message to {client_id}: {e}")
                 await self.disconnect(client_id)
@@ -305,7 +305,7 @@ class ConnectionManager:
         last_seen = self.last_activity[client_id]
         timeout = timedelta(seconds=self.config.heartbeat_timeout)
         
-        if datetime.utcnow() - last_seen > timeout:
+        if datetime.now(timezone.utc) - last_seen > timeout:
             logger.warning(f"Client {client_id} heartbeat timeout")
             await self.disconnect(client_id)
             return False
@@ -314,7 +314,7 @@ class ConnectionManager:
     
     async def cleanup_inactive_connections(self):
         """Clean up inactive connections based on timeout."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         timeout = timedelta(seconds=self.config.connection_timeout)
         
         inactive_clients = [
@@ -392,7 +392,7 @@ class DataStreamer:
                                     'low': latest.low_price,
                                     'close': latest.close_price,
                                     'volume': latest.volume,
-                                    'timestamp': datetime.utcnow().isoformat()
+                                    'timestamp': datetime.now(timezone.utc).isoformat()
                                 }
                                 
                                 # Check if data changed
@@ -428,7 +428,7 @@ class DataStreamer:
                             'low': latest.low_price,
                             'close': latest.close_price,
                             'volume': latest.volume,
-                            'timestamp': datetime.utcnow().isoformat()
+                            'timestamp': datetime.now(timezone.utc).isoformat()
                         }
                         
                         # Check if data changed
@@ -468,7 +468,7 @@ class DataStreamer:
                                     'low': latest.low_price,
                                     'close': latest.close_price,
                                     'volume': latest.volume,
-                                    'timestamp': datetime.utcnow().isoformat()
+                                    'timestamp': datetime.now(timezone.utc).isoformat()
                                 }
                                 
                                 # Check if data changed
@@ -493,7 +493,7 @@ class DataStreamer:
                     if await self.manager.check_heartbeat(client_id):
                         await self.manager.send_personal_message({
                             'type': 'heartbeat',
-                            'timestamp': datetime.utcnow().isoformat()
+                            'timestamp': datetime.now(timezone.utc).isoformat()
                         }, client_id)
             except Exception as e:
                 logger.error(f"Error in heartbeat task: {e}")

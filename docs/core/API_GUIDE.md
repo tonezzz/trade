@@ -1,7 +1,7 @@
 
 ---
 
-**Last Updated:** 2026-08-05
+**Last Updated:** 2026-08-07
 # Trading Data API Guide
 
 ## Overview

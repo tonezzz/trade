@@ -3,7 +3,7 @@ Base service class for common service functionality.
 """
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 import logging
 
 
@@ -134,5 +134,5 @@ class BaseService:
         return {
             'error': error_message,
             'error_type': type(exception).__name__,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }

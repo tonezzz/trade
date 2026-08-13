@@ -14,7 +14,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 import uvicorn
-from src.api import app
+from src.api.main import create_app
 
 
 def load_config(config_path: str = None) -> dict:
@@ -59,6 +59,9 @@ def run_server(mode: str = "production", config: dict = None):
     else:
         reload = server_config.get('reload', False)
         print(f"Running in PRODUCTION mode with {workers} worker(s)")
+    
+    # Create app
+    app = create_app()
     
     # Print configuration
     print(f"Starting FastAPI server on {host}:{port}")

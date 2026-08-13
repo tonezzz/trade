@@ -1,0 +1,176 @@
+{
+  "summary": {
+    "timestamp": "2026-08-07T20:42:19.472999",
+    "duration_seconds": 3.563366,
+    "total_validations": 11,
+    "failed_validations": 8,
+    "success_rate": 27.27272727272727,
+    "exchange_rates_validated": 8,
+    "commodities_validated": 2,
+    "dollar_index_validated": 1,
+    "tolerance_pct": 2.0,
+    "max_freshness_days": 2
+  },
+  "detailed_results": [
+    {
+      "symbol": "EUR",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-07 20:42:15.953607",
+      "db_value": 0.867316,
+      "external_value": 0.867316,
+      "difference_pct": 0.0,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54007249295206,
+      "issues": [
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "NZD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-07 20:42:16.190443",
+      "db_value": 1.703428,
+      "external_value": 1.703428,
+      "difference_pct": 0.0,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54007249295206,
+      "issues": [
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "JPY",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-07 20:42:16.347679",
+      "db_value": 158.205205,
+      "external_value": 158.205205,
+      "difference_pct": 0.0,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54007249295206,
+      "issues": [
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "AUD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-07 20:42:16.538996",
+      "db_value": 1.421461,
+      "external_value": 1.421461,
+      "difference_pct": 0.0,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54007249295206,
+      "issues": [
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "GBP",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-07 20:42:16.697511",
+      "db_value": 0.743043,
+      "external_value": 0.743043,
+      "difference_pct": 0.0,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54007249295206,
+      "issues": [
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "CHF",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-07 20:42:16.999578",
+      "db_value": 0.811611,
+      "external_value": 0.811611,
+      "difference_pct": 0.0,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54007249295206,
+      "issues": [
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "THB",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-07 20:42:17.186012",
+      "db_value": 33.0863,
+      "external_value": 33.086318,
+      "difference_pct": 5.440315237611793e-05,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": 228.69512686266611,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "CAD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-07 20:42:17.346370",
+      "db_value": 1.401227,
+      "external_value": 1.401227,
+      "difference_pct": 0.0,
+      "is_accurate": false,
+      "freshness_days": 0,
+      "completeness_pct": 73.54007249295206,
+      "issues": [
+        "Data completeness 73.5% below 90%"
+      ],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "XAU",
+      "data_type": "commodities",
+      "timestamp": "2026-08-07 20:42:17.515445",
+      "db_value": 4267.85,
+      "external_value": 4267.85,
+      "difference_pct": 0.0,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [],
+      "external_source": "minted-metal-api"
+    },
+    {
+      "symbol": "XAG",
+      "data_type": "commodities",
+      "timestamp": "2026-08-07 20:42:17.705726",
+      "db_value": 61.74,
+      "external_value": 61.74,
+      "difference_pct": 0.0,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [],
+      "external_source": "minted-metal-api"
+    },
+    {
+      "symbol": "DXY",
+      "data_type": "dollar_index",
+      "timestamp": "2026-08-07 20:42:17.897362",
+      "db_value": 119.7034,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": 7,
+      "completeness_pct": null,
+      "issues": [
+        "Data is 7 days old (max: 2)",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    }
+  ]
+}

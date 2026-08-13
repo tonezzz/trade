@@ -24,6 +24,7 @@ from src.database import get_db
 from src.importer import DataImporter
 from src.notifications import NotificationManager, NotificationConfig, StatusLogger, load_notification_config_from_env
 from src.models import CommodityPrice, ExchangeRate, DollarIndex
+from src.data_sources import UnifiedDataDownloader
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -137,6 +138,14 @@ class JobScheduler:
         self.jobs: Dict[str, JobConfig] = {}
         self.job_history: List[JobResult] = []
         
+        # Load tolerance settings for intermittent availability
+        self.tolerance_days = self.config['settings'].get('tolerance', {
+            'thb': 2,
+            'dxy': 30,
+            'commodities': 90,
+            'currencies': 7
+        })
+        
         # Initialize notification system
         notification_config = load_notification_config_from_env()
         # Override with config file settings if available
@@ -146,6 +155,9 @@ class JobScheduler:
         
         self.notification_manager = NotificationManager(notification_config)
         self.status_logger = StatusLogger(self.config['settings'].get('log_file', 'logs/automation.log').replace('.log', '_status.log'))
+        
+        # Initialize unified data downloader
+        self.data_downloader = UnifiedDataDownloader(config_path)
         
         self._load_jobs()
     
@@ -198,25 +210,39 @@ class JobScheduler:
                 self.logger.info(f"Loaded job: {job_id}")
     
     def _download_data(self, job: JobConfig) -> str:
-        """Download data from URL."""
+        """Download data using unified data source system."""
         # Check for dry run mode
         if self.config['settings'].get('dry_run', False):
-            self.logger.info(f"DRY RUN: Would download {job.name} from {job.url}")
+            self.logger.info(f"DRY RUN: Would download {job.name} using unified data source")
             return "dry_run_file.csv"
         
-        import urllib.request
+        # Use unified data downloader
+        symbol = job.symbol or job.commodity or job.quote_currency
+        if not symbol:
+            self.logger.error(f"No symbol specified for job {job.name}")
+            raise ValueError(f"No symbol specified for job {job.name}")
         
-        download_dir = self.config['settings'].get('download_dir', 'data/archive')
-        os.makedirs(download_dir, exist_ok=True)
+        self.logger.info(f"Downloading {job.name} (symbol: {symbol}) using unified data source")
         
-        filename = f"{job.name.lower().replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.csv"
-        filepath = os.path.join(download_dir, filename)
+        # Download data using unified downloader
+        result = self.data_downloader.download_data(job.name, symbol)
         
-        self.logger.info(f"Downloading {job.name} from {job.url}")
-        urllib.request.urlretrieve(job.url, filepath)
-        self.logger.info(f"Downloaded to {filepath}")
+        if not result.success:
+            raise Exception(f"Data download failed: {result.error}")
         
-        return filepath
+        # Save to file
+        import_dir = self.config['settings'].get('import_dir', 'data/imported')
+        os.makedirs(import_dir, exist_ok=True)
+        
+        # Sanitize job name to avoid directory creation from slashes
+        safe_name = job.name.lower().replace(' ', '_').replace('/', '_').replace('\\', '_')
+        output_file = os.path.join(import_dir, f"{safe_name}_formatted.csv")
+        
+        if self.data_downloader.save_to_csv(result, output_file):
+            self.logger.info(f"Saved to {output_file}")
+            return output_file
+        else:
+            raise Exception("Failed to save downloaded data to CSV")
     
     def _format_data(self, job: JobConfig, input_file: str) -> str:
         """Format data using custom formatter if specified."""
@@ -225,53 +251,9 @@ class JobScheduler:
             self.logger.info(f"DRY RUN: Would format data for {job.name}")
             return "dry_run_formatted.csv"
         
-        import_dir = self.config['settings'].get('import_dir', 'data/imported')
-        os.makedirs(import_dir, exist_ok=True)
-        
-        output_file = os.path.join(
-            import_dir,
-            f"{job.name.lower().replace(' ', '_')}_formatted.csv"
-        )
-        
-        # If a custom formatter is specified, use it
-        if job.formatter:
-            # Try to import and use the formatter
-            try:
-                # Import formatter from download_data module
-                import download_data
-                
-                # For the existing formatters, we need to rename the input file to what they expect
-                if job.formatter in ['format_wti_data', 'format_brent_data']:
-                    # The existing formatters expect specific input file names
-                    expected_input = 'data/archive/wti_raw.csv' if job.formatter == 'format_wti_data' else 'data/archive/brent_raw.csv'
-                    
-                    # Copy the downloaded file to the expected location
-                    shutil.copy(input_file, expected_input)
-                    self.logger.info(f"Copied {input_file} to {expected_input} for formatter")
-                    
-                    if hasattr(download_data, job.formatter):
-                        formatter_func = getattr(download_data, job.formatter)
-                        formatter_func()
-                        
-                        # The existing formatters create files with specific names
-                        # We need to return the actual file that was created
-                        actual_output = 'data/imported/wti_formatted.csv' if job.formatter == 'format_wti_data' else 'data/imported/brent_formatted.csv'
-                        
-                        # If the actual output differs from expected, copy it to the expected location
-                        if actual_output != output_file and os.path.exists(actual_output):
-                            shutil.copy(actual_output, output_file)
-                            self.logger.info(f"Copied formatter output {actual_output} to {output_file}")
-                        
-                        return output_file
-                else:
-                    # Generic formatter call
-                    if hasattr(download_data, job.formatter):
-                        formatter_func = getattr(download_data, job.formatter)
-                        formatter_func()
-                        return output_file
-            except Exception as e:
-                self.logger.warning(f"Custom formatter failed: {e}. Using default formatting.")
-        
+        # Data is already formatted by unified downloader, just return the input file
+        self.logger.info(f"Data already formatted by unified downloader for {job.name}")
+        return input_file
         # Default: just copy the file
         shutil.copy(input_file, output_file)
         return output_file
@@ -431,12 +413,77 @@ class JobScheduler:
         self.job_history.append(result)
         return result
     
+    def get_last_update(self, job_id: str) -> Optional[datetime]:
+        """Get the last update date for a job's data."""
+        job = self.jobs[job_id]
+        session = next(get_db())
+        
+        try:
+            if job.type == 'exchange_rate':
+                # For exchange rates, get the latest date for the specific currency
+                if job.quote_currency:
+                    latest = session.query(ExchangeRate).filter(
+                        ExchangeRate.quote_currency == job.quote_currency.upper()
+                    ).order_by(ExchangeRate.date.desc()).first()
+                    if latest:
+                        return datetime.combine(latest.date, datetime.min.time())
+            elif job.type == 'dollar_index':
+                # For dollar index, get the latest date
+                latest = session.query(DollarIndex).order_by(DollarIndex.date.desc()).first()
+                if latest:
+                    return datetime.combine(latest.date, datetime.min.time())
+            elif job.type == 'commodity':
+                # For commodities, get the latest date for the specific commodity
+                if job.commodity:
+                    latest = session.query(CommodityPrice).filter(
+                        CommodityPrice.commodity == job.commodity.upper()
+                    ).order_by(CommodityPrice.date.desc()).first()
+                    if latest:
+                        return datetime.combine(latest.date, datetime.min.time())
+        finally:
+            session.close()
+        
+        return None
+    
+    def should_run_job(self, job_id: str) -> bool:
+        """Check if job should run based on data freshness."""
+        job = self.jobs[job_id]
+        if not job:
+            return False
+        
+        # Determine tolerance based on job type
+        if job.type == 'exchange_rate':
+            if job.quote_currency == 'THB':
+                tolerance = self.tolerance_days.get('thb', 2)
+            else:
+                tolerance = self.tolerance_days.get('currencies', 7)
+        elif job.type == 'dollar_index':
+            tolerance = self.tolerance_days.get('dxy', 30)
+        elif job.type == 'commodity':
+            tolerance = self.tolerance_days.get('commodities', 90)
+        else:
+            tolerance = 7  # Default tolerance
+        
+        # Check if data is within tolerance
+        last_update = self.get_last_update(job_id)
+        if last_update:
+            days_since_update = (datetime.now() - last_update).days
+            if days_since_update < tolerance:
+                self.logger.info(f"Skipping {job.name}: data is fresh ({days_since_update} days old, tolerance: {tolerance} days)")
+                return False
+        
+        return True
+    
     def schedule_job(self, job_id: str):
         """Schedule a job based on its configuration."""
         job = self.jobs[job_id]
         
         def job_wrapper():
-            self._execute_job(job_id)
+            # Check if job should run based on data freshness
+            if self.should_run_job(job_id):
+                self._execute_job(job_id)
+            else:
+                self.logger.info(f"Job {job.name} skipped due to fresh data")
         
         # Schedule based on job configuration
         if job.schedule == 'daily':
@@ -468,6 +515,55 @@ class JobScheduler:
     def run_job_now(self, job_id: str) -> JobResult:
         """Run a job immediately (for testing or manual execution)."""
         return self._execute_job(job_id)
+    
+    def run_job_with_retry(self, job_id: str, max_retries: int = None) -> JobResult:
+        """Run job with retry logic for network issues."""
+        if max_retries is None:
+            max_retries = self.config['settings'].get('max_retries', 3)
+        
+        original_max_retries = self.retry_handler.max_retries
+        self.retry_handler.max_retries = max_retries
+        
+        try:
+            result = self._execute_job(job_id)
+            return result
+        finally:
+            self.retry_handler.max_retries = original_max_retries
+    
+    def run_catch_up_updates(self) -> Dict[str, JobResult]:
+        """Run catch-up updates for all stale data sources."""
+        self.logger.info("Starting catch-up updates for stale data")
+        results = {}
+        
+        for job_id in self.jobs:
+            if not self.should_run_job(job_id):
+                # Data is fresh, skip
+                continue
+            
+            self.logger.info(f"Running catch-up update for {job_id}")
+            try:
+                result = self.run_job_with_retry(job_id, max_retries=3)
+                results[job_id] = result
+                
+                if result.status == JobStatus.SUCCESS:
+                    self.logger.info(f"Catch-up successful for {job_id}: {result.records_processed} records")
+                else:
+                    self.logger.error(f"Catch-up failed for {job_id}: {result.error_message}")
+            except Exception as e:
+                self.logger.error(f"Catch-up error for {job_id}: {e}")
+                results[job_id] = JobResult(
+                    job_name=self.jobs[job_id].name,
+                    status=JobStatus.FAILED,
+                    start_time=datetime.now(),
+                    end_time=datetime.now(),
+                    error_message=str(e)
+                )
+        
+        successful = sum(1 for r in results.values() if r.status == JobStatus.SUCCESS)
+        failed = len(results) - successful
+        
+        self.logger.info(f"Catch-up updates completed: {successful} successful, {failed} failed")
+        return results
     
     def run_all_jobs_now(self) -> List[JobResult]:
         """Run all jobs immediately (for testing)."""

@@ -166,6 +166,26 @@ mcp_servers:
       - "chrome_automation"
       - "playwright"
       - "browser_testing"
+
+  playlive_local:
+    name: "playlive.local"
+    description: "Browser automation MCP server on tony-omen"
+    machine: "tony_omen"
+    transport: "stdio"
+    enabled: true
+    endpoint: "http://localhost:9231"
+    capabilities:
+      - "chrome_automation"
+      - "playwright"
+      - "browser_testing"
+    deployment:
+      service_path: "/home/tony/CascadeProjects/chaba-omen/mcp/mcp-playlive/playlived.service"
+      daemon_path: "/home/tony/CascadeProjects/chaba-omen/mcp/mcp-playlive/playlived.mjs"
+      systemd_service: "playlived.service"
+      environment:
+        PLAYLIVED_PORT: "9231"
+        PLAYLIVED_REMOTE_CDP: "http://127.0.0.1:9223"
+        PLAYLIVED_LOCAL_CDP: "http://localhost:9222"
       
   mcp_gpu:
     name: "mcp-gpu"
@@ -180,6 +200,25 @@ mcp_servers:
     environment:
       IMAGEN_URL: "http://localhost:8080/apps/imagen2/api"
       LLAMA_URL: "http://localhost:8001"
+
+  docs_trade:
+    name: "docs-trade"
+    description: "Documentation search MCP server for trade project"
+    machine: "tony_omen"
+    transport: "stdio"
+    enabled: true
+    capabilities:
+      - "documentation_search"
+      - "full_text_search"
+      - "documentation_indexing"
+    deployment:
+      docs_path: "/home/tony/CascadeProjects/trade/docs"
+      cache_dir: "/home/tony/CascadeProjects/trade/.docs-mcp"
+      mcp_tool: "@devista/docs-mcp"
+      tools:
+        - search_docs
+        - get_page
+        - list_sections
 
 # Network configuration
 network:
@@ -211,7 +250,12 @@ network:
       destination: "tony-dell"
       port: 9230
       protocol: "tcp"
-      description: "PlayLive browser automation"
+      description: "PlayLive browser automation on tony-dell"
+    - source: "tony-omen"
+      destination: "tony-omen"
+      port: 9231
+      protocol: "tcp"
+      description: "PlayLive browser automation on tony-omen"
 
 # Monitoring and health checks
 monitoring:
@@ -235,6 +279,168 @@ monitoring:
       metric: "disk_usage"
       threshold: 90  # percent
       interval: 3600  # 1 hour
+    
+    - name: "trade_api_health"
+      type: "http"
+      endpoint: "http://localhost:9000/api/health"
+      interval: 60  # 1 minute
+      timeout: 10
+      expected_status: 200
+      
+    - name: "trade_data_quality"
+      type: "http"
+      endpoint: "http://localhost:9000/api/data_quality"
+      interval: 300  # 5 minutes
+      timeout: 15
+      
+    - name: "trade_automation_status"
+      type: "container"
+      container: "trade-automation"
+      interval: 300  # 5 minutes
+      timeout: 10
+
+# Trade system configuration
+trade_system:
+  # Docker Compose configuration
+  docker_compose:
+    project_name: "trade"
+    compose_file: "docker-compose.yml"
+    network: "trade-network"
+    services:
+      trade-api:
+        image: "trade-trade-api"
+        container_name: "trade-api"
+        ports:
+          - "9000:9000"
+        environment:
+          - DB_TYPE=sqlite
+          - DB_NAME=/app/data/dollar_prices.db
+          - DATA_QUALITY_ENABLED=true
+          - ALPHA_VANTAGE_API_KEY=KUTH6I3J1OORWZI8
+        volumes:
+          - ./data:/app/data
+          - ./config:/app/config
+          - ./logs:/app/logs
+        restart: unless-stopped
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+          start_period: 40s
+      
+      trade-automation:
+        image: "trade-trade-automation"
+        container_name: "trade-automation"
+        environment:
+          - DB_TYPE=sqlite
+          - DB_NAME=/app/data/dollar_prices.db
+          - DATA_QUALITY_ENABLED=true
+          - ALPHA_VANTAGE_API_KEY=KUTH6I3J1OORWZI8
+        volumes:
+          - ./data:/app/data
+          - ./config:/app/config
+          - ./logs:/app/logs
+        command: ["python", "scripts/auto_update.py", "--scheduled"]
+        restart: unless-stopped
+        depends_on:
+          - trade-api
+  
+  # Database configuration
+  database:
+    type: "sqlite"
+    path: "./data/dollar_prices.db"
+    size: "26MB"
+    tables:
+      - exchange_rates: 145,061 records (23 currencies)
+      - dollar_index: 13,478 records (1973-2026)
+      - commodity_prices: 828 records (WHEAT, CORN)
+    backup_enabled: false
+    backup_schedule: "daily"
+    backup_retention: 7
+  
+  # API endpoints
+  api:
+    base_url: "http://localhost:9000"
+    endpoints:
+      health: "/api/health"
+      data_quality: "/api/data_quality"
+      exchange_rates: "/api/exchange_rates/{currency}"
+      dollar_index: "/api/dollar_index"
+      commodity_prices: "/api/commodity_prices/{commodity}"
+      available_currencies: "/api/available/currencies"
+      available_commodities: "/api/available/commodities"
+  
+  # Data sources configuration
+  data_sources:
+    thb:
+      provider: "open.er-api.com"
+      format: "JSON"
+      url: "https://open.er-api.com/v6/latest/USD"
+      update_frequency: "daily"
+      status: "active"
+      last_update: "2026-08-10"
+    
+    dxy:
+      provider: "FRED API"
+      series_id: "DTWEXBGS"
+      format: "CSV"
+      url: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS"
+      update_frequency: "daily"
+      status: "limited"
+      last_update: "2026-07-31"
+      note: "DNS issues in containers, use host system for updates"
+    
+    commodities:
+      provider: "Alpha Vantage"
+      format: "JSON"
+      functions:
+        - COPPER: "Copper prices"
+        - NATURAL_GAS: "Henry Hub Natural Gas"
+        - WTI: "Crude Oil WTI"
+        - BRENT: "Crude Oil Brent"
+      update_frequency: "monthly"
+      status: "active"
+      last_update: "2026-08-03"
+      note: "WHEAT and CORN removed on 2026-08-10 due to Alpha Vantage monthly data staleness (70+ days)"
+    
+    currencies:
+      provider: "FRED API"
+      format: "CSV"
+      currencies:
+        - EUR: "DEXUSEU"
+        - JPY: "DEXJPUS"
+        - CAD: "DEXCAUS"
+        - CHF: "DEXSZUS"
+        - AUD: "DEXUSAL"
+        - NZD: "DEXUSNZ"
+        - GBP: "DEXUSUK"
+        - SEK: "DEXSDUS"
+        - NOK: "DEXNOUS"
+        - DKK: "DEXDKUS"
+        - CZK: "DEXCZUS"
+        - HUF: "DEXHUF"
+        - PLN: "DEXPLN"
+        - INR: "DEXINUS"
+        - CNY: "DEXCHUS"
+        - KRW: "DEXKOUS"
+        - MXN: "DEXMXUS"
+        - TRY: "DEXUSTUS"
+        - ZAR: "DEXSZUS"
+        - BRL: "DEXBZUS"
+      update_frequency: "daily"
+      status: "limited"
+      note: "DNS issues in containers, use host system for updates"
+  
+  # Data quality thresholds
+  data_quality:
+    max_freshness_days:
+      thb: 2
+      currencies: 7
+      dxy: 30
+      commodities: 90
+    min_completeness_pct: 90
+    outlier_threshold: 3  # standard deviations
 
 # Backup and recovery
 backup:
