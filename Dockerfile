@@ -33,7 +33,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ ./src/
 COPY config/ ./config/
 COPY scripts/ ./scripts/
-COPY download_data.py ./
 
 # Create data directory
 RUN mkdir -p /app/data
@@ -46,4 +45,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:9000/api/health || exit 1
 
 # Run the application with uvicorn
-CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "9000"]
+CMD ["uvicorn", "src.legacy_api:app", "--host", "0.0.0.0", "--port", "9000"]

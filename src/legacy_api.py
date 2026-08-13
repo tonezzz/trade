@@ -166,6 +166,25 @@ class SignalHistoryResponse(BaseModel):
     timeframe: Optional[str] = None
 
 
+class ChartDataResponse(BaseModel):
+    """Chart data response for UI consumption."""
+    data: List[Dict[str, Any]]
+    count: int
+    last_updated: str
+    symbol: str
+    timeframe: str
+
+
+class ChartDataPoint(BaseModel):
+    """Single chart data point."""
+    time: int  # Unix timestamp
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: Optional[float] = None
+
+
 class SignalPerformanceResponse(BaseModel):
     """Signal performance metrics response."""
     asset_type: str
@@ -324,13 +343,13 @@ def parse_period(period: str) -> tuple[date, date]:
         '1y': (today - timedelta(days=365), today),
         '5y': (today - timedelta(days=1825), today),
     }
-    
+
     if period not in period_map:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid period: {period}. Must be one of: {list(period_map.keys())}"
         )
-    
+
     return period_map[period]
 
 
@@ -342,7 +361,7 @@ def apply_pagination(data: List, limit: Optional[int], offset: int = 0) -> Dict[
     else:
         paginated_data = data[offset:]
         has_more = False
-    
+
     return {
         'data': paginated_data,
         'count': len(data),
@@ -445,24 +464,24 @@ async def get_exchange_rates(
     try:
         # Validate currency
         validated_currency = DataValidator.validate_currency_code(currency)
-        
+
         # Parse dates
         if period and (start_date or end_date):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Cannot specify both 'period' and 'start_date'/'end_date'"
             )
-        
+
         if period:
             start_dt, end_dt = parse_period(period)
         else:
             start_dt = DataValidator.validate_date(start_date) if start_date else None
             end_dt = DataValidator.validate_date(end_date) if end_date else None
-        
+
         # Query data
         queries = PriceQueries(db)
         df = queries.get_exchange_rates(validated_currency, start_dt, end_dt)
-        
+
         if df.empty:
             return PaginatedResponse(
                 data=[],
@@ -471,7 +490,7 @@ async def get_exchange_rates(
                 offset=offset,
                 has_more=False
             )
-        
+
         # Convert to response models
         data = [
             ExchangeRateResponse(
@@ -492,7 +511,7 @@ async def get_exchange_rates(
         paginated = apply_pagination(data, limit, offset)
 
         return PaginatedResponse(**paginated)
-        
+
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -505,21 +524,160 @@ async def get_exchange_rates(
         )
 
 
+@app.get("/api/ui/chart-data/{symbol}", response_model=ChartDataResponse)
+async def get_ui_chart_data(
+    symbol: str,
+    timeframe: str = Query("1y", description="Time period: 1d, 1w, 1m, 3m, 6m, 1y, all"),
+    db: Session = Depends(get_db)
+):
+    """Get chart data formatted for UI consumption (Lightweight Charts format)."""
+    try:
+        # Determine data type based on symbol
+        if symbol.upper() in ['THB', 'EUR', 'GBP', 'JPY', 'CAD', 'CHF', 'AUD', 'NZD']:
+            # Currency data
+            validated_currency = DataValidator.validate_currency_code(symbol)
+            start_dt, end_dt = parse_period(timeframe) if timeframe != 'all' else (None, None)
+
+            queries = PriceQueries(db)
+            df = queries.get_exchange_rates(validated_currency, start_dt, end_dt)
+
+            if df.empty:
+                return ChartDataResponse(
+                    data=[],
+                    count=0,
+                    last_updated=datetime.now().isoformat(),
+                    symbol=symbol.upper(),
+                    timeframe=timeframe
+                )
+
+            # Convert to chart format
+            chart_data = []
+            for _, row in df.iterrows():
+                chart_data.append({
+                    "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
+                    "open": float(row['open'] if pd.notna(row['open']) else row['rate']),
+                    "high": float(row['high'] if pd.notna(row['high']) else row['rate']),
+                    "low": float(row['low'] if pd.notna(row['low']) else row['rate']),
+                    "close": float(row['close'] if pd.notna(row['close']) else row['rate']),
+                    "volume": float(row['volume']) if pd.notna(row['volume']) else None
+                })
+
+            # Get last updated date
+            last_updated = df['date'].max() if not df.empty else datetime.now()
+            if isinstance(last_updated, date):
+                last_updated = datetime.combine(last_updated, datetime.min.time())
+
+        elif symbol.upper() in ['GOLD', 'SILVER', 'OIL', 'WTI', 'BRENT', 'COPPER', 'NATURAL_GAS', 'WHEAT', 'CORN']:
+            # Commodity data
+            commodity = symbol.upper()
+            start_dt, end_dt = parse_period(timeframe) if timeframe != 'all' else (None, None)
+
+            queries = PriceQueries(db)
+            df = queries.get_commodity_prices(commodity, start_dt, end_dt)
+
+            if df.empty:
+                return ChartDataResponse(
+                    data=[],
+                    count=0,
+                    last_updated=datetime.now().isoformat(),
+                    symbol=commodity,
+                    timeframe=timeframe
+                )
+
+            # Convert to chart format
+            chart_data = []
+            for _, row in df.iterrows():
+                chart_data.append({
+                    "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
+                    "open": float(row['open_price'] if pd.notna(row['open_price']) else row['price']),
+                    "high": float(row['high_price'] if pd.notna(row['high_price']) else row['price']),
+                    "low": float(row['low_price'] if pd.notna(row['low_price']) else row['price']),
+                    "close": float(row['close_price'] if pd.notna(row['close_price']) else row['price']),
+                    "volume": float(row['volume']) if pd.notna(row['volume']) else None
+                })
+
+            # Get last updated date
+            last_updated = df['date'].max() if not df.empty else datetime.now()
+            if isinstance(last_updated, date):
+                last_updated = datetime.combine(last_updated, datetime.min.time())
+
+        elif symbol.upper() == 'DXY' or symbol.upper() == 'DOLLAR_INDEX':
+            # Dollar index data
+            start_dt, end_dt = parse_period(timeframe) if timeframe != 'all' else (None, None)
+
+            queries = PriceQueries(db)
+            df = queries.get_dollar_index(start_dt, end_dt)
+
+            if df.empty:
+                return ChartDataResponse(
+                    data=[],
+                    count=0,
+                    last_updated=datetime.now().isoformat(),
+                    symbol='DXY',
+                    timeframe=timeframe
+                )
+
+            # Convert to chart format
+            chart_data = []
+            for _, row in df.iterrows():
+                chart_data.append({
+                    "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
+                    "open": float(row['open_price'] if pd.notna(row['open_price']) else row['value']),
+                    "high": float(row['high_price'] if pd.notna(row['high_price']) else row['value']),
+                    "low": float(row['low_price'] if pd.notna(row['low_price']) else row['value']),
+                    "close": float(row['close_price'] if pd.notna(row['close_price']) else row['value']),
+                    "volume": float(row['volume']) if pd.notna(row['volume']) else None
+                })
+
+            # Get last updated date
+            last_updated = df['date'].max() if not df.empty else datetime.now()
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Unknown symbol: {symbol}. Supported: currencies (THB, EUR, etc.), commodities (GOLD, OIL, etc.), DXY"
+            )
+
+        # Ensure last_updated is a datetime
+        if isinstance(last_updated, date):
+            last_updated = datetime.combine(last_updated, datetime.min.time())
+
+        return ChartDataResponse(
+            data=chart_data,
+            count=len(chart_data),
+            last_updated=last_updated.isoformat() if hasattr(last_updated, 'isoformat') else str(last_updated),
+            symbol=symbol.upper(),
+            timeframe=timeframe
+        )
+
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve chart data: {str(e)}"
+        )
+
+
 @app.get("/api/exchange_rates/{currency}/latest", response_model=ExchangeRateResponse)
 async def get_latest_exchange_rate(currency: str, db: Session = Depends(get_db)):
     """Get the latest exchange rate for a currency."""
     try:
         validated_currency = DataValidator.validate_currency_code(currency)
-        
+
         queries = PriceQueries(db)
         latest = queries.get_latest_exchange_rate(validated_currency)
-        
+
         if not latest:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"No exchange rate data found for currency: {validated_currency}"
             )
-        
+
         return ExchangeRateResponse(
             date=latest.date,
             base_currency=latest.base_currency,
@@ -531,7 +689,7 @@ async def get_latest_exchange_rate(currency: str, db: Session = Depends(get_db))
             close=latest.close_price if latest.close_price is not None else latest.rate,
             volume=latest.volume
         )
-        
+
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -563,17 +721,17 @@ async def get_dollar_index(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Cannot specify both 'period' and 'start_date'/'end_date'"
             )
-        
+
         if period:
             start_dt, end_dt = parse_period(period)
         else:
             start_dt = DataValidator.validate_date(start_date) if start_date else None
             end_dt = DataValidator.validate_date(end_date) if end_date else None
-        
+
         # Query data
         queries = PriceQueries(db)
         df = queries.get_dollar_index(start_dt, end_dt)
-        
+
         if df.empty:
             return PaginatedResponse(
                 data=[],
@@ -582,7 +740,7 @@ async def get_dollar_index(
                 offset=offset,
                 has_more=False
             )
-        
+
         # Convert to response models
         data = [
             DollarIndexResponse(
@@ -596,12 +754,12 @@ async def get_dollar_index(
             )
             for _, row in df.iterrows()
         ]
-        
+
         # Apply pagination
         paginated = apply_pagination(data, limit, offset)
-        
+
         return PaginatedResponse(**paginated)
-        
+
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -620,13 +778,13 @@ async def get_latest_dollar_index(db: Session = Depends(get_db)):
     try:
         queries = PriceQueries(db)
         latest = queries.get_latest_dollar_index()
-        
+
         if not latest:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="No dollar index data found"
             )
-        
+
         return DollarIndexResponse(
             date=latest.date,
             value=latest.value,
@@ -636,7 +794,7 @@ async def get_latest_dollar_index(db: Session = Depends(get_db)):
             close=latest.close_price if latest.close_price is not None else latest.value,
             volume=latest.volume
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -660,24 +818,24 @@ async def get_commodity_prices(
     try:
         # Validate commodity
         validated_commodity = DataValidator.validate_commodity(commodity)
-        
+
         # Parse dates
         if period and (start_date or end_date):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Cannot specify both 'period' and 'start_date'/'end_date'"
             )
-        
+
         if period:
             start_dt, end_dt = parse_period(period)
         else:
             start_dt = DataValidator.validate_date(start_date) if start_date else None
             end_dt = DataValidator.validate_date(end_date) if end_date else None
-        
+
         # Query data
         queries = PriceQueries(db)
         df = queries.get_commodity_prices(commodity=validated_commodity, start_date=start_dt, end_date=end_dt)
-        
+
         if df.empty:
             return PaginatedResponse(
                 data=[],
@@ -686,7 +844,7 @@ async def get_commodity_prices(
                 offset=offset,
                 has_more=False
             )
-        
+
         # Convert to response models
         data = [
             CommodityPriceResponse(
@@ -703,12 +861,12 @@ async def get_commodity_prices(
             )
             for _, row in df.iterrows()
         ]
-        
+
         # Apply pagination
         paginated = apply_pagination(data, limit, offset)
-        
+
         return PaginatedResponse(**paginated)
-        
+
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -726,16 +884,16 @@ async def get_latest_commodity_price(commodity: str, db: Session = Depends(get_d
     """Get the latest commodity price."""
     try:
         validated_commodity = DataValidator.validate_commodity(commodity)
-        
+
         queries = PriceQueries(db)
         latest = queries.get_latest_commodity_price(commodity=validated_commodity)
-        
+
         if not latest:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"No commodity price data found for: {validated_commodity}"
             )
-        
+
         return CommodityPriceResponse(
             date=latest.date,
             commodity=latest.commodity,
@@ -748,7 +906,7 @@ async def get_latest_commodity_price(commodity: str, db: Session = Depends(get_d
             close=latest.close_price if latest.close_price is not None else latest.price,
             volume=latest.volume
         )
-        
+
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -774,14 +932,14 @@ async def get_performance(
     """Get performance analysis for a currency."""
     try:
         validated_currency = DataValidator.validate_currency_code(currency)
-        
+
         # Parse dates
         if period and (start_date or end_date):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Cannot specify both 'period' and 'start_date'/'end_date'"
             )
-        
+
         if period:
             start_dt, end_dt = parse_period(period)
         else:
@@ -792,19 +950,19 @@ async def get_performance(
                 )
             start_dt = DataValidator.validate_date(start_date)
             end_dt = DataValidator.validate_date(end_date)
-        
+
         # Calculate performance
         analysis = PriceAnalysis(db)
         performance = analysis.calculate_currency_performance(validated_currency, start_dt, end_dt)
-        
+
         if not performance:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"No performance data found for currency: {validated_currency}"
             )
-        
+
         return PerformanceResponse(**performance)
-        
+
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -829,29 +987,29 @@ async def get_currency_signal(
 ):
     """
     Get current trading signal for a currency.
-    
+
     Args:
         currency: Currency code (e.g., EUR, GBP, JPY)
         timeframe: Timeframe for analysis
         db: Database session
-        
+
     Returns:
         Current trading signal with indicators
     """
     try:
         # Validate currency
         validated_currency = DataValidator.validate_currency_code(currency)
-        
+
         # Get historical data
         queries = PriceQueries(db)
         df = queries.get_exchange_rates(validated_currency)
-        
+
         if df.empty or len(df) < 50:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Insufficient data for currency: {validated_currency}"
             )
-        
+
         # Prepare data for signal generation
         df = df.set_index('date')
         if 'close' not in df.columns and 'rate' in df.columns:
@@ -864,18 +1022,18 @@ async def get_currency_signal(
             df['low'] = df['close']
         if 'volume' not in df.columns:
             df['volume'] = 1.0
-        
+
         # Generate signal
         generator = SignalGenerator()
         signal = generator.generate_signal(df, timeframe)
-        
+
         # Validate signal
         validation = generator.validate_signal(signal)
-        
+
         # Save signal to history
         history_tracker = SignalHistoryTracker(db)
         history_tracker.save_signal(signal, 'currency', validated_currency)
-        
+
         response = SignalResponse(
             signal_type=signal.signal_type.value,
             strength=signal.strength.value,
@@ -887,9 +1045,9 @@ async def get_currency_signal(
             timeframe=signal.timeframe,
             validation=validation
         )
-        
+
         return response
-        
+
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -911,11 +1069,11 @@ async def get_dollar_index_signal(
 ):
     """
     Get current trading signal for Dollar Index (DXY).
-    
+
     Args:
         timeframe: Timeframe for analysis
         db: Database session
-        
+
     Returns:
         Current trading signal with indicators
     """
@@ -923,13 +1081,13 @@ async def get_dollar_index_signal(
         # Get historical data
         queries = PriceQueries(db)
         df = queries.get_dollar_index()
-        
+
         if df.empty or len(df) < 50:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Insufficient data for Dollar Index"
             )
-        
+
         # Prepare data for signal generation
         df = df.set_index('date')
         if 'close' not in df.columns and 'value' in df.columns:
@@ -942,18 +1100,18 @@ async def get_dollar_index_signal(
             df['low'] = df['close']
         if 'volume' not in df.columns:
             df['volume'] = 1.0
-        
+
         # Generate signal
         generator = SignalGenerator()
         signal = generator.generate_signal(df, timeframe)
-        
+
         # Validate signal
         validation = generator.validate_signal(signal)
-        
+
         # Save signal to history
         history_tracker = SignalHistoryTracker(db)
         history_tracker.save_signal(signal, 'dollar_index', 'DXY')
-        
+
         response = SignalResponse(
             signal_type=signal.signal_type.value,
             strength=signal.strength.value,
@@ -965,9 +1123,9 @@ async def get_dollar_index_signal(
             timeframe=signal.timeframe,
             validation=validation
         )
-        
+
         return response
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -985,12 +1143,12 @@ async def get_commodity_signal(
 ):
     """
     Get current trading signal for a commodity.
-    
+
     Args:
         commodity: Commodity name or symbol (e.g., GOLD, XAU, OIL)
         timeframe: Timeframe for analysis
         db: Database session
-        
+
     Returns:
         Current trading signal with indicators
     """
@@ -998,17 +1156,17 @@ async def get_commodity_signal(
         # Get historical data
         queries = PriceQueries(db)
         df = queries.get_commodity_prices(commodity=commodity.upper())
-        
+
         if df.empty:
             # Try by symbol
             df = queries.get_commodity_prices(symbol=commodity.upper())
-        
+
         if df.empty or len(df) < 50:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Insufficient data for commodity: {commodity}"
             )
-        
+
         # Prepare data for signal generation
         df = df.set_index('date')
         if 'close' not in df.columns and 'price' in df.columns:
@@ -1021,19 +1179,19 @@ async def get_commodity_signal(
             df['low'] = df['close']
         if 'volume' not in df.columns:
             df['volume'] = 1.0
-        
+
         # Generate signal
         generator = SignalGenerator()
         signal = generator.generate_signal(df, timeframe)
-        
+
         # Validate signal
         validation = generator.validate_signal(signal)
-        
+
         # Save signal to history
         history_tracker = SignalHistoryTracker(db)
         symbol = df['symbol'].iloc[-1] if 'symbol' in df.columns else commodity.upper()
         history_tracker.save_signal(signal, 'commodity', symbol)
-        
+
         response = SignalResponse(
             signal_type=signal.signal_type.value,
             strength=signal.strength.value,
@@ -1045,9 +1203,9 @@ async def get_commodity_signal(
             timeframe=signal.timeframe,
             validation=validation
         )
-        
+
         return response
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -1066,13 +1224,13 @@ async def get_signal_history(
 ):
     """
     Get signal history.
-    
+
     Args:
         asset_type: Filter by asset type (currency, commodity, dollar_index)
         asset_symbol: Filter by asset symbol
         limit: Maximum number of signals to return
         db: Database session
-        
+
     Returns:
         List of historical signals
     """
@@ -1083,9 +1241,9 @@ async def get_signal_history(
             asset_symbol=asset_symbol,
             limit=limit
         )
-        
+
         return [SignalHistoryResponse(**s) for s in signals]
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -1100,38 +1258,38 @@ async def run_signal_backtest(
 ):
     """
     Run backtest on historical data using signal generation.
-    
+
     Args:
         request: Backtest request parameters
         db: Database session
-        
+
     Returns:
         Backtest results
     """
     try:
         # Get historical data based on asset type
         queries = PriceQueries(db)
-        
+
         if request.asset_type == 'currency':
             df = queries.get_exchange_rates(request.asset_symbol, request.start_date, request.end_date)
         elif request.asset_type == 'dollar_index':
             df = queries.get_dollar_index(request.start_date, request.end_date)
         elif request.asset_type == 'commodity':
-            df = queries.get_commodity_prices(commodity=request.asset_symbol, 
-                                             start_date=request.start_date, 
+            df = queries.get_commodity_prices(commodity=request.asset_symbol,
+                                             start_date=request.start_date,
                                              end_date=request.end_date)
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Invalid asset type: {request.asset_type}"
             )
-        
+
         if df.empty or len(df) < 100:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Insufficient data for backtesting (minimum 100 data points required)"
             )
-        
+
         # Prepare data
         df = df.set_index('date')
         if 'close' not in df.columns:
@@ -1144,7 +1302,7 @@ async def run_signal_backtest(
             df['low'] = df['close']
         if 'volume' not in df.columns:
             df['volume'] = 1.0
-        
+
         # Run backtest
         generator = SignalGenerator()
         backtester = Backtester(generator)
@@ -1153,7 +1311,7 @@ async def run_signal_backtest(
             initial_capital=request.initial_capital,
             commission=request.commission
         )
-        
+
         # Save performance to database
         if 'error' not in results:
             try:
@@ -1175,9 +1333,9 @@ async def run_signal_backtest(
             except Exception as e:
                 db.rollback()
                 print(f"Error saving backtest results: {e}")
-        
+
         return results
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -1196,28 +1354,28 @@ async def get_signal_performance(
 ):
     """
     Get signal performance metrics from backtests.
-    
+
     Args:
         asset_type: Filter by asset type
         asset_symbol: Filter by asset symbol
         limit: Maximum number of results
         db: Database session
-        
+
     Returns:
         List of performance metrics
     """
     try:
         query = db.query(SignalPerformance)
-        
+
         if asset_type:
             query = query.filter(SignalPerformance.asset_type == asset_type)
         if asset_symbol:
             query = query.filter(SignalPerformance.asset_symbol == asset_symbol)
-        
+
         results = query.order_by(
             SignalPerformance.test_end_date.desc()
         ).limit(limit).all()
-        
+
         return [SignalPerformanceResponse(
             asset_type=r.asset_type,
             asset_symbol=r.asset_symbol,
@@ -1235,7 +1393,7 @@ async def get_signal_performance(
             profit_factor=r.profit_factor,
             sharpe_ratio=r.sharpe_ratio
         ) for r in results]
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -1250,26 +1408,26 @@ async def get_currency_indicators(
 ):
     """
     Get all technical indicators for a currency without generating a signal.
-    
+
     Args:
         currency: Currency code
         db: Database session
-        
+
     Returns:
         Dictionary of all calculated indicators
     """
     try:
         validated_currency = DataValidator.validate_currency_code(currency)
-        
+
         queries = PriceQueries(db)
         df = queries.get_exchange_rates(validated_currency)
-        
+
         if df.empty or len(df) < 50:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Insufficient data for currency: {validated_currency}"
             )
-        
+
         # Prepare data
         df = df.set_index('date')
         if 'close' not in df.columns and 'rate' in df.columns:
@@ -1282,11 +1440,11 @@ async def get_currency_indicators(
             df['low'] = df['close']
         if 'volume' not in df.columns:
             df['volume'] = 1.0
-        
+
         # Calculate indicators
         generator = SignalGenerator()
         indicators = generator.calculate_all_indicators(df)
-        
+
         # Return only the latest values
         latest_indicators = {}
         for key, series in indicators.items():
@@ -1296,13 +1454,13 @@ async def get_currency_indicators(
                 latest_indicators[key] = series
             else:
                 latest_indicators[key] = series
-        
+
         return {
             'currency': validated_currency,
             'timestamp': datetime.now().isoformat(),
             'indicators': latest_indicators
         }
-        
+
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -1855,35 +2013,35 @@ async def compare_strategies(request: CompareRequest, db: Session = Depends(get_
 async def websocket_exchange_rates(websocket: WebSocket, currency: str):
     """
     WebSocket endpoint for live exchange rate updates.
-    
+
     Subscribe to real-time exchange rate updates for a specific currency.
-    
+
     Args:
         websocket: WebSocket connection
         currency: Currency code (e.g., EUR, GBP, JPY)
     """
     manager = get_websocket_manager()
     config = get_websocket_config()
-    
+
     # Get client IP
     client_host = websocket.client.host if websocket.client else "unknown"
-    
+
     try:
         # Validate currency
         validated_currency = DataValidator.validate_currency_code(currency)
-        
+
         # Connect client
         client_id = await manager.connect(websocket, client_host)
-        
+
         # Subscribe to data stream
         await manager.subscribe(client_id, 'exchange_rate', validated_currency)
-        
+
         # Send initial data
         db = next(get_db())
         queries = PriceQueries(db)
         latest = queries.get_latest_exchange_rate(validated_currency)
         db.close()
-        
+
         if latest:
             await manager.send_personal_message({
                 'type': 'exchange_rate',
@@ -1898,11 +2056,11 @@ async def websocket_exchange_rates(websocket: WebSocket, currency: str):
                 'timestamp': datetime.now(timezone.utc).isoformat(),
                 'message': 'Connected to exchange rate stream'
             }, client_id)
-        
+
         # Handle client messages
         while True:
             data = await websocket.receive_json()
-            
+
             # Handle subscription changes
             if data.get('action') == 'unsubscribe':
                 await manager.unsubscribe(client_id, 'exchange_rate', validated_currency)
@@ -1911,14 +2069,14 @@ async def websocket_exchange_rates(websocket: WebSocket, currency: str):
                     'message': f'Unsubscribed from {validated_currency}'
                 }, client_id)
                 break
-            
+
             # Handle ping/pong
             elif data.get('action') == 'ping':
                 await manager.send_personal_message({
                     'type': 'pong',
                     'timestamp': datetime.now(timezone.utc).isoformat()
                 }, client_id)
-            
+
     except ValidationError as e:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason=str(e))
     except Exception as e:
@@ -1933,30 +2091,30 @@ async def websocket_exchange_rates(websocket: WebSocket, currency: str):
 async def websocket_dollar_index(websocket: WebSocket):
     """
     WebSocket endpoint for live Dollar Index (DXY) updates.
-    
+
     Subscribe to real-time Dollar Index updates.
-    
+
     Args:
         websocket: WebSocket connection
     """
     manager = get_websocket_manager()
-    
+
     # Get client IP
     client_host = websocket.client.host if websocket.client else "unknown"
-    
+
     try:
         # Connect client
         client_id = await manager.connect(websocket, client_host)
-        
+
         # Subscribe to data stream
         await manager.subscribe(client_id, 'dollar_index', 'DXY')
-        
+
         # Send initial data
         db = next(get_db())
         queries = PriceQueries(db)
         latest = queries.get_latest_dollar_index()
         db.close()
-        
+
         if latest:
             await manager.send_personal_message({
                 'type': 'dollar_index',
@@ -1970,11 +2128,11 @@ async def websocket_dollar_index(websocket: WebSocket):
                 'timestamp': datetime.now(timezone.utc).isoformat(),
                 'message': 'Connected to dollar index stream'
             }, client_id)
-        
+
         # Handle client messages
         while True:
             data = await websocket.receive_json()
-            
+
             # Handle subscription changes
             if data.get('action') == 'unsubscribe':
                 await manager.unsubscribe(client_id, 'dollar_index', 'DXY')
@@ -1983,14 +2141,14 @@ async def websocket_dollar_index(websocket: WebSocket):
                     'message': 'Unsubscribed from dollar index'
                 }, client_id)
                 break
-            
+
             # Handle ping/pong
             elif data.get('action') == 'ping':
                 await manager.send_personal_message({
                     'type': 'pong',
                     'timestamp': datetime.now(timezone.utc).isoformat()
                 }, client_id)
-            
+
     except Exception as e:
         logger = __import__('logging').getLogger(__name__)
         logger.error(f"WebSocket error for dollar index: {e}")
@@ -2003,34 +2161,34 @@ async def websocket_dollar_index(websocket: WebSocket):
 async def websocket_commodity_prices(websocket: WebSocket, commodity: str):
     """
     WebSocket endpoint for live commodity price updates.
-    
+
     Subscribe to real-time commodity price updates for a specific commodity.
-    
+
     Args:
         websocket: WebSocket connection
         commodity: Commodity name (e.g., GOLD, SILVER, OIL)
     """
     manager = get_websocket_manager()
-    
+
     # Get client IP
     client_host = websocket.client.host if websocket.client else "unknown"
-    
+
     try:
         # Validate commodity (basic validation)
         validated_commodity = commodity.upper().strip()
-        
+
         # Connect client
         client_id = await manager.connect(websocket, client_host)
-        
+
         # Subscribe to data stream
         await manager.subscribe(client_id, 'commodity', validated_commodity)
-        
+
         # Send initial data
         db = next(get_db())
         queries = PriceQueries(db)
         latest = queries.get_latest_commodity_price(commodity=validated_commodity)
         db.close()
-        
+
         if latest:
             await manager.send_personal_message({
                 'type': 'commodity',
@@ -2047,11 +2205,11 @@ async def websocket_commodity_prices(websocket: WebSocket, commodity: str):
                 'timestamp': datetime.now(timezone.utc).isoformat(),
                 'message': f'Connected to {validated_commodity} stream'
             }, client_id)
-        
+
         # Handle client messages
         while True:
             data = await websocket.receive_json()
-            
+
             # Handle subscription changes
             if data.get('action') == 'unsubscribe':
                 await manager.unsubscribe(client_id, 'commodity', validated_commodity)
@@ -2060,14 +2218,14 @@ async def websocket_commodity_prices(websocket: WebSocket, commodity: str):
                     'message': f'Unsubscribed from {validated_commodity}'
                 }, client_id)
                 break
-            
+
             # Handle ping/pong
             elif data.get('action') == 'ping':
                 await manager.send_personal_message({
                     'type': 'pong',
                     'timestamp': datetime.now(timezone.utc).isoformat()
                 }, client_id)
-            
+
     except Exception as e:
         logger = __import__('logging').getLogger(__name__)
         logger.error(f"WebSocket error for commodity prices: {e}")
@@ -2080,7 +2238,7 @@ async def websocket_commodity_prices(websocket: WebSocket, commodity: str):
 async def websocket_status():
     """
     Get WebSocket connection status and statistics.
-    
+
     Returns:
         Dictionary with connection statistics
     """
