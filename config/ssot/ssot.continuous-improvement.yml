@@ -16,7 +16,7 @@ review_cadence:
 initiatives:
   - id: mcp-tools-policy
     title: MCP Tools SSOT Policy
-    status: in_progress
+    status: completed
     priority: high
     description: |
       Consolidate MCP server and tool guidance into a machine-readable SSOT
@@ -24,11 +24,10 @@ initiatives:
     refs:
       - config/ssot/ssot.index.yml
       - config/ssot/ssot.mcp-tools.yml
+      - /home/tony/CascadeProjects/chaba-kbman/docs/ssot/infrastructure/ssot.mcp-tools.yml
       - AGENTS.md
     next_steps:
-      - Review ssot.mcp-tools.yml for accuracy and completeness
-      - Promote status from experimental to active after validation
-      - Update this SSOT and ssot.index.yml when promoted
+      - Promote the global ssot.mcp-tools.yml status from experimental to active after validation
 
   - id: ui-state-persistence
     title: UI Selection State Persistence

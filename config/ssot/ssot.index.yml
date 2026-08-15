@@ -94,7 +94,7 @@ sections:
         path: config/ssot/ssot.continuous-improvement.yml
 
       - label: ssot.mcp-tools.yml
-        text: MCP server registry, selection rules, and failure procedures
+        text: MCP tools policy — local reference to the global chaba-kbman SSOT
         path: config/ssot/ssot.mcp-tools.yml
 
   - title: Cross-References
@@ -127,6 +127,9 @@ recent_changes:
   - date: 2026-08-15
     description: "Created ssot.mcp-tools.yml catalog and registered it in the index"
     impact: "Centralized MCP server selection and failure-handling guidance"
+  - date: 2026-08-15
+    description: "Moved canonical MCP tools policy to chaba-kbman global SSOT"
+    impact: "Trade keeps a reference stub; global source avoids cross-project drift"
 
 # Search integration
 search_integration:
