@@ -119,14 +119,31 @@ Use the deployment-sync skill or sync script:
 ### Phase 2: Cleanup (Future)
 - Remove `app.js` (functionality moved to chart-loader)
 - Remove `compare.js` (functionality moved to chart-loader)
-- Remove `ui-renderer.js` (YAML approach abandoned)
-- Remove `ssot.ui.yml` (YAML approach abandoned)
 
 ### Phase 3: Enhancement (Future)
 - Add WebSocket real-time updates to chart-loader
 - Add technical indicators to chart-loader
 - Add chart markers functionality to chart-loader
 - Add auto-refresh to chart-loader
+
+## UI SSOT Model
+
+The TradeCanvas UI is configured through a four-layer Single Source of Truth (SSOT) YAML system. The loader in `tradecanvas-ui/strategy-compare-new.js` deep-merges the layers in the following order, with later layers overriding earlier ones:
+
+1. **Base SSOT** — `config/ssot/ssot.ui.yml` — global defaults shared by every page.
+2. **Family SSOT** — `config/ssot/ssot.ui.compare-family.yml` — shared configuration for the compare page family.
+3. **Page SSOT** — `config/ssot/ssot.ui.<page>.yml` — per-page overrides (e.g., `ssot.ui.compare.yml` for the stable page, `ssot.ui.compare2.yml` for the experimental preview page).
+4. **Feature SSOTs** — `config/ssot/ssot.ui.feature.<name>.yml` — optional feature-specific overlays requested by the page.
+
+Any `ref` markers are stripped during the merge.
+
+### Feature Promotion Workflow
+
+- `compare2` is the experimental/preview page.
+- Create new feature SSOTs under `config/ssot/ssot.ui.feature.<name>.yml` and enable them on `compare2` first.
+- If `scripts/validate-ui-ssot.sh` exists, run it to validate SSOT changes before promoting.
+- Once the feature is validated, promote its configuration into the compare family SSOT (`config/ssot/ssot.ui.compare-family.yml`) or the stable `compare` page SSOT (`config/ssot/ssot.ui.compare.yml`) as appropriate.
+- Sync the updated files to the production directory with `./sync-tradecanvas-ui.sh` from the project root.
 
 ## Benefits of Shared Architecture
 

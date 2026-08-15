@@ -38,6 +38,7 @@ class ChartLoader {
             'EUR': 1.08,
             'GBP': 1.27,
             'JPY': 155.0,
+            'GOLD': 4401.94,
             'DXY': 105.0,
             'OIL': 75.0
         };
@@ -183,6 +184,7 @@ class ChartLoader {
             'EUR': 'eur_formatted.csv',
             'GBP': 'gbp_formatted.csv',
             'JPY': 'jpy_formatted.csv',
+            'GOLD': 'gold_formatted.csv',
             'DXY': 'dxy_formatted.csv',
             'OIL': 'wti_formatted.csv'
         };
@@ -319,7 +321,16 @@ class ChartLoader {
 
     updateChart() {
         if (this.candlestickSeries && this.data.length > 0) {
-            this.candlestickSeries.setData(this.data);
+            const chartData = this.data
+                .filter(d => d.time != null && d.open != null && d.high != null && d.low != null && d.close != null)
+                .map(d => ({
+                    time: d.time,
+                    open: d.open,
+                    high: d.high,
+                    low: d.low,
+                    close: d.close
+                }));
+            this.candlestickSeries.setData(chartData);
             this.chart.timeScale().fitContent();
         }
     }

@@ -36,18 +36,6 @@ pages:
     data_source: "api"  # api, csv, or auto
     api_endpoint: "http://100.75.102.88:9000/api/ui/chart-data"
     
-  compare:
-    title: "TradeCanvas - Compare"
-    symbol: "THB"
-    show_chart: true
-    show_indicators: false
-    show_volume: false
-    show_controls: false
-    show_strategy_panel: true
-    data_source: "api"  # api, csv, or auto
-    api_endpoint: "http://100.75.102.88:9000/api/ui/chart-data"
-    default_timeframe: "all"  # Changed from 1Y to all to show full available data
-
 navigation:
   - title: "Trading Dashboard"
     url: "index.html"
