@@ -34,6 +34,10 @@ sections:
         text: Data source configuration — APIs, download URLs, scheduling, validation
         path: config/ssot/ssot.data.yml
 
+      - label: ssot.datasource-catalog.yml
+        text: Comprehensive catalog of all available data sources for reliability and redundancy
+        path: config/ssot/ssot.datasource-catalog.yml
+
       - label: ssot.api.yml
         text: API configuration — endpoints, authentication, rate limiting, CORS
         path: config/ssot/ssot.api.yml
@@ -55,8 +59,24 @@ sections:
     layout: list
     items:
       - label: ssot.ui.yml
-        text: TradeCanvas UI configuration — pages, symbols, timeframes, data sources
+        text: TradeCanvas UI base configuration — colors, symbols, APIs, strategy panel defaults
         path: config/ssot/ssot.ui.yml
+
+      - label: ssot.ui.compare-family.yml
+        text: TradeCanvas Compare family configuration — shared settings for compare and compare2
+        path: config/ssot/ssot.ui.compare-family.yml
+
+      - label: ssot.ui.compare.yml
+        text: TradeCanvas Compare page-specific configuration — chart, currency selector, scripts
+        path: config/ssot/ssot.ui.compare.yml
+
+      - label: ssot.ui.compare2.yml
+        text: TradeCanvas Compare2 page-specific configuration — layout, chart, strategy panel
+        path: config/ssot/ssot.ui.compare2.yml
+
+      - label: ssot.ui.feature.template.yml
+        text: Feature SSOT template for preview on compare2 and promotion to compare/family
+        path: config/ssot/ssot.ui.feature.template.yml
 
   - title: Cross-References
     icon: 🔗

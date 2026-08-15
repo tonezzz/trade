@@ -1,0 +1,630 @@
+title: Trade Data Source Catalog
+subtitle: Comprehensive catalog of all available data sources for reliability and redundancy
+icon: 📊
+
+sections:
+  - title: Data Source Policy
+    icon: 🎯
+    items: data_source_policy
+  - title: Exchange Rate Sources
+    icon: 💱
+    items: exchange_rate_sources
+  - title: Commodity Sources
+    icon: 📈
+    items: commodity_sources
+  - title: Index Sources
+    icon: 📊
+    items: index_sources
+  - title: Validation Sources
+    icon: ✅
+    items: validation_sources
+  - title: Alternative Sources
+    icon: 🔀
+    items: alternative_sources
+  - title: Source Evaluation
+    icon: 🔍
+    items: source_evaluation
+
+# Data source provider policy
+# Maps each category to its primary, fallback, and validation providers
+data_source_policy:
+  # Currencies: Multi-source strategy for reliability
+  exchange_rates:
+    primary: "FRED"
+    historical_primary: "Frankfurter API"
+    historical_secondary: "exchangerate.dev"
+    current_spot: "open.er-api.com"
+    fallback_current_spot: "exchangerate-api.com"
+    broad_coverage: "irfanokr/currency-api"
+    note: "Frankfurter blends 50+ central banks with holiday coverage back to 1948"
+
+  thb:
+    primary: "open.er-api.com"
+    fallback: "exchangerate-api.com"
+    historical: "Bank of Thailand API"
+    broad_coverage: "irfanokr/currency-api"
+    note: "Thai market has specific holiday patterns, use BoT for historical coverage"
+
+  # Commodities: Alpha Vantage primary with multiple fallbacks
+  commodities:
+    primary: "Alpha Vantage"
+    fallback: "Investing.com API"
+    time_series: "XRates API"
+    symbols:
+      - WTI
+      - BRENT
+      - COPPER
+      - NATURAL_GAS
+
+  precious_metals:
+    primary: "GitHub datasets (historical)"
+    validation: "Minted Metal"
+    fallback: "MetalPrices API"
+    broad_coverage: "irfanokr/currency-api (includes XAU, XAG)"
+    note: "LBMA benchmark prices are authoritative for precious metals"
+
+  # Dollar index: Multi-source strategy
+  dxy:
+    primary: "FRED"
+    series_id: "DTWEXBGS"
+    fallback: "Bloomberg"
+    note: "FRED has DNS issues in containers, consider alternatives"
+
+# Exchange Rate Sources
+exchange_rate_sources:
+  # Primary Historical Sources
+  fred:
+    name: "Federal Reserve Economic Data (FRED)"
+    type: "historical"
+    coverage: "Major currencies (EUR, GBP, JPY, CAD, CHF, AUD, NZD, DXY)"
+    format: "CSV"
+    frequency: "Daily"
+    history: "1970s-present (varies by series)"
+    cost: "FREE"
+    api_key: "Required (free tier available)"
+    rate_limit: "120 requests/minute (free tier)"
+    url: "https://fred.stlouisfed.org/"
+    series_mapping:
+      THB: "DEXTHUS"
+      JPY: "DEXJPUS"
+      CAD: "DEXCAUS"
+      CHF: "DEXSZUS"
+      AUD: "DEXUSAL"
+      NZD: "DEXUSNZ"
+      DXY: "DTWEXBGS"
+    pros:
+      - "Authoritative US Federal Reserve data"
+      - "Long historical coverage"
+      - "Daily frequency"
+      - "Well-documented API"
+    cons:
+      - "DNS issues in Docker containers"
+      - "Limited holiday coverage for non-US markets"
+      - "USD/base format requires inversion"
+      - "No real-time data"
+
+  # Current Spot Rate Sources
+  open_exchange_rates:
+    name: "Open Exchange Rates"
+    type: "current"
+    coverage: "170+ currencies"
+    format: "JSON"
+    frequency: "Hourly updates"
+    history: "Current only (no historical API)"
+    cost: "FREE"
+    api_key: "Required (free tier: 1,000 requests/month)"
+    rate_limit: "1,000 requests/month (free tier)"
+    url: "https://open.er-api.com/"
+    thb_specific: true
+    pros:
+      - "Excellent THB coverage"
+      - "Reliable and fast"
+      - "Simple API"
+      - "Good for current spot rates"
+    cons:
+      - "No historical data API"
+      - "Rate limits on free tier"
+      - "Hourly updates only"
+
+  exchangerate_api:
+    name: "ExchangeRate-API"
+    type: "current"
+    coverage: "160+ currencies"
+    format: "JSON"
+    frequency: "Hourly updates"
+    history: "Current only (no historical API)"
+    cost: "FREE"
+    api_key: "Required (free tier: 1,500 requests/month)"
+    rate_limit: "1,500 requests/month (free tier)"
+    url: "https://www.exchangerate-api.com/"
+    pros:
+      - "Good currency coverage"
+      - "Fallback for open.er-api.com"
+      - "Simple API"
+    cons:
+      - "No historical data API"
+      - "Rate limits on free tier"
+      - "Less reliable than open.er-api.com"
+
+  # Regional Central Banks
+  bank_of_thailand:
+    name: "Bank of Thailand API"
+    type: "historical"
+    coverage: "THB and regional currencies"
+    format: "JSON/XML"
+    frequency: "Daily"
+    history: "Decades of historical data"
+    cost: "FREE"
+    api_key: "May be required"
+    url: "https://www.bot.or.th/"
+    thb_specific: true
+    holiday_aware: true
+    pros:
+      - "Authoritative Thai market data"
+      - "Holiday-aware data"
+      - "Long historical coverage"
+      - "Best for Thai holiday gaps"
+    cons:
+      - "Limited to Thai region"
+      - "API may require registration"
+      - "Documentation in Thai"
+
+  european_central_bank:
+    name: "European Central Bank (ECB)"
+    type: "historical"
+    coverage: "40+ currencies vs EUR"
+    format: "XML/CSV"
+    frequency: "Daily"
+    history: "1999-present"
+    cost: "FREE"
+    api_key: "Not required"
+    url: "https://www.ecb.europa.eu/"
+    pros:
+      - "Authoritative European data"
+      - "Long historical coverage"
+      - "No API key required"
+      - "Daily reference rates"
+    cons:
+      - "EUR base only (requires conversion)"
+      - "Limited currency coverage"
+      - "European market hours only"
+
+# Commodity Sources
+commodity_sources:
+  # Primary Energy Sources
+  alpha_vantage:
+    name: "Alpha Vantage API"
+    type: "current_historical"
+    coverage: "WTI, BRENT, NATURAL_GAS, COPPER, WHEAT, CORN"
+    format: "JSON"
+    frequency: "Daily (energy), Monthly (agricultural)"
+    history: "20+ years"
+    cost: "FREE"
+    api_key: "Required (free tier: 25 requests/day)"
+    rate_limit: "25 requests/day (free tier)"
+    url: "https://www.alphavantage.co/"
+    mcp_integration: true
+    pros:
+      - "Unified API for multiple commodities"
+      - "Good historical coverage"
+      - "MCP integration available"
+      - "Well-documented"
+    cons:
+      - "Rate limits on free tier"
+      - "No precious metals spot prices"
+      - "Different frequencies by commodity"
+
+  # Precious Metals Sources
+  github_datasets:
+    name: "GitHub Historical Datasets"
+    type: "historical"
+    coverage: "GOLD, SILVER"
+    format: "CSV"
+    frequency: "Daily"
+    history: "2004-present (GOLD), 1968-present (SILVER)"
+    cost: "FREE"
+    api_key: "Not required"
+    url: "https://github.com/datasets/"
+    pros:
+      - "Long historical coverage"
+      - "No rate limits"
+      - "Free and open"
+      - "Daily data"
+    cons:
+      - "Manual updates required"
+      - "No real-time data"
+      - "Limited to GOLD/SILVER"
+
+  minted_metal:
+    name: "Minted Metal API"
+    type: "validation"
+    coverage: "GOLD, SILVER, PLATINUM, PALLADIUM, RHODIUM"
+    format: "JSON"
+    frequency: "Twice daily (11:00 and 16:00 UTC)"
+    history: "Current spot prices"
+    cost: "FREE"
+    api_key: "Not required"
+    url: "https://mintedmetal.com/api/prices.json"
+    source: "LBMA benchmark prices"
+    pros:
+      - "Authoritative LBMA prices"
+      - "No API key required"
+      - "Good for validation"
+      - "CORS enabled"
+    cons:
+      - "Current prices only"
+      - "Twice daily updates"
+      - "No historical data"
+
+  metalprices:
+    name: "MetalPrices API"
+    type: "fallback"
+    coverage: "GOLD, SILVER, PLATINUM, PALLADIUM"
+    format: "JSON"
+    frequency: "Hourly"
+    history: "Current spot prices"
+    cost: "FREE"
+    api_key: "Not required"
+    url: "https://api.metalpriceapi.com/v1/"
+    pros:
+      - "Hourly updates"
+      - "No API key required"
+      - "Good fallback"
+    cons:
+      - "Current prices only"
+      - "Less authoritative than LBMA"
+
+  goldapi:
+    name: "GoldAPI.io"
+    type: "specialized"
+    coverage: "XAU/THB (Thai Gold)"
+    format: "JSON"
+    frequency: "Daily"
+    history: "Historical available"
+    cost: "FREE (100 calls/month)"
+    api_key: "Required"
+    rate_limit: "100 calls/month (free tier)"
+    url: "https://www.goldapi.io/"
+    thb_specific: true
+    pros:
+      - "Specialized for Thai gold"
+      - "Historical data available"
+      - "XAU/THB specific"
+    cons:
+      - "Low rate limit on free tier"
+      - "Requires API key"
+      - "Limited to gold"
+
+# Index Sources
+index_sources:
+  fred_dxy:
+    name: "FRED DXY (DTWEXBGS)"
+    type: "primary"
+    coverage: "US Dollar Index"
+    format: "CSV"
+    frequency: "Daily"
+    history: "1973-present"
+    cost: "FREE"
+    url: "https://fred.stlouisfed.org/series/DTWEXBGS"
+    pros:
+      - "Authoritative source"
+      - "Long historical coverage"
+      - "Daily frequency"
+    cons:
+      - "DNS issues in containers"
+      - "No real-time data"
+
+  bloomberg:
+    name: "Bloomberg Terminal/API"
+    type: "premium"
+    coverage: "All major indices"
+    format: "JSON/CSV"
+    frequency: "Real-time"
+    history: "Decades"
+    cost: "Paid subscription"
+    url: "https://www.bloomberg.com/"
+    pros:
+      - "Real-time data"
+      - "Comprehensive coverage"
+      - "High reliability"
+      - "Holiday-aware"
+    cons:
+      - "Expensive subscription"
+      - "Overkill for current needs"
+
+# Validation Sources
+validation_sources:
+  minted_metal:
+    name: "Minted Metal (Primary Validation)"
+    type: "precious_metals"
+    authority: "LBMA benchmark prices"
+    frequency: "Twice daily"
+    pros:
+      - "Authoritative source"
+      - "No API key required"
+      - "Good for validation"
+
+  metalprices:
+    name: "MetalPrices (Fallback Validation)"
+    type: "precious_metals"
+    frequency: "Hourly"
+    pros:
+      - "Good backup"
+      - "No API key required"
+
+# Alternative Sources (for reliability improvements)
+alternative_sources:
+  # Additional Currency Sources (NEW - Discovered 2026-08-15)
+  frankfurter:
+    name: "Frankfurter API"
+    type: "historical_current"
+    coverage: "201 currencies (blended from 50+ central banks)"
+    format: "JSON/NDJSON/CSV"
+    frequency: "Daily"
+    history: "1948-present"
+    cost: "FREE"
+    api_key: "Not required"
+    rate_limit: "No rate limits (self-hosted option available)"
+    url: "https://api.frankfurter.dev/"
+    docker_available: true
+    discovered: "2026-08-15"
+    pros:
+      - "Blends data from 50+ central banks"
+      - "Historical data back to 1948"
+      - "No API key required"
+      - "No rate limits"
+      - "Self-hosting option available"
+      - "Holiday-aware (central bank data)"
+    cons:
+      - "Daily frequency only"
+      - "May have slight delays vs real-time"
+    priority: "HIGH - Excellent for historical currency data with holiday coverage"
+
+  exchangerate_dev:
+    name: "exchangerate.dev"
+    type: "historical_current"
+    coverage: "31 currencies (live), 465 pairs total"
+    format: "JSON"
+    frequency: "Live for major pairs (~60s), daily for others"
+    history: "1999-present"
+    cost: "FREE (10,000 calls/month)"
+    api_key: "Not required"
+    rate_limit: "10,000 calls/month"
+    url: "https://api.exchangerate.dev/"
+    discovered: "2026-08-15"
+    pros:
+      - "Historical data back to 1999"
+      - "Live rates for major pairs"
+      - "No API key required"
+      - "Source attribution in responses"
+      - "Market session information"
+    cons:
+      - "Rate limits on free tier"
+      - "Limited to 31 live currencies"
+    priority: "HIGH - Excellent for historical data with live rates"
+
+  irfanokr_currency_api:
+    name: "irfanokr/currency-api"
+    type: "historical_current"
+    coverage: "170+ currencies (fiat + crypto + precious metals)"
+    format: "JSON"
+    frequency: "Daily"
+    history: "Daily updates via GitHub Actions"
+    cost: "FREE"
+    api_key: "Not required"
+    rate_limit: "No rate limits"
+    url: "https://github.com/irfanokr/currency-api"
+    cdn_available: true
+    discovered: "2026-08-15"
+    pros:
+      - "170+ currencies including precious metals"
+      - "No API key required"
+      - "No rate limits"
+      - "Any base currency"
+      - "CDN delivery"
+      - "Open source"
+    cons:
+      - "Daily updates only"
+      - "GitHub Actions dependency"
+    priority: "HIGH - Excellent for broad currency coverage with no limits"
+
+  xrates_api:
+    name: "XRates API"
+    type: "historical_current"
+    coverage: "45+ currencies"
+    format: "JSON"
+    frequency: "Every 4 hours"
+    history: "Historical available"
+    cost: "FREE (100 requests/month)"
+    api_key: "Required"
+    rate_limit: "100 requests/month"
+    url: "https://xratesapi.com/"
+    discovered: "2026-08-15"
+    pros:
+      - "Historical data available"
+      - "Time-series data"
+      - "Rate fluctuation analysis"
+      - "Currency conversion"
+    cons:
+      - "Low rate limit on free tier"
+      - "Requires API key"
+      - "Limited currency coverage"
+    priority: "MEDIUM - Good for time-series analysis"
+
+  openexchangeapi:
+    name: "OpenExchangeAPI"
+    type: "historical_current"
+    coverage: "200+ currencies (fiat + crypto + commodities)"
+    format: "JSON"
+    frequency: "Real-time"
+    history: "Historical available"
+    cost: "Commercial license"
+    api_key: "Required"
+    url: "https://openexchangeapi.com/"
+    discovered: "2026-08-15"
+    pros:
+      - "Real-time rates"
+      - "Historical data"
+      - "High precision (8 decimal places)"
+      - "Comprehensive coverage"
+      - "ISO 4217 support"
+    cons:
+      - "Commercial license required"
+      - "API key required"
+      - "Cost involved"
+    priority: "LOW - Premium option if budget allows"
+
+  # Legacy Sources (Keep for reference)
+  fixer:
+    name: "Fixer API"
+    type: "current"
+    coverage: "170+ currencies"
+    format: "JSON"
+    cost: "FREE (100 requests/month)"
+    url: "https://fixer.io/"
+    pros:
+      - "Good currency coverage"
+      - "Historical data available (paid)"
+    cons:
+      - "Rate limits on free tier"
+      - "Historical requires paid plan"
+    priority: "LOW - Superseded by better free options"
+
+  currency_layer:
+    name: "CurrencyLayer API"
+    type: "current_historical"
+    coverage: "168 currencies"
+    format: "JSON"
+    cost: "FREE (1,000 requests/month)"
+    url: "https://currencylayer.com/"
+    pros:
+      - "Historical data available"
+      - "Good coverage"
+    cons:
+      - "Rate limits on free tier"
+      - "Historical requires paid plan"
+    priority: "LOW - Superseded by better free options"
+
+  # Additional Commodity Sources
+  investing:
+    name: "Investing.com API"
+    type: "current_historical"
+    coverage: "Commodities, indices, stocks"
+    format: "JSON"
+    cost: "FREE tier available"
+    url: "https://www.investing.com/"
+    pros:
+      - "Comprehensive coverage"
+      - "Historical data available"
+      - "Real-time available"
+    cons:
+      - "Complex API"
+      - "Rate limits"
+
+  quandl:
+    name: "Quandl"
+    type: "historical"
+    coverage: "Financial, economic data"
+    format: "JSON/CSV"
+    cost: "FREE tier available"
+    url: "https://www.quandl.com/"
+    pros:
+      - "Extensive database"
+      - "Historical data"
+      - "Well-documented"
+    cons:
+      - "Rate limits on free tier"
+      - "Some datasets require paid plan"
+
+  # Thai-Specific Sources
+  thai_government:
+    name: "Thai Government Data Portal"
+    type: "historical"
+    coverage: "Thai economic data"
+    format: "CSV/JSON"
+    cost: "FREE"
+    url: "https://data.go.th/"
+    thb_specific: true
+    pros:
+      - "Official Thai data"
+      - "Holiday-aware"
+      - "Free"
+    cons:
+      - "Limited coverage"
+      - "Documentation in Thai"
+
+# Source Evaluation Matrix
+source_evaluation:
+  reliability:
+    high:
+      - "FRED (historical currencies)"
+      - "Minted Metal (precious metals validation)"
+      - "Bank of Thailand (THB historical)"
+    medium:
+      - "Alpha Vantage (commodities)"
+      - "open.er-api.com (current THB)"
+      - "ECB (European currencies)"
+    low:
+      - "GitHub datasets (manual updates)"
+      - "MetalPrices (fallback only)"
+
+  coverage:
+    comprehensive:
+      - "FRED (major currencies)"
+      - "Alpha Vantage (commodities)"
+    limited:
+      - "open.er-api.com (current only)"
+      - "Bank of Thailand (Thai region only)"
+      - "Minted Metal (precious metals only")
+
+  cost_effectiveness:
+    excellent:
+      - "FRED (free, no rate limits)"
+      - "Minted Metal (free, no rate limits)"
+      - "ECB (free, no rate limits)"
+    good:
+      - "open.er-api.com (free, reasonable limits)"
+      - "Alpha Vantage (free, limited daily)"
+    poor:
+      - "GoldAPI (very low rate limits)"
+      - "Premium services (expensive)"
+
+  integration_complexity:
+    simple:
+      - "open.er-api.com (simple JSON API)"
+      - "Minted Metal (simple JSON endpoint)"
+      - "ECB (direct XML download)"
+    moderate:
+      - "Alpha Vantage (function-based API)"
+      - "FRED (CSV download with parameters)"
+    complex:
+      - "Bloomberg (requires subscription, complex API)"
+      - "Quandl (complex database structure)"
+
+# Recommended Improvements
+recommended_improvements:
+  priority_high:
+    - "Add Frankfurter API for historical currency data with holiday coverage (50+ central banks, 1948-present)"
+    - "Add exchangerate.dev for historical data back to 1999 with live rates for major pairs"
+    - "Add irfanokr/currency-api for 170+ currencies including precious metals with no rate limits"
+    - "Add Bank of Thailand API for THB historical holiday coverage"
+    - "Implement FRED DNS workaround or alternative for container reliability"
+
+  priority_medium:
+    - "Add XRates API for time-series data and rate fluctuation analysis"
+    - "Add Investing.com API for commodity data redundancy"
+    - "Implement Quandl for additional economic data sources"
+    - "Add CurrencyLayer as additional current rate fallback"
+
+  priority_low:
+    - "Evaluate OpenExchangeAPI for premium needs (real-time, high precision)"
+    - "Evaluate Bloomberg Terminal for premium needs"
+    - "Consider Thai Government Data Portal for regional data"
+    - "Explore additional commodity-specific APIs"
+
+# Implementation Notes
+implementation_notes:
+  thb_holiday_strategy: "Use Bank of Thailand API for historical Thai holiday periods, combine with open.er-api.com for current rates"
+  container_dns_workaround: "Use host networking or DNS configuration for FRED access in containers, or implement fallback to alternative sources"
+  rate_limit_management: "Implement request queuing and caching for rate-limited APIs, prioritize critical data sources"
+  validation_strategy: "Use Minted Metal as primary validation for precious metals, MetalPrices as fallback, cross-check with multiple sources for critical data
