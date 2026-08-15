@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <script src="ui-components.js?v=3"></script>
+    <script src="ui-components.js?v=4"></script>
     <style>
         /* Full page layout styles */
         body {
@@ -85,6 +85,58 @@
             color: #e6edf3;
             font-size: 14px;
         }
+
+        .market-info {
+            margin-top: 12px;
+            padding: 12px;
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+        }
+
+        .market-info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .market-info-row + .market-info-row {
+            margin-top: 8px;
+        }
+
+        .market-info .pair-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #a8d5ff;
+        }
+
+        .market-info .status {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .market-info .price-display {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e6edf3;
+        }
+
+        .market-info .price-change {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .market-info .price-change.positive {
+            color: #3fb950;
+        }
+
+        .market-info .price-change.negative {
+            color: #da3633;
+        }
     </style>
 </head>
 <body>
@@ -96,15 +148,10 @@
                 <nav class="nav-compact">
                     <a href="index.html" class="nav-link">Dashboard</a>
                     <a href="compare.html" class="nav-link">Compare</a>
-                    <a href="compare2.html?v=10" class="nav-link active">Compare2</a>
+                    <a href="compare2.html?v=11" class="nav-link active">Compare2</a>
                 </nav>
             </div>
-            <div class="header-right">
-                <span class="pair-label" id="pair-label">USD/THB</span>
-                <span id="current-price" class="price-display">--</span>
-                <span id="price-change" class="price-change">--</span>
-                <span id="connection-status" class="status-dot disconnected"></span>
-            </div>
+            <div class="header-right"></div>
         </header>
 
         <div class="main-content-compact">
@@ -119,6 +166,16 @@
                     </div>
                     <div id="currency-selector-container"></div>
                     <div id="timeframe-selector-container"></div>
+                    <div class="market-info">
+                        <div class="market-info-row">
+                            <span class="pair-label" id="pair-label">USD/THB</span>
+                            <span id="connection-status" class="status disconnected">Loading</span>
+                        </div>
+                        <div class="market-info-row price-row">
+                            <span id="current-price" class="price-display">--</span>
+                            <span id="price-change" class="price-change">--</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="panel-section-compact" id="strategy-panel">
@@ -139,7 +196,7 @@
 
     <script src="chart-data-provider.js?v=7"></script>
     <script src="chart-renderer.js?v=7"></script>
-    <script src="chart-loader.js?v=7"></script>
+    <script src="chart-loader.js?v=8"></script>
     <script src="strategies-new.js"></script>
     <script src="hindsight-strategies-new.js"></script>
     <script src="strategy-compare-new.js?v=15"></script>

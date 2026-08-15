@@ -31,7 +31,7 @@ initiatives:
 
   - id: ui-state-persistence
     title: UI Selection State Persistence
-    status: in_progress
+    status: completed
     priority: high
     description: |
       Make all user selections (currency, timeframe, chart type, etc.) survive
@@ -47,7 +47,7 @@ initiatives:
 
   - id: ui-initial-disconnected
     title: Fix Initial "Disconnected" Status on Compare2
-    status: in_progress
+    status: completed
     priority: high
     description: |
       The compare2 page shows "Disconnected" on first load until the user

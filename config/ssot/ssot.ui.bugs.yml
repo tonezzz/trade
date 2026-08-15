@@ -10,7 +10,7 @@ status: active
 bugs:
   - id: ui-bug-001
     title: Compare2 starts in "Disconnected" state
-    status: open
+    status: resolved
     severity: high
     pages:
       - compare2.html
@@ -38,7 +38,7 @@ bugs:
 
   - id: ui-bug-002
     title: Selections not remembered on page refresh
-    status: open
+    status: resolved
     severity: high
     pages:
       - compare2.html
