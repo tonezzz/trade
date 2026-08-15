@@ -48,6 +48,8 @@ strategy_panel:
 
 scripts:
   shared:
+    - chart-data-provider.js
+    - chart-renderer.js
     - chart-loader.js
     - hindsight-strategies-new.js
     - strategy-compare-new.js

@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime, timedelta
 from src.database import db
 from src.models import ExchangeRate, CommodityPrice, DollarIndex
+from src.config.data_sources_config import DataSourceCatalog
 import requests
 import json
 import logging
@@ -104,7 +105,10 @@ class DataQualityAgent:
         
         # Primary: open.er-api.com (reliable for THB, use for all currencies)
         try:
-            url = f"https://open.er-api.com/v6/latest/USD"
+            url = DataSourceCatalog.get_validation_endpoint(
+                'open_exchange_rates_validation',
+                'https://open.er-api.com/v6/latest/USD'
+            )
             response = requests.get(url, timeout=10)
             
             if response.status_code == 200:
@@ -134,7 +138,10 @@ class DataQualityAgent:
         
         # Fallback: ExchangeRate-API (free tier: 1,500 requests/month)
         try:
-            url = f"https://api.exchangerate-api.com/v4/latest/USD"
+            url = DataSourceCatalog.get_validation_endpoint(
+                'exchangerate_api_validation',
+                'https://api.exchangerate-api.com/v4/latest/USD'
+            )
             response = requests.get(url, timeout=10)
             
             if response.status_code == 200:
@@ -242,7 +249,10 @@ class DataQualityAgent:
                 metal_map = {'GOLD': 'gold', 'SILVER': 'silver', 'XAU': 'gold', 'XAG': 'silver'}
                 metal_key = metal_map.get(symbol, symbol.lower())
                 
-                url = "https://mintedmetal.com/api/prices.json"
+                url = DataSourceCatalog.get_validation_endpoint(
+                    'minted_metal',
+                    'https://mintedmetal.com/api/prices.json'
+                )
                 response = requests.get(url, timeout=10)
                 
                 if response.status_code == 200:
@@ -264,7 +274,10 @@ class DataQualityAgent:
                 metal_map = {'GOLD': 'XAU', 'SILVER': 'XAG', 'XAU': 'XAU', 'XAG': 'XAG'}
                 metal_symbol = metal_map.get(symbol, symbol)
                 
-                url = f"https://api.metalpriceapi.com/v1/latest"
+                url = DataSourceCatalog.get_validation_endpoint(
+                    'metalprices',
+                    'https://api.metalpriceapi.com/v1/latest'
+                )
                 params = {
                     'api_key': metal_prices_key,
                     'base': 'USD',
@@ -293,7 +306,7 @@ class DataQualityAgent:
             try:
                 url = f"https://api.stlouisfed.org/fred/series/observations"
                 params = {
-                    'series_id': 'DTWEXBGS',  # Trade Weighted U.S. Dollar Index (Broad)
+                    'series_id': DataSourceCatalog.get_policy('dxy', 'series_id', 'DTWEXBGS'),
                     'api_key': fred_api_key,
                     'limit': 1,
                     'sort_order': 'desc'

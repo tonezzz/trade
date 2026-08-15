@@ -2,6 +2,9 @@
 Data sources configuration management.
 """
 from typing import Optional, Dict, Any, List
+from pathlib import Path
+import logging
+
 from pydantic import BaseModel, Field
 import yaml
 import os
@@ -148,3 +151,51 @@ class DataSourcesConfig(BaseModel):
     def get_data_source_config(self, source_id: str) -> Optional[Dict[str, Any]]:
         """Get configuration for a specific data source."""
         return self.data_sources.get(source_id)
+
+
+class DataSourceCatalog:
+    """Read-only catalog helper for config/ssot/ssot.datasource-catalog.yml."""
+    
+    _catalog: Optional[Dict[str, Any]] = None
+    
+    @classmethod
+    def _load(cls) -> Dict[str, Any]:
+        """Load (and cache) the datasource catalog."""
+        if cls._catalog is not None:
+            return cls._catalog
+        
+        project_root = Path(__file__).resolve().parents[2]
+        catalog_path = project_root / 'config' / 'ssot' / 'ssot.datasource-catalog.yml'
+        
+        try:
+            with open(catalog_path, 'r') as f:
+                cls._catalog = yaml.safe_load(f) or {}
+        except Exception as e:
+            logging.getLogger(__name__).warning(f"Failed to load datasource catalog {catalog_path}: {e}")
+            cls._catalog = {}
+        
+        return cls._catalog
+    
+    @classmethod
+    def get_validation_endpoint(cls, name: str, default: Optional[str] = None) -> Optional[str]:
+        """Get a validation source endpoint by catalog key or name."""
+        catalog = cls._load()
+        for key, source in catalog.get('validation_sources', {}).items():
+            if key == name or source.get('name') == name:
+                return source.get('endpoint', default)
+        return default
+    
+    @classmethod
+    def get_operational_endpoint(cls, name: str, default: Optional[str] = None) -> Optional[str]:
+        """Get an operational source endpoint by catalog key."""
+        catalog = cls._load()
+        source = catalog.get('operational_sources', {}).get(name)
+        if source and isinstance(source, dict):
+            return source.get('endpoint', default)
+        return default
+    
+    @classmethod
+    def get_policy(cls, category: str, key: str, default: Any = None) -> Any:
+        """Get a value from data_source_policy (e.g. get_policy('dxy', 'series_id'))."""
+        catalog = cls._load()
+        return catalog.get('data_source_policy', {}).get(category, {}).get(key, default)

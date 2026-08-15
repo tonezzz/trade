@@ -100,8 +100,7 @@ class CurrencySelector extends UIComponent {
         
         // Update chart loader if available
         if (this.chartLoader) {
-            this.chartLoader.config.symbol = newCurrency;
-            this.chartLoader.loadData();
+            this.chartLoader.updateSymbol(newCurrency);
         }
         
         // Emit change event
@@ -194,8 +193,7 @@ class TimeframeSelector extends UIComponent {
         
         // Update chart loader if available
         if (this.chartLoader) {
-            this.chartLoader.config.timeframe = newTimeframe;
-            this.chartLoader.loadData();
+            this.chartLoader.updateTimeframe(newTimeframe);
         }
         
         // Emit change event

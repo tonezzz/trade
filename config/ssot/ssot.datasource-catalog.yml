@@ -26,49 +26,66 @@ sections:
     items: source_evaluation
 
 # Data source provider policy
-# Maps each category to its primary, fallback, and validation providers
+# Maps each category to its primary, fallback, and validation providers.
+# "status" = active (wired into ssot.data.yml / scripts) or candidate (not implemented).
 data_source_policy:
   # Currencies: Multi-source strategy for reliability
   exchange_rates:
+    status: "active"
     primary: "FRED"
-    historical_primary: "Frankfurter API"
-    historical_secondary: "exchangerate.dev"
     current_spot: "open.er-api.com"
     fallback_current_spot: "exchangerate-api.com"
+    validation: "open.er-api.com, exchangerate-api.com"
+    candidate_historical:
+      - "Frankfurter API"
+      - "exchangerate.dev"
+      - "irfanokr/currency-api"
     broad_coverage: "irfanokr/currency-api"
-    note: "Frankfurter blends 50+ central banks with holiday coverage back to 1948"
+    note: "FRED series are USD/base and are inverted on import. New historical sources are candidates only."
 
   thb:
+    status: "active"
     primary: "open.er-api.com"
     fallback: "exchangerate-api.com"
-    historical: "Bank of Thailand API"
+    validation: "open.er-api.com, exchangerate-api.com"
+    historical_candidate: "Bank of Thailand API"
     broad_coverage: "irfanokr/currency-api"
-    note: "Thai market has specific holiday patterns, use BoT for historical coverage"
+    note: "THB currently comes from open.er-api.com; Bank of Thailand is a candidate for historical holiday coverage."
 
   # Commodities: Alpha Vantage primary with multiple fallbacks
   commodities:
+    status: "active"
     primary: "Alpha Vantage"
-    fallback: "Investing.com API"
-    time_series: "XRates API"
+    validation: "Alpha Vantage"
+    fallback:
+      - "Investing.com API"
+      - "GitHub datasets"
+    time_series_candidate: "XRates API"
     symbols:
       - WTI
       - BRENT
       - COPPER
       - NATURAL_GAS
+    note: "Wheat, corn and soy were removed on 2026-08-10 due to staleness. Investing.com and XRates are candidates."
 
   precious_metals:
+    status: "active"
     primary: "GitHub datasets (historical)"
     validation: "Minted Metal"
     fallback: "MetalPrices API"
+    thai_gold: "GoldAPI.io"
+    thai_gold_fallback: "https://api.chnwt.dev/thai-gold-api/latest"
     broad_coverage: "irfanokr/currency-api (includes XAU, XAG)"
-    note: "LBMA benchmark prices are authoritative for precious metals"
+    note: "LBMA benchmark prices are authoritative for precious metals validation."
 
   # Dollar index: Multi-source strategy
   dxy:
+    status: "active"
     primary: "FRED"
     series_id: "DTWEXBGS"
+    validation: "FRED"
     fallback: "Bloomberg"
-    note: "FRED has DNS issues in containers, consider alternatives"
+    note: "FRED has DNS issues in containers and was 6 days stale as of 2026-08-06."
 
 # Exchange Rate Sources
 exchange_rate_sources:
@@ -333,12 +350,16 @@ index_sources:
       - "Overkill for current needs"
 
 # Validation Sources
+# Sources actually used by data_quality_agent.py and ssot.data.yml for cross-checking.
 validation_sources:
+  # Precious metals validation
   minted_metal:
     name: "Minted Metal (Primary Validation)"
     type: "precious_metals"
     authority: "LBMA benchmark prices"
     frequency: "Twice daily"
+    endpoint: "https://mintedmetal.com/api/prices.json"
+    used_by: "data_quality_agent.py"
     pros:
       - "Authoritative source"
       - "No API key required"
@@ -348,9 +369,41 @@ validation_sources:
     name: "MetalPrices (Fallback Validation)"
     type: "precious_metals"
     frequency: "Hourly"
+    endpoint: "https://api.metalpriceapi.com/v1/latest"
+    used_by: "data_quality_agent.py"
     pros:
       - "Good backup"
       - "No API key required"
+
+  # Exchange-rate validation
+  open_exchange_rates_validation:
+    name: "open.er-api.com (Validation)"
+    type: "exchange_rate"
+    endpoint: "https://open.er-api.com/v6/latest/USD"
+    used_by: "data_quality_agent.py, manual_update.sh"
+    note: "Primary current-spot cross-check for all currencies including THB"
+
+  exchangerate_api_validation:
+    name: "exchangerate-api.com (Validation)"
+    type: "exchange_rate"
+    endpoint: "https://api.exchangerate-api.com/v4/latest/USD"
+    used_by: "data_quality_agent.py"
+    note: "Fallback current-spot cross-check"
+
+  fred_dxy_validation:
+    name: "FRED DXY (Validation)"
+    type: "dollar_index"
+    endpoint: "https://api.stlouisfed.org/fred/series/observations?series_id=DTWEXBGS"
+    used_by: "data_quality_agent.py"
+    note: "Requires FRED_API_KEY; FRED DNS issues in containers"
+
+  # Commodity validation
+  alpha_vantage_validation:
+    name: "Alpha Vantage (Validation)"
+    type: "commodity"
+    endpoint: "https://www.alphavantage.co/query?function=<WTI|BRENT|COPPER|NATURAL_GAS>"
+    used_by: "data_quality_agent.py"
+    note: "Uses ALPHA_VANTAGE_API_KEY; DXY via CURRENCY_EXCHANGE_RATE is not supported"
 
 # Alternative Sources (for reliability improvements)
 alternative_sources:
@@ -554,39 +607,42 @@ alternative_sources:
       - "Documentation in Thai"
 
 # Source Evaluation Matrix
+# Operational observations from data_quality_agent.py and ssot.data.yml.
 source_evaluation:
   reliability:
     high:
-      - "FRED (historical currencies)"
       - "Minted Metal (precious metals validation)"
-      - "Bank of Thailand (THB historical)"
+      - "open.er-api.com (current THB and currencies)"
+      - "Bank of Thailand (THB historical - candidate)"
     medium:
+      - "FRED (historical currencies, but DNS issues in containers)"
       - "Alpha Vantage (commodities)"
-      - "open.er-api.com (current THB)"
-      - "ECB (European currencies)"
+      - "ECB (European currencies, currently disabled)"
     low:
       - "GitHub datasets (manual updates)"
       - "MetalPrices (fallback only)"
+      - "GoldAPI (100 calls/month free tier)"
 
   coverage:
     comprehensive:
       - "FRED (major currencies)"
-      - "Alpha Vantage (commodities)"
+      - "irfanokr/currency-api (candidate - 170+ currencies)"
     limited:
       - "open.er-api.com (current only)"
       - "Bank of Thailand (Thai region only)"
-      - "Minted Metal (precious metals only")
+      - "Minted Metal (precious metals only)"
 
   cost_effectiveness:
     excellent:
-      - "FRED (free, no rate limits)"
-      - "Minted Metal (free, no rate limits)"
-      - "ECB (free, no rate limits)"
+      - "open.er-api.com (free, 1000 req/month)"
+      - "Minted Metal (free, no API key)"
+      - "ECB (free, no API key)"
     good:
-      - "open.er-api.com (free, reasonable limits)"
-      - "Alpha Vantage (free, limited daily)"
+      - "FRED (free, requires API key, 120 req/min)"
+      - "Alpha Vantage (free, 25 req/day)"
+      - "exchangerate-api.com (free, 1500 req/month)"
     poor:
-      - "GoldAPI (very low rate limits)"
+      - "GoldAPI (100 calls/month free tier)"
       - "Premium services (expensive)"
 
   integration_complexity:
@@ -600,6 +656,12 @@ source_evaluation:
     complex:
       - "Bloomberg (requires subscription, complex API)"
       - "Quandl (complex database structure)"
+
+  operational_issues:
+    currencies: "7/8 currency validation checks failing (4-68% difference) as of 2026-08-06"
+    dxy: "6 days stale; FRED DNS unreliable in containers"
+    commodities: "Wheat, corn and soy removed due to staleness; validation only runs on precious metals"
+    precious_metals: "Minted Metal is primary validation; GitHub datasets are manual"
 
 # Recommended Improvements
 recommended_improvements:
@@ -627,4 +689,259 @@ implementation_notes:
   thb_holiday_strategy: "Use Bank of Thailand API for historical Thai holiday periods, combine with open.er-api.com for current rates"
   container_dns_workaround: "Use host networking or DNS configuration for FRED access in containers, or implement fallback to alternative sources"
   rate_limit_management: "Implement request queuing and caching for rate-limited APIs, prioritize critical data sources"
-  validation_strategy: "Use Minted Metal as primary validation for precious metals, MetalPrices as fallback, cross-check with multiple sources for critical data
+  catalog_alignment: "This catalog should be the source of truth for source metadata; ssot.data.yml and the validation scripts should derive endpoints/routing from it."
+
+# Operational source registry
+# Links catalog entries to the actual scripts/SSOT that consume them today.
+operational_sources:
+  fred:
+    status: "active"
+    type: "historical"
+    endpoints:
+      dxy: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS"
+      jpy: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXJPUS"
+      cad: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXCAUS"
+      chf: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXSZUS"
+      aud: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXUSAL"
+      nzd: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXUSNZ"
+    used_by: "ssot.data.yml, data_quality_agent.py"
+    schedule: "daily"
+    known_issues: "DNS resolution in Docker containers; DXY can be stale"
+
+  open_exchange_rates:
+    status: "active"
+    type: "current"
+    endpoint: "https://open.er-api.com/v6/latest/USD"
+    used_by: "ssot.data.yml thb_exchange_rates, data_quality_agent.py, manual_update.sh"
+    schedule: "daily"
+    known_issues: "No historical API"
+
+  exchangerate_api:
+    status: "active"
+    type: "current"
+    endpoint: "https://api.exchangerate-api.com/v4/latest/USD"
+    used_by: "data_quality_agent.py"
+    schedule: "on-demand"
+    known_issues: "Lower priority fallback"
+
+  alpha_vantage:
+    status: "active"
+    type: "current_historical"
+    endpoints:
+      wti: "https://www.alphavantage.co/query?function=WTI"
+      brent: "https://www.alphavantage.co/query?function=BRENT"
+      copper: "https://www.alphavantage.co/query?function=COPPER"
+      natural_gas: "https://www.alphavantage.co/query?function=NATURAL_GAS"
+    used_by: "ssot.data.yml, data_quality_agent.py"
+    schedule: "monthly"
+    known_issues: "Free tier 25 req/day; no XAU/XAG; DXY not supported"
+
+  github_datasets:
+    status: "active"
+    type: "historical"
+    endpoints:
+      gold: "https://raw.githubusercontent.com/datasets/gold-prices/main/data/gold-daily.csv"
+      silver: "https://raw.githubusercontent.com/datasets/silver-prices/main/data/silver-daily.csv"
+      wti_legacy: "https://raw.githubusercontent.com/datasets/oil-prices/main/data/wti-daily.csv"
+      brent_legacy: "https://raw.githubusercontent.com/datasets/oil-prices/main/data/brent-daily.csv"
+    used_by: "ssot.data.yml gold/silver; legacy download_data.py for oil"
+    schedule: "weekly"
+    known_issues: "Manual updates; no real-time data"
+
+  minted_metal:
+    status: "active"
+    type: "validation"
+    endpoint: "https://mintedmetal.com/api/prices.json"
+    used_by: "data_quality_agent.py"
+    schedule: "twice daily"
+    known_issues: "Current prices only"
+
+  metalprices:
+    status: "active"
+    type: "validation"
+    endpoint: "https://api.metalpriceapi.com/v1/latest"
+    used_by: "data_quality_agent.py"
+    schedule: "hourly"
+    known_issues: "Current prices only; 100 req/month free tier"
+
+  goldapi:
+    status: "disabled"
+    type: "specialized"
+    endpoint: "https://www.goldapi.io/api/XAU/THB"
+    fallback: "https://api.chnwt.dev/thai-gold-api/latest"
+    used_by: "ssot.data.yml thai_gold (disabled)"
+    schedule: "manual"
+    known_issues: "100 calls/month; disabled until historical dataset is built"
+
+  ecb:
+    status: "disabled"
+    type: "historical"
+    endpoint: "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
+    used_by: "ssot.data.yml ecb_exchange_rates (disabled)"
+    schedule: "daily"
+    known_issues: "EUR base; limited coverage"
+
+  frankfurter:
+    status: "candidate"
+    type: "historical_current"
+    endpoint: "https://api.frankfurter.dev/"
+    used_by: "none yet"
+    schedule: "daily"
+    known_issues: "Not integrated"
+
+  exchangerate_dev:
+    status: "candidate"
+    type: "historical_current"
+    endpoint: "https://api.exchangerate.dev/"
+    used_by: "none yet"
+    schedule: "live"
+    known_issues: "Not integrated"
+
+  irfanokr_currency_api:
+    status: "candidate"
+    type: "historical_current"
+    endpoint: "https://github.com/irfanokr/currency-api"
+    used_by: "none yet"
+    schedule: "daily"
+    known_issues: "Not integrated"
+
+  xrates_api:
+    status: "candidate"
+    type: "historical_current"
+    endpoint: "https://xratesapi.com/"
+    used_by: "none yet"
+    schedule: "every 4 hours"
+    known_issues: "Not integrated"
+
+  investing:
+    status: "candidate"
+    type: "current_historical"
+    endpoint: "https://www.investing.com/"
+    used_by: "none yet"
+    schedule: "real-time"
+    known_issues: "Not integrated"
+
+  quandl:
+    status: "candidate"
+    type: "historical"
+    endpoint: "https://www.quandl.com/"
+    used_by: "none yet"
+    schedule: "varies"
+    known_issues: "Not integrated"
+
+  currencylayer:
+    status: "candidate"
+    type: "current"
+    endpoint: "https://currencylayer.com/"
+    used_by: "none yet"
+    schedule: "hourly"
+    known_issues: "Not integrated"
+
+  openexchangeapi:
+    status: "candidate"
+    type: "premium"
+    endpoint: "https://openexchangeapi.com/"
+    used_by: "none yet"
+    schedule: "real-time"
+    known_issues: "Commercial license required"
+
+  thai_government:
+    status: "candidate"
+    type: "historical"
+    endpoint: "https://data.go.th/"
+    used_by: "none yet"
+    schedule: "varies"
+    known_issues: "Not integrated"
+
+# Per-symbol source routing (as configured in ssot.data.yml and data_quality_agent.py)
+per_symbol_routing:
+  THB:
+    data_type: "exchange_rate"
+    primary: "open.er-api.com"
+    fallback: "exchangerate-api.com"
+    validation: "open.er-api.com, exchangerate-api.com"
+    schedule: "daily"
+    tolerance_pct: 0.5
+  JPY:
+    data_type: "exchange_rate"
+    primary: "FRED (DEXJPUS)"
+    validation: "open.er-api.com, exchangerate-api.com"
+    schedule: "daily"
+    tolerance_pct: 1.0
+  CAD:
+    data_type: "exchange_rate"
+    primary: "FRED (DEXCAUS)"
+    validation: "open.er-api.com, exchangerate-api.com"
+    schedule: "daily"
+    tolerance_pct: 1.0
+  CHF:
+    data_type: "exchange_rate"
+    primary: "FRED (DEXSZUS)"
+    validation: "open.er-api.com, exchangerate-api.com"
+    schedule: "daily"
+    tolerance_pct: 1.0
+  AUD:
+    data_type: "exchange_rate"
+    primary: "FRED (DEXUSAL)"
+    validation: "open.er-api.com, exchangerate-api.com"
+    schedule: "daily"
+    tolerance_pct: 1.0
+  NZD:
+    data_type: "exchange_rate"
+    primary: "FRED (DEXUSNZ)"
+    validation: "open.er-api.com, exchangerate-api.com"
+    schedule: "daily"
+    tolerance_pct: 1.0
+  DXY:
+    data_type: "dollar_index"
+    primary: "FRED (DTWEXBGS)"
+    validation: "FRED"
+    schedule: "daily"
+    max_freshness_days: 7
+  WTI:
+    data_type: "commodity"
+    primary: "Alpha Vantage (WTI)"
+    validation: "Alpha Vantage (WTI)"
+    schedule: "monthly"
+  BRENT:
+    data_type: "commodity"
+    primary: "Alpha Vantage (BRENT)"
+    validation: "Alpha Vantage (BRENT)"
+    schedule: "monthly"
+  COPPER:
+    data_type: "commodity"
+    primary: "Alpha Vantage (COPPER)"
+    validation: "Alpha Vantage (COPPER)"
+    schedule: "monthly"
+  NATURAL_GAS:
+    data_type: "commodity"
+    primary: "Alpha Vantage (NATURAL_GAS)"
+    validation: "Alpha Vantage (NATURAL_GAS)"
+    schedule: "monthly"
+  GOLD:
+    data_type: "commodity"
+    primary: "GitHub datasets"
+    validation: "Minted Metal"
+    schedule: "weekly"
+    tolerance_pct: 15.0
+  SILVER:
+    data_type: "commodity"
+    primary: "GitHub datasets"
+    validation: "Minted Metal"
+    schedule: "weekly"
+    tolerance_pct: 15.0
+  XAU-THB:
+    data_type: "commodity"
+    primary: "GoldAPI.io (disabled)"
+    fallback: "https://api.chnwt.dev/thai-gold-api/latest"
+    schedule: "manual"
+
+# Last observed data quality snapshot (from ssot.data.yml)
+last_observed:
+  date: "2026-08-06"
+  overall_success_rate: "41.2%"
+  thb: "33.1197"
+  dxy_staleness_days: 6
+  currency_validation_failures: "7/8"
+  notes: "Currencies need FRED/open.er reconciliation. DXY needs FRED DNS workaround or fallback."
+  validation_strategy: "Use Minted Metal as primary validation for precious metals, MetalPrices as fallback, cross-check with multiple sources for critical data"

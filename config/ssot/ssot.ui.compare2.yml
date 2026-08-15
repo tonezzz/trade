@@ -39,6 +39,8 @@ strategy_panel:
     hide_position_pct_for_hindsight: true
 
 scripts:
+  - chart-data-provider.js
+  - chart-renderer.js
   - chart-loader.js
   - strategies-new.js
   - hindsight-strategies-new.js
@@ -47,8 +49,11 @@ scripts:
 cache_busting:
   query_param: v
   versions:
-    compare2_html: 7
-    chart_loader: 5
+    compare2_html: 10
+    chart_loader: 7
+    chart_data_provider: 7
+    chart_renderer: 7
+    ui_components: 3
 
 navigation:
   ref: "ssot.ui.yml#navigation"
