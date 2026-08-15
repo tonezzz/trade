@@ -89,13 +89,14 @@ debugging_guidance:
     - 'Run freshness monitor: `docker exec trade-api python scripts/data_freshness_monitor.py`'
 
 # Data source configuration notes
+# See config/ssot/ssot.data.yml for the authoritative data source configuration.
 data_sources:
-  thb: "open.er-api.com (JSON format, reliable, current as of 2026-08-14), Thai holiday gap Aug 8-11 (Queen's Birthday + bridge holidays) is expected behavior"
-  dxy: "FRED API (DTWEXBGS series, latest 2026-07-31, DNS issues in containers)"
-  commodities: "Alpha Vantage API (COPPER, NATURAL_GAS, OIL, monthly data, reliable) - WHEAT/CORN removed 2026-08-10"
-  currencies: "FRED API (EUR, JPY, CAD, CHF, AUD, NZD, etc., DNS issues in containers)"
-  precious_metals: "MetalPrices API fallback (GOLD/XAU, SILVER/XAG when Alpha Vantage unavailable)"
-  ohlc_policy: "Only real OHLC data shown in charts - no estimated/fallback values (updated 2026-08-14), records without proper OHLC are excluded from chart display"
+  thb: "open.er-api.com (primary), exchangerate-api.com (fallback), current as of 2026-08-14, Thai holiday gap Aug 8-11 is expected behavior"
+  dxy: "FRED API (DTWEXBGS series), no Alpha Vantage support, latest 2026-07-31"
+  commodities: "Alpha Vantage API (WTI, BRENT, COPPER, NATURAL_GAS monthly data) - WHEAT/CORN removed 2026-08-10"
+  currencies: "FRED API (JPY, CAD, CHF, AUD, NZD), validated against open.er-api.com / exchangerate-api.com"
+  precious_metals: "GitHub datasets (GOLD/XAU, SILVER/XAG) with Minted Metal validation and MetalPrices fallback"
+  ohlc_policy: "Only real OHLC data shown in charts - no estimated/fallback values, records without proper OHLC are excluded from chart display"
 
 # Recent changes and fixes
 recent_changes:

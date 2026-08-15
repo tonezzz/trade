@@ -418,7 +418,6 @@ trade_system:
       external: true
       description: "Docker Compose network for web services"
       note: "Shared with chaba web stack for PostgreSQL database access"
-      - "chaba web stack"
     tables:
       - exchange_rates
       - dollar_index
@@ -440,14 +439,16 @@ trade_system:
       available_commodities: "/api/available/commodities"
   
   # Data sources configuration
+  # NOTE: Authoritative configuration is in config/ssot/ssot.data.yml.
   data_sources:
     thb:
       provider: "open.er-api.com"
+      fallback: "exchangerate-api.com"
       format: "JSON"
       url: "https://open.er-api.com/v6/latest/USD"
       update_frequency: "daily"
       status: "active"
-      last_update: "2026-08-10"
+      last_update: "2026-08-14"
     
     dxy:
       provider: "FRED API"
@@ -469,36 +470,33 @@ trade_system:
         - BRENT: "Crude Oil Brent"
       update_frequency: "monthly"
       status: "active"
-      last_update: "2026-08-03"
+      last_update: "2026-08-14"
       note: "WHEAT and CORN removed on 2026-08-10 due to Alpha Vantage monthly data staleness (70+ days)"
     
     currencies:
       provider: "FRED API"
+      validation: "open.er-api.com"
+      fallback: "exchangerate-api.com"
       format: "CSV"
       currencies:
-        - EUR: "DEXUSEU"
         - JPY: "DEXJPUS"
         - CAD: "DEXCAUS"
         - CHF: "DEXSZUS"
         - AUD: "DEXUSAL"
         - NZD: "DEXUSNZ"
-        - GBP: "DEXUSUK"
-        - SEK: "DEXSDUS"
-        - NOK: "DEXNOUS"
-        - DKK: "DEXDKUS"
-        - CZK: "DEXCZUS"
-        - HUF: "DEXHUF"
-        - PLN: "DEXPLN"
-        - INR: "DEXINUS"
-        - CNY: "DEXCHUS"
-        - KRW: "DEXKOUS"
-        - MXN: "DEXMXUS"
-        - TRY: "DEXUSTUS"
-        - ZAR: "DEXSZUS"
-        - BRL: "DEXBZUS"
       update_frequency: "daily"
       status: "limited"
       note: "DNS issues in containers, use host system for updates"
+    
+    precious_metals:
+      provider: "GitHub datasets (historical)"
+      validation: "Minted Metal"
+      fallback: "MetalPrices API"
+      symbols:
+        - XAU: "Gold"
+        - XAG: "Silver"
+      update_frequency: "weekly"
+      status: "active"
   
   # Data quality thresholds
   data_quality:

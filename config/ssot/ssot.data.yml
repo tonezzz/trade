@@ -14,34 +14,52 @@ sections:
     items: recent_changes
 
 # Data Sources Configuration for Automated Download and Import
-# This file defines all data sources, their download URLs, and scheduling information
-#
-# ACTUAL DATA SOURCE USAGE (as of 2026-08-14):
-# ================================================
-# EXCHANGE RATES:
-# - USD/THB: open.er-api.com (real-time, reliable for THB, current as of 2026-08-14)
-# - Other currencies: FRED API (primary), limited historical coverage
-# - Alpha Vantage: NOT used for exchange rates (limited THB support)
-#
-# COMMODITIES:
-# - WHEAT, CORN, WTI, BRENT, NATURAL_GAS, COPPER: Alpha Vantage API (correct function names)
-# - XAU (Gold), XAG (Silver): MetalPrices API (Alpha Vantage doesn't provide spot prices)
-#
-# DOLLAR INDEX (DXY):
-# - FRED API (DTWEXBGS series) - Alpha Vantage doesn't support DXY
-#
-# VALIDATION SOURCES:
-# - Data quality agent uses multiple external sources for validation
-# - Alpha Vantage MCP integration for commodity price validation (WTI, BRENT, WHEAT, CORN, COPPER, NATURAL_GAS)
-# - Minted Metal API for precious metals validation (GOLD/XAU, SILVER/XAG) - LBMA benchmark prices, free, no API key
-# - MetalPrices API as backup for precious metals validation
-#
-# DATA QUALITY POLICY (as of 2026-08-14):
-# ================================================
-# - OHLC DATA: Only real OHLC data is stored and displayed - no estimated/fallback values
-# - CHART DISPLAY: Records without proper OHLC data are excluded from chart display
-# - HOLIDAY GAPS: Thai holiday gaps (e.g., Aug 8-11, 2026) are expected behavior
-# - DATA FRESHNESS: System uses tolerance settings to account for intermittent availability
+# This is the authoritative SSOT for Trade data sources. It defines all download
+# targets, scheduling, and the consolidated provider/alternative map used for
+# validation and redundancy.
+
+# Consolidated data source provider policy
+# Maps each category to its primary, fallback, and validation providers.
+data_source_policy:
+  # Currencies: FRED provides daily historical series. open.er-api.com and
+  # exchangerate-api.com provide current spot rates for validation.
+  exchange_rates:
+    primary: "FRED"
+    current_spot: "open.er-api.com"
+    fallback_current_spot: "exchangerate-api.com"
+    note: "FRED series are USD/base and are inverted on import to base/USD."
+
+  thb:
+    primary: "open.er-api.com"
+    fallback: "exchangerate-api.com"
+
+  # Commodities: Alpha Vantage is the primary source for energy and industrial
+  # metals. Precious metals use GitHub historical datasets and are validated
+  # against Minted Metal / MetalPrices.
+  commodities:
+    primary: "Alpha Vantage"
+    symbols:
+      - WTI
+      - BRENT
+      - COPPER
+      - NATURAL_GAS
+
+  precious_metals:
+    primary: "GitHub datasets (historical)"
+    validation: "Minted Metal"
+    fallback: "MetalPrices API"
+
+  # Dollar index: FRED is the only supported source.
+  dxy:
+    primary: "FRED"
+    series_id: "DTWEXBGS"
+
+# Data quality policy
+data_quality_policy:
+  ohlc: "Only real OHLC data is stored and displayed - no estimated/fallback values"
+  chart_display: "Records without proper OHLC data are excluded from chart display"
+  holiday_gaps: "Thai holiday gaps (e.g., Aug 8-11, 2026) are expected behavior"
+  data_freshness: "System uses tolerance settings to account for intermittent availability"
 
 # Global settings
 settings:
@@ -121,46 +139,46 @@ data_sources:
   # WTI Crude Oil Data
   wti_oil:
     name: "WTI Crude Oil"
-    description: "West Texas Intermediate crude oil daily prices"
+    description: "West Texas Intermediate crude oil prices (Alpha Vantage)"
     type: "commodity"
     symbol: "WTI"
     commodity: "OIL"
     unit: "barrel"
-    # Download URL for raw data
-    url: "https://raw.githubusercontent.com/datasets/oil-prices/main/data/wti-daily.csv"
-    # Schedule: daily at 6:00 AM
-    schedule: "daily"
+    # Primary: Alpha Vantage commodity API
+    url: "https://www.alphavantage.co/query?function=WTI&apikey=KUTH6I3J1OORWZI8"
+    # Schedule: monthly at 6:00 AM (Alpha Vantage commodity update frequency)
+    schedule: "monthly"
     schedule_time: "06:00"
     # Import function to use
     import_function: "import_commodity_prices"
     # Data source identifier for database
-    source: "automated_wti"
+    source: "alphavantage_wti"
     # Enable/disable this source
-    enabled: false  # Disabled due to data quality issues
-    # Custom formatter function (optional)
-    formatter: "format_wti_data"
+    enabled: true
+    # Custom formatter function
+    formatter: "format_alpha_vantage_commodity"
 
   # Brent Crude Oil Data
   brent_oil:
     name: "Brent Crude Oil"
-    description: "Brent crude oil daily prices"
+    description: "Brent crude oil prices (Alpha Vantage)"
     type: "commodity"
     symbol: "BRENT"
     commodity: "OIL"
     unit: "barrel"
-    # Download URL for raw data
-    url: "https://raw.githubusercontent.com/datasets/oil-prices/main/data/brent-daily.csv"
-    # Schedule: daily at 6:00 AM
-    schedule: "daily"
+    # Primary: Alpha Vantage commodity API
+    url: "https://www.alphavantage.co/query?function=BRENT&apikey=KUTH6I3J1OORWZI8"
+    # Schedule: monthly at 6:00 AM (Alpha Vantage commodity update frequency)
+    schedule: "monthly"
     schedule_time: "06:00"
     # Import function to use
     import_function: "import_commodity_prices"
     # Data source identifier for database
-    source: "automated_brent"
+    source: "alphavantage_brent"
     # Enable/disable this source
-    enabled: false  # Disabled due to data quality issues
-    # Custom formatter function (optional)
-    formatter: "format_brent_data"
+    enabled: true
+    # Custom formatter function
+    formatter: "format_alpha_vantage_commodity"
 
   # ECB Exchange Rates
   ecb_exchange_rates:
@@ -266,6 +284,8 @@ data_sources:
     symbol: "THB"
     quote_currency: "THB"
     url: "https://open.er-api.com/v6/latest/USD"
+    fallback_url: "https://api.exchangerate-api.com/v4/latest/USD"
+    validation_url: "https://open.er-api.com/v6/latest/USD"
     schedule: "daily"
     schedule_time: "17:00"
     import_function: "import_exchange_rates"
@@ -313,6 +333,9 @@ data_sources:
     enabled: true
     # Custom formatter function (optional)
     formatter: "format_gold_data"
+    # Validation source for current spot price
+    validation_source: "Minted Metal"
+    validation_url: "https://mintedmetal.com/api/prices.json"
 
   # Thai Gold Prices (XAU/THB) - GoldAPI.io
   thai_gold:
@@ -364,6 +387,9 @@ data_sources:
     source: "automated_silver"
     enabled: true
     formatter: "format_commodity_data"
+    # Validation source for current spot price
+    validation_source: "Minted Metal"
+    validation_url: "https://mintedmetal.com/api/prices.json"
 
   # Copper Prices (Alpha Vantage)
   copper:
@@ -479,18 +505,13 @@ data_sources:
 # - Data Format: JSON with CORS enabled
 # - Integration: Added to data_quality_agent.py as primary validation source for precious metals
 
-# RECENT CHANGES:
-# ================================
-# 2026-08-14:
-# - Fixed scheduler data source lookup (job_id vs job.name) in src/scheduler.py
-# - Implemented OHLC filtering in src/queries.py and src/legacy_api.py
-# - Removed all fallback/estimation logic - only real OHLC data shown in charts
-# - Documented Thai holiday data gap (Aug 8-11, 2026) as expected behavior
-# - Configured Tailscale network for cross-machine API access (100.75.102.88:9000)
-# - Updated UI to use API-first data loading with CSV fallback
-# - TradeCanvas UI now displays only real OHLC data (no horizontal lines)
-#
-# 2026-08-13:
-# - Initial PostgreSQL database setup and configuration
-# - API health checks configured and operational
-# - Docker Compose services deployed and running
+recent_changes:
+  - date: 2026-08-15
+    description: "Consolidated data source SSOT: added data_source_policy, enabled WTI/Brent via Alpha Vantage, documented alternatives/fallbacks/validation sources"
+    impact: "Single authoritative provider map, reduced duplicated comments, clearer primary/fallback/validation sources"
+  - date: 2026-08-14
+    description: "Fixed scheduler data source lookup, implemented OHLC filtering, documented Thai holiday gap"
+    impact: "Charts now show only real OHLC data, automation working correctly, data gaps properly documented"
+  - date: 2026-08-13
+    description: "Initial PostgreSQL database setup and configuration"
+    impact: "API health checks configured and operational, Docker Compose services deployed"
