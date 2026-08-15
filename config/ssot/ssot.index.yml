@@ -78,6 +78,13 @@ sections:
         text: Feature SSOT template for preview on compare2 and promotion to compare/family
         path: config/ssot/ssot.ui.feature.template.yml
 
+  - title: Planning and Improvement
+    layout: list
+    items:
+      - label: ssot.continuous-improvement.yml
+        text: Active development initiatives, backlog, and follow-up tracker
+        path: config/ssot/ssot.continuous-improvement.yml
+
   - title: Cross-References
     icon: 🔗
     layout: list
@@ -102,6 +109,9 @@ recent_changes:
   - date: 2026-08-14
     description: "Fixed scheduler data source lookup, implemented OHLC filtering, documented Thai holiday gap"
     impact: "System operational with proper data quality policies"
+  - date: 2026-08-15
+    description: "Created ssot.continuous-improvement.yml to track initiatives and backlog"
+    impact: "Improved follow-up visibility across all active development threads"
 
 # Search integration
 search_integration:

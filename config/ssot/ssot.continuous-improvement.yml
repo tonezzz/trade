@@ -1,0 +1,141 @@
+title: Continuous Improvement Plan
+subtitle: Active development initiatives, backlog, and follow-up tracker for the Trade system
+status: active
+
+ideas:
+  - Central tracker for all ongoing and proposed improvements
+  - Links each initiative to its SSOT, documentation, and next actionable step
+  - Reviewed and updated at the end of each session
+
+review_cadence:
+  - End of every working session: update initiative status and next steps
+  - Weekly: re-prioritize backlog and unblock blocked items
+  - Monthly: archive completed items into docs/core/DECISION_LOG.md
+
+# Active and planned initiatives
+initiatives:
+  - id: mcp-tools-policy
+    title: MCP Tools SSOT Policy
+    status: proposed
+    priority: high
+    description: |
+      Consolidate MCP server and tool guidance into a machine-readable SSOT
+      to improve discovery, selection logic, and failure handling.
+    refs:
+      - config/ssot/ssot.index.yml
+      - AGENTS.md
+      - /home/tony/.config/devin/mcp_config.json
+    next_steps:
+      - Draft ssot.mcp-tools.yml catalog
+      - Map each MCP server to use cases, priorities, and fallback rules
+      - Validate guidance against global_rules.md and AGENTS.md
+
+  - id: compare-modularization
+    title: Compare / Compare2 Modularization
+    status: in_progress
+    priority: high
+    description: |
+      Complete the SSOT-driven modularization of compare and compare2 pages,
+      including a generic promote-feature.sh, ui-components.js, and the feature promotion workflow.
+    refs:
+      - config/ssot/ssot.ui.feature.template.yml
+      - docs/kb/tradecanvas-ui-ssot-workflow.md
+      - tradecanvas-ui/ARCHITECTURE.md
+    next_steps:
+      - Create generic promote-feature.sh with SSOT_DIR argument
+      - Create docs/ssot/ design registry
+      - Promote existing compare2 features to family or page SSOT
+
+  - id: ssot-streamlining
+    title: Streamlined SSOT Structure Across Domains
+    status: proposed
+    priority: medium
+    description: |
+      Apply the four-layer SSOT pattern (base, family, page, feature) across
+      apps, libraries, APIs, data, and infrastructure.
+    refs:
+      - config/ssot/ssot.index.yml
+      - docs/kb/tradecanvas-ui-ssot-workflow.md
+    next_steps:
+      - Define naming convention ssot.<domain>.<layer>.<component>.yml
+      - Catalog existing SSOT files and identify structural gaps
+      - Update ssot.index.yml to reflect new organization
+
+  - id: datasource-reliability
+    title: Data Source Reliability and Catalog
+    status: in_progress
+    priority: high
+    description: |
+      Maintain and extend ssot.datasource-catalog.yml with active/candidate
+      sources and validation results from data_quality_agent.py.
+    refs:
+      - config/ssot/ssot.datasource-catalog.yml
+      - scripts/data_quality_agent.py
+    next_steps:
+      - Integrate Frankfurter and exchangerate.dev into data pipeline where appropriate
+      - Validate THB and commodity data paths
+      - Update status fields based on operational observations
+
+  - id: playlive-cdp-persistence
+    title: PlayLive CDP Setup Persistence
+    status: completed
+    priority: medium
+    description: |
+      Ensure Chrome CDP and playlived remain available across reboots
+      on tony-omen, tony-dell, and macbook.
+    refs:
+      - docs/kb/root-cause-2026-08-15.md
+      - /home/tony/.local/playlive/remote-setup.sh
+    next_steps:
+      - Verify after next reboot
+      - Document monitoring procedure
+
+  - id: perfect-strategy
+    title: Perfect Strategy Benchmarking
+    status: in_progress
+    priority: medium
+    description: |
+      Test Perfect strategy auto-detect with full historical data and
+      run "Run All & Compare" against algorithmic strategies.
+    refs:
+      - docs/kb/trade-ui-improvements-2026-08-07.md
+      - tradecanvas-ui/strategies.js
+      - config/ssot/ssot.ui.yml
+    next_steps:
+      - Run full dataset auto-detect
+      - Benchmark against existing strategies
+      - Document performance findings
+
+  - id: git-push-workflow
+    title: Git Push Scope Resolution
+    status: blocked
+    priority: low
+    description: |
+      Resolve the workflow scope or SSH push issue for the trade branch.
+    refs:
+      - .github/workflows/ci.yml
+    next_steps:
+      - Decide on SSH remote, new PAT, or temporary workflow removal
+      - Push pending commit 2b4881b and any uncommitted UI tweaks
+
+# Unprioritized or future ideas
+backlog:
+  - id: auth-system
+    title: Authentication / Authorization
+    status: candidate
+    priority: low
+    refs:
+      - ROADMAP.md
+
+  - id: real-time-data
+    title: Real-time Data Integration
+    status: candidate
+    priority: low
+    refs:
+      - ROADMAP.md
+
+# History of significant changes to this plan
+recent_changes:
+  - date: 2026-08-15
+    description: "Created continuous improvement SSOT to track active initiatives and backlog"
+    impact: "Single source of truth for follow-up and prioritization"
