@@ -16,19 +16,19 @@ review_cadence:
 initiatives:
   - id: mcp-tools-policy
     title: MCP Tools SSOT Policy
-    status: proposed
+    status: in_progress
     priority: high
     description: |
       Consolidate MCP server and tool guidance into a machine-readable SSOT
       to improve discovery, selection logic, and failure handling.
     refs:
       - config/ssot/ssot.index.yml
+      - config/ssot/ssot.mcp-tools.yml
       - AGENTS.md
-      - /home/tony/.config/devin/mcp_config.json
     next_steps:
-      - Draft ssot.mcp-tools.yml catalog
-      - Map each MCP server to use cases, priorities, and fallback rules
-      - Validate guidance against global_rules.md and AGENTS.md
+      - Review ssot.mcp-tools.yml for accuracy and completeness
+      - Promote status from experimental to active after validation
+      - Update this SSOT and ssot.index.yml when promoted
 
   - id: compare-modularization
     title: Compare / Compare2 Modularization

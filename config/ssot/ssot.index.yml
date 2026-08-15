@@ -85,6 +85,10 @@ sections:
         text: Active development initiatives, backlog, and follow-up tracker
         path: config/ssot/ssot.continuous-improvement.yml
 
+      - label: ssot.mcp-tools.yml
+        text: MCP server registry, selection rules, and failure procedures
+        path: config/ssot/ssot.mcp-tools.yml
+
   - title: Cross-References
     icon: 🔗
     layout: list
@@ -112,6 +116,9 @@ recent_changes:
   - date: 2026-08-15
     description: "Created ssot.continuous-improvement.yml to track initiatives and backlog"
     impact: "Improved follow-up visibility across all active development threads"
+  - date: 2026-08-15
+    description: "Created ssot.mcp-tools.yml catalog and registered it in the index"
+    impact: "Centralized MCP server selection and failure-handling guidance"
 
 # Search integration
 search_integration:
