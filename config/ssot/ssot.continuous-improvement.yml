@@ -30,6 +30,38 @@ initiatives:
       - Promote status from experimental to active after validation
       - Update this SSOT and ssot.index.yml when promoted
 
+  - id: ui-state-persistence
+    title: UI Selection State Persistence
+    status: in_progress
+    priority: high
+    description: |
+      Make all user selections (currency, timeframe, chart type, etc.) survive
+      a page refresh by driving persistence from ssot.ui.state.yml.
+    refs:
+      - config/ssot/ssot.ui.state.yml
+      - tradecanvas-ui/ui-components.js
+      - tradecanvas-ui/chart-loader.js
+    next_steps:
+      - Audit localStorage reads/writes against ssot.ui.state.yml
+      - Ensure CurrencySelector and TimeframeSelector render with stored values
+      - Fix the "reverts on refresh" issue (ui-bug-002)
+
+  - id: ui-initial-disconnected
+    title: Fix Initial "Disconnected" Status on Compare2
+    status: in_progress
+    priority: high
+    description: |
+      The compare2 page shows "Disconnected" on first load until the user
+      manually changes a selection. Update load state and status flow.
+    refs:
+      - config/ssot/ssot.ui.bugs.yml
+      - tradecanvas-ui/chart-loader.js
+      - tradecanvas-ui/chart-renderer.js
+    next_steps:
+      - Change initial status from "Disconnected" to "Loading"
+      - Ensure updateUI() runs on both API and fallback data
+      - Verify with playlive on a fresh session
+
   - id: compare-modularization
     title: Compare / Compare2 Modularization
     status: in_progress
