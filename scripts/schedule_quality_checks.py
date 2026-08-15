@@ -21,7 +21,7 @@ from src.logging_config import setup_logging, get_logger
 class QualityScheduler:
     """Scheduler for data quality checks."""
     
-    def __init__(self, config_path: str = "config/data_sources.yml"):
+    def __init__(self, config_path: str = "config/ssot/ssot.data.yml"):
         self.config_path = config_path
         self.config = self.load_config()
         self.logger = get_logger(__name__)
@@ -184,8 +184,8 @@ Examples:
     
     parser.add_argument(
         '--config',
-        default='config/data_sources.yml',
-        help='Path to configuration file (default: config/data_sources.yml)'
+        default='config/ssot/ssot.data.yml',
+        help='Path to configuration file (default: config/ssot/ssot.data.yml)'
     )
     
     parser.add_argument(

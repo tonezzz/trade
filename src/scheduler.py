@@ -127,7 +127,7 @@ class RetryHandler:
 class JobScheduler:
     """Main scheduler for automated data download and import jobs."""
     
-    def __init__(self, config_path: str = "config/data_sources.yml"):
+    def __init__(self, config_path: str = "config/ssot/ssot.data.yml"):
         self.config_path = config_path
         self.config = self._load_config()
         self.logger = self._setup_logging()
@@ -209,7 +209,7 @@ class JobScheduler:
                 )
                 self.logger.info(f"Loaded job: {job_id}")
     
-    def _download_data(self, job: JobConfig) -> str:
+    def _download_data(self, job: JobConfig, job_id: str) -> str:
         """Download data using unified data source system."""
         # Check for dry run mode
         if self.config['settings'].get('dry_run', False):
@@ -224,8 +224,8 @@ class JobScheduler:
         
         self.logger.info(f"Downloading {job.name} (symbol: {symbol}) using unified data source")
         
-        # Download data using unified downloader
-        result = self.data_downloader.download_data(job.name, symbol)
+        # Download data using unified downloader - use job_id instead of job.name
+        result = self.data_downloader.download_data(job_id, symbol)
         
         if not result.success:
             raise Exception(f"Data download failed: {result.error}")
@@ -360,7 +360,7 @@ class JobScheduler:
         
         def job_task():
             # Download data
-            downloaded_file = self._download_data(job)
+            downloaded_file = self._download_data(job, job_id)
             
             # Format data
             formatted_file = self._format_data(job, downloaded_file)

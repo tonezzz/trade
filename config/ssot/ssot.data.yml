@@ -1,11 +1,26 @@
+title: Trade Data Sources Configuration
+subtitle: Data sources, APIs, download URLs, and scheduling information
+icon: 📊
+
+sections:
+  - title: Global Settings
+    icon: ⚙️
+    items: settings
+  - title: Data Sources
+    icon: 📈
+    items: data_sources
+  - title: Recent Changes
+    icon: 📝
+    items: recent_changes
+
 # Data Sources Configuration for Automated Download and Import
 # This file defines all data sources, their download URLs, and scheduling information
 #
-# ACTUAL DATA SOURCE USAGE (as of 2026-08-07):
+# ACTUAL DATA SOURCE USAGE (as of 2026-08-14):
 # ================================================
 # EXCHANGE RATES:
-# - USD/THB: open.er-api.com (real-time, reliable for THB)
-# - Other currencies: exchangerate-api.com (primary), FRED API (secondary)
+# - USD/THB: open.er-api.com (real-time, reliable for THB, current as of 2026-08-14)
+# - Other currencies: FRED API (primary), limited historical coverage
 # - Alpha Vantage: NOT used for exchange rates (limited THB support)
 #
 # COMMODITIES:
@@ -20,6 +35,13 @@
 # - Alpha Vantage MCP integration for commodity price validation (WTI, BRENT, WHEAT, CORN, COPPER, NATURAL_GAS)
 # - Minted Metal API for precious metals validation (GOLD/XAU, SILVER/XAG) - LBMA benchmark prices, free, no API key
 # - MetalPrices API as backup for precious metals validation
+#
+# DATA QUALITY POLICY (as of 2026-08-14):
+# ================================================
+# - OHLC DATA: Only real OHLC data is stored and displayed - no estimated/fallback values
+# - CHART DISPLAY: Records without proper OHLC data are excluded from chart display
+# - HOLIDAY GAPS: Thai holiday gaps (e.g., Aug 8-11, 2026) are expected behavior
+# - DATA FRESHNESS: System uses tolerance settings to account for intermittent availability
 
 # Global settings
 settings:
@@ -456,3 +478,19 @@ data_sources:
 # - License: CC BY 4.0 (attribution required: "Cite: Minted Metal (mintedmetal.com)")
 # - Data Format: JSON with CORS enabled
 # - Integration: Added to data_quality_agent.py as primary validation source for precious metals
+
+# RECENT CHANGES:
+# ================================
+# 2026-08-14:
+# - Fixed scheduler data source lookup (job_id vs job.name) in src/scheduler.py
+# - Implemented OHLC filtering in src/queries.py and src/legacy_api.py
+# - Removed all fallback/estimation logic - only real OHLC data shown in charts
+# - Documented Thai holiday data gap (Aug 8-11, 2026) as expected behavior
+# - Configured Tailscale network for cross-machine API access (100.75.102.88:9000)
+# - Updated UI to use API-first data loading with CSV fallback
+# - TradeCanvas UI now displays only real OHLC data (no horizontal lines)
+#
+# 2026-08-13:
+# - Initial PostgreSQL database setup and configuration
+# - API health checks configured and operational
+# - Docker Compose services deployed and running

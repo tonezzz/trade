@@ -1,10 +1,31 @@
 
 ---
 
-**Last Updated:** 2026-08-07
+**Last Updated:** 2026-08-14
 # Historical Data Sources for Dollar Price Database
 
 This guide provides comprehensive sources for downloading historical dollar price data that can be imported into your database.
+
+## ⚠️ Important Notes
+
+### Holiday Data Gaps
+**Thai Holiday Data Gap (August 8-11, 2026):**
+- **Issue**: Missing THB data for August 8-11, 2026
+- **Cause**: Queen's Birthday holiday (August 12) with likely bridge holidays (August 10-11)
+- **Status**: Expected behavior - no trading during holidays
+- **Details**: See [Thai Holiday Data Gap Analysis](../kb/thai-holiday-data-gap-analysis-2026-08-14.md)
+
+**General Holiday Considerations:**
+- Most data sources do not provide data during market holidays
+- Weekend data is typically unavailable for forex markets
+- Different countries have different holiday calendars
+- Consider holiday calendars when analyzing data gaps
+
+### Data Source Limitations
+- **FRED API**: Good for major currencies, limited holiday coverage
+- **OpenExchangeRates**: Current data only, no historical for specific dates
+- **ECB**: European market hours, may not cover Asian holidays
+- **Regional Sources**: May provide better holiday coverage for specific currencies
 
 ## 📊 Exchange Rates (USD to other currencies)
 

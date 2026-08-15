@@ -46,10 +46,10 @@ class PriceQueries:
         data = [{
             'date': r.date,
             'rate': r.rate,
-            'open': r.open_price if r.open_price is not None else r.rate,
-            'high': r.high_price if r.high_price is not None else r.rate,
-            'low': r.low_price if r.low_price is not None else r.rate,
-            'close': r.close_price if r.close_price is not None else r.rate,
+            'open': r.open_price,
+            'high': r.high_price,
+            'low': r.low_price,
+            'close': r.close_price,
             'volume': r.volume
         } for r in results]
         
@@ -87,10 +87,10 @@ class PriceQueries:
         data = [{
             'date': r.date,
             'value': r.value,
-            'open': r.open_price if r.open_price is not None else r.value,
-            'high': r.high_price if r.high_price is not None else r.value,
-            'low': r.low_price if r.low_price is not None else r.value,
-            'close': r.close_price if r.close_price is not None else r.value,
+            'open': r.open_price,
+            'high': r.high_price,
+            'low': r.low_price,
+            'close': r.close_price,
             'volume': r.volume
         } for r in results]
         
@@ -137,10 +137,10 @@ class PriceQueries:
             'symbol': r.symbol,
             'price': r.price,
             'unit': r.unit,
-            'open': r.open_price if r.open_price is not None else r.price,
-            'high': r.high_price if r.high_price is not None else r.price,
-            'low': r.low_price if r.low_price is not None else r.price,
-            'close': r.close_price if r.close_price is not None else r.price,
+            'open': r.open_price,
+            'high': r.high_price,
+            'low': r.low_price,
+            'close': r.close_price,
             'volume': r.volume
         } for r in results]
         

@@ -550,17 +550,19 @@ async def get_ui_chart_data(
                     timeframe=timeframe
                 )
 
-            # Convert to chart format
+            # Convert to chart format - only include records with proper OHLC data
             chart_data = []
             for _, row in df.iterrows():
-                chart_data.append({
-                    "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
-                    "open": float(row['open'] if pd.notna(row['open']) else row['rate']),
-                    "high": float(row['high'] if pd.notna(row['high']) else row['rate']),
-                    "low": float(row['low'] if pd.notna(row['low']) else row['rate']),
-                    "close": float(row['close'] if pd.notna(row['close']) else row['rate']),
-                    "volume": float(row['volume']) if pd.notna(row['volume']) else None
-                })
+                # Skip records without proper OHLC data (no estimated/fallback values)
+                if pd.notna(row['open']) and pd.notna(row['high']) and pd.notna(row['low']) and pd.notna(row['close']):
+                    chart_data.append({
+                        "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
+                        "open": float(row['open']),
+                        "high": float(row['high']),
+                        "low": float(row['low']),
+                        "close": float(row['close']),
+                        "volume": float(row['volume']) if pd.notna(row['volume']) else None
+                    })
 
             # Get last updated date
             last_updated = df['date'].max() if not df.empty else datetime.now()
@@ -584,17 +586,19 @@ async def get_ui_chart_data(
                     timeframe=timeframe
                 )
 
-            # Convert to chart format
+            # Convert to chart format - only include records with proper OHLC data
             chart_data = []
             for _, row in df.iterrows():
-                chart_data.append({
-                    "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
-                    "open": float(row['open_price'] if pd.notna(row['open_price']) else row['price']),
-                    "high": float(row['high_price'] if pd.notna(row['high_price']) else row['price']),
-                    "low": float(row['low_price'] if pd.notna(row['low_price']) else row['price']),
-                    "close": float(row['close_price'] if pd.notna(row['close_price']) else row['price']),
-                    "volume": float(row['volume']) if pd.notna(row['volume']) else None
-                })
+                # Skip records without proper OHLC data (no estimated/fallback values)
+                if pd.notna(row['open']) and pd.notna(row['high']) and pd.notna(row['low']) and pd.notna(row['close']):
+                    chart_data.append({
+                        "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
+                        "open": float(row['open']),
+                        "high": float(row['high']),
+                        "low": float(row['low']),
+                        "close": float(row['close']),
+                        "volume": float(row['volume']) if pd.notna(row['volume']) else None
+                    })
 
             # Get last updated date
             last_updated = df['date'].max() if not df.empty else datetime.now()
@@ -617,17 +621,19 @@ async def get_ui_chart_data(
                     timeframe=timeframe
                 )
 
-            # Convert to chart format
+            # Convert to chart format - only include records with proper OHLC data
             chart_data = []
             for _, row in df.iterrows():
-                chart_data.append({
-                    "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
-                    "open": float(row['open_price'] if pd.notna(row['open_price']) else row['value']),
-                    "high": float(row['high_price'] if pd.notna(row['high_price']) else row['value']),
-                    "low": float(row['low_price'] if pd.notna(row['low_price']) else row['value']),
-                    "close": float(row['close_price'] if pd.notna(row['close_price']) else row['value']),
-                    "volume": float(row['volume']) if pd.notna(row['volume']) else None
-                })
+                # Skip records without proper OHLC data (no estimated/fallback values)
+                if pd.notna(row['open']) and pd.notna(row['high']) and pd.notna(row['low']) and pd.notna(row['close']):
+                    chart_data.append({
+                        "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
+                        "open": float(row['open']),
+                        "high": float(row['high']),
+                        "low": float(row['low']),
+                        "close": float(row['close']),
+                        "volume": float(row['volume']) if pd.notna(row['volume']) else None
+                    })
 
             # Get last updated date
             last_updated = df['date'].max() if not df.empty else datetime.now()
@@ -788,10 +794,10 @@ async def get_latest_dollar_index(db: Session = Depends(get_db)):
         return DollarIndexResponse(
             date=latest.date,
             value=latest.value,
-            open=latest.open_price if latest.open_price is not None else latest.value,
-            high=latest.high_price if latest.high_price is not None else latest.value,
-            low=latest.low_price if latest.low_price is not None else latest.value,
-            close=latest.close_price if latest.close_price is not None else latest.value,
+            open=latest.open_price if latest.open_price is not None else None,
+            high=latest.high_price if latest.high_price is not None else None,
+            low=latest.low_price if latest.low_price is not None else None,
+            close=latest.close_price if latest.close_price is not None else None,
             volume=latest.volume
         )
 

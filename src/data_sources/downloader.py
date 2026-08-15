@@ -19,7 +19,7 @@ import logging
 class UnifiedDataDownloader:
     """Unified data downloader using modular data sources."""
     
-    def __init__(self, config_path: str = "config/data_sources.yml"):
+    def __init__(self, config_path: str = "config/ssot/ssot.data.yml"):
         """
         Initialize the unified downloader.
         

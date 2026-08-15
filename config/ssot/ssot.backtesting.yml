@@ -1,3 +1,24 @@
+title: Backtesting Configuration
+subtitle: Backtesting strategies, parameters, execution settings, and performance metrics
+icon: 📊
+
+sections:
+  - title: Initial Capital
+    icon: 💰
+    items: initial_capital
+  - title: Commission Settings
+    icon: 💸
+    items: commission
+  - title: Slippage Settings
+    icon: 📉
+    items: slippage
+  - title: Risk Management
+    icon: 🛡️
+    items: risk_management
+  - title: Performance Metrics
+    icon: 📈
+    items: performance_metrics
+
 # Backtesting Configuration
 
 # Initial capital settings

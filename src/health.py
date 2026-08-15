@@ -12,7 +12,7 @@ from src.database import db
 class HealthChecker:
     """Check system health and database status."""
     
-    def __init__(self, config_path: str = "config/data_sources.yml"):
+    def __init__(self, config_path: str = "config/ssot/ssot.data.yml"):
         self.engine = db.engine
         self.issues = []
         self.warnings = []
@@ -472,8 +472,9 @@ class HealthChecker:
         results['checks']['data_volume'] = self.check_data_volume()
         results['checks']['data_quality'] = self.check_data_quality()
         results['checks']['system_resources'] = self.check_system_resources()
-        results['checks']['data_gaps'] = self.check_data_gaps()
-        results['data_gaps'] = self.check_data_gaps()
+        # data_gaps returns dict, store separately
+        data_gaps_result = self.check_data_gaps()
+        results['data_gaps'] = data_gaps_result
         
         # Determine overall status
         if self.issues:

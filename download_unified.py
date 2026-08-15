@@ -216,8 +216,8 @@ Examples:
     parser.add_argument(
         '--config',
         type=str,
-        default='config/data_sources.yml',
-        help='Path to configuration file (default: config/data_sources.yml)'
+        default='config/ssot/ssot.data.yml',
+        help='Path to configuration file (default: config/ssot/ssot.data.yml)'
     )
     parser.add_argument(
         '--verbose',

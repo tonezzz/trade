@@ -19,7 +19,7 @@ from src.logging_config import setup_logging, get_logger
 class AutomationController:
     """Controller for the automation system."""
     
-    def __init__(self, config_path: str = "config/data_sources.yml", dry_run: bool = False):
+    def __init__(self, config_path: str = "config/ssot/ssot.data.yml", dry_run: bool = False):
         self.config_path = config_path
         self.dry_run = dry_run
         self.scheduler = None

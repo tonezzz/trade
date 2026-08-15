@@ -1,0 +1,95 @@
+title: Trade SSOT Index
+subtitle: Master index of all Trade system SSOT files — purpose, location, and key content
+icon: 📊
+
+ideas:
+  - Single entry point for Trade system SSOT configuration
+  - Use ssot-search skill to search across all SSOT content (YAML only)
+  - Cross-references central SSOT for shared infrastructure
+  - Files without subtitles are config-type (flexible structure, no title required)
+  - Integration with central SSOT at /home/tony/CascadeProjects/chaba-kbman/docs/ssot/ssot.index.yml
+
+sections:
+  - title: Core Trade Configuration
+    icon: ⚙️
+    layout: list
+    items:
+      - label: ssot.index.yml
+        text: This file. Master index of all Trade SSOT files.
+        path: config/ssot/ssot.index.yml
+
+      - label: ssot.health.yml
+        text: Health check endpoints and monitoring for trade services — API, automation, database
+        path: config/ssot/ssot.health.yml
+
+      - label: ssot.infrastructure.yml
+        text: Trade system infrastructure — Docker Compose, networks, machines, deployment
+        path: config/ssot/ssot.infrastructure.yml
+
+  - title: Data & Data Sources
+    icon: 📈
+    layout: list
+    items:
+      - label: ssot.data.yml
+        text: Data source configuration — APIs, download URLs, scheduling, validation
+        path: config/ssot/ssot.data.yml
+
+      - label: ssot.api.yml
+        text: API configuration — endpoints, authentication, rate limiting, CORS
+        path: config/ssot/ssot.api.yml
+
+  - title: Trading Features
+    icon: 📉
+    layout: list
+    items:
+      - label: ssot.signals.yml
+        text: Trading signals configuration — strategies, parameters, thresholds
+        path: config/ssot/ssot.signals.yml
+
+      - label: ssot.backtesting.yml
+        text: Backtesting configuration — strategies, parameters, execution settings
+        path: config/ssot/ssot.backtesting.yml
+
+  - title: UI & Frontend
+    icon: 🎨
+    layout: list
+    items:
+      - label: ssot.ui.yml
+        text: TradeCanvas UI configuration — pages, symbols, timeframes, data sources
+        path: config/ssot/ssot.ui.yml
+
+  - title: Cross-References
+    icon: 🔗
+    layout: list
+    items:
+      - label: Central SSOT Index
+        text: Master SSOT index for all projects — infrastructure, services, apps
+        path: /home/tony/CascadeProjects/chaba-kbman/docs/ssot/ssot.index.yml
+
+      - label: Central Health SSOT
+        text: Health check configuration for shared services (PostgreSQL, GPU, etc.)
+        path: /home/tony/CascadeProjects/chaba-kbman/docs/ssot/infrastructure/ssot.health.yml
+
+      - label: Central Infrastructure SSOT
+        text: Shared infrastructure configuration — networks, machines, services
+        path: /home/tony/CascadeProjects/chaba-kbman/docs/ssot/infrastructure/ssot.services.yml
+
+# Recent changes to Trade SSOT
+recent_changes:
+  - date: 2026-08-14
+    description: "Created Trade SSOT index, moved SSOT files to config/ssot/, standardized structure"
+    impact: "Improved searchability, integration with central SSOT system"
+  - date: 2026-08-14
+    description: "Fixed scheduler data source lookup, implemented OHLC filtering, documented Thai holiday gap"
+    impact: "System operational with proper data quality policies"
+
+# Search integration
+search_integration:
+  ssot_search_skill:
+    pattern: "config/ssot/**/*.yml"
+    excludes:
+      - "template.yml"
+    context_lines: 2
+  central_ssot:
+    path: "/home/tony/CascadeProjects/chaba-kbman/docs/ssot/ssot.index.yml"
+    cross_reference: true

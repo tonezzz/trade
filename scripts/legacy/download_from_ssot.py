@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Download data from sources defined in SSOT (config/data_sources.yml).
+Download data from sources defined in SSOT (config/ssot/ssot.data.yml).
 This script reads the configuration and downloads data for enabled sources.
 """
 import yaml
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class SSOTDataDownloader:
     """Download data from sources defined in SSOT configuration."""
     
-    def __init__(self, config_path: str = "config/data_sources.yml"):
+    def __init__(self, config_path: str = "config/ssot/ssot.data.yml"):
         """Initialize downloader with SSOT configuration."""
         self.config_path = config_path
         self.config = self.load_config()
@@ -226,7 +226,7 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='Download data from SSOT configuration')
-    parser.add_argument('--config', default='config/data_sources.yml', help='Path to SSOT config file')
+    parser.add_argument('--config', default='config/ssot/ssot.data.yml', help='Path to SSOT config file')
     parser.add_argument('--type', choices=['all', 'currencies', 'commodities'], 
                        default='all', help='Type of data sources to process')
     parser.add_argument('--source', help='Process specific source by name')

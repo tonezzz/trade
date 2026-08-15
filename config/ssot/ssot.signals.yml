@@ -1,3 +1,18 @@
+title: Trading Signals Configuration
+subtitle: Technical indicator parameters, signal generation rules, and alert settings
+icon: 📉
+
+sections:
+  - title: Technical Indicators
+    icon: 📈
+    items: indicators
+  - title: Signal Generation
+    icon: 🎯
+    items: signal_generation
+  - title: Alert Settings
+    icon: 🔔
+    items: alert_settings
+
 # Trading Signal System Configuration
 # This file defines indicator parameters, signal generation rules, and alert settings
 

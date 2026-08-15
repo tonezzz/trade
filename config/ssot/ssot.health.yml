@@ -1,6 +1,24 @@
 title: Trade Project Health Check Configuration
-description: Health check endpoints and monitoring for trade services
-version: 2
+subtitle: Health check endpoints and monitoring for trade services
+icon: 🏥
+version: 3
+
+sections:
+  - title: Services
+    icon: 🚀
+    items: services
+  - title: Recovery Actions
+    icon: 🔧
+    items: recovery_actions
+  - title: Debugging Guidance
+    icon: 🔍
+    items: debugging_guidance
+  - title: Data Sources
+    icon: 📊
+    items: data_sources
+  - title: Recent Changes
+    icon: 📝
+    items: recent_changes
 
 services:
   # Trade API Service
@@ -13,7 +31,7 @@ services:
     category: api
     url: http://localhost:9000/api/health
     expected_status: 200
-    note: Docker Compose container, PostgreSQL database (dollar_prices), updated 2026-08-13
+    note: Docker Compose container, PostgreSQL database (dollar_prices), updated 2026-08-14, scheduler fixed (job_id vs job.name), OHLC filtering implemented
 
   # Trade Automation Service
   - id: trade-automation
@@ -23,7 +41,7 @@ services:
     expected_state: running
     timeout: 10
     category: api
-    note: Docker Compose container, data update scheduler, PostgreSQL (dollar_prices), disabled HTTP healthcheck, updated 2026-08-13
+    note: Docker Compose container, data update scheduler, PostgreSQL (dollar_prices), disabled HTTP healthcheck, updated 2026-08-14, scheduler fixed (job_id vs job.name), OHLC filtering implemented
 
   # Database Health (PostgreSQL)
   - id: trade-database
@@ -44,7 +62,7 @@ recovery_actions:
   http_error: "Check if service is running: `docker compose ps`, Check service logs for errors, Verify port is accessible: `curl -v <url>`, Restart service if needed"
   database_missing: "Check if database file exists: `ls -la data/dollar_prices.db`, Restore from backup if needed, Reinitialize database: `python scripts/setup_database.py`"
   dns_resolution: "FRED API has DNS issues in containers, use Alpha Vantage API instead, Check network connectivity: `docker exec <container> python -c 'import socket; print(socket.gethostbyname(\"google.com\"))'`"
-  data_freshness: "THB updated 2026-08-12 (current), DXY at 2026-08-07 (5 days old, within 30-day tolerance), Commodities (COPPER, NATURAL_GAS) at 2026-08-05 (7 days old, within 90-day tolerance), FRED currencies (JPY, CAD, CHF, AUD, NZD) at 2026-08-07 (5 days old, within 7-day tolerance), Health check now includes type-specific gap detection with tolerance settings from config/data_sources.yml"
+  data_freshness: "THB updated 2026-08-14 (current), DXY at 2026-08-07 (7 days old, within 30-day tolerance), Commodities (COPPER, NATURAL_GAS) at 2026-08-05 (9 days old, within 90-day tolerance), FRED currencies (JPY, CAD, CHF, AUD, NZD) at 2026-08-07 (7 days old, within 7-day tolerance), Thai holiday gap Aug 8-11 (Queen's Birthday + bridge holidays) is expected behavior, OHLC filtering implemented - only real OHLC data shown in charts (no estimated values)"
 
 # Testing and debugging guidance
 debugging_guidance:
@@ -72,8 +90,18 @@ debugging_guidance:
 
 # Data source configuration notes
 data_sources:
-  thb: "open.er-api.com (JSON format, reliable, current as of 2026-08-10)"
+  thb: "open.er-api.com (JSON format, reliable, current as of 2026-08-14), Thai holiday gap Aug 8-11 (Queen's Birthday + bridge holidays) is expected behavior"
   dxy: "FRED API (DTWEXBGS series, latest 2026-07-31, DNS issues in containers)"
   commodities: "Alpha Vantage API (COPPER, NATURAL_GAS, OIL, monthly data, reliable) - WHEAT/CORN removed 2026-08-10"
   currencies: "FRED API (EUR, JPY, CAD, CHF, AUD, NZD, etc., DNS issues in containers)"
   precious_metals: "MetalPrices API fallback (GOLD/XAU, SILVER/XAG when Alpha Vantage unavailable)"
+  ohlc_policy: "Only real OHLC data shown in charts - no estimated/fallback values (updated 2026-08-14), records without proper OHLC are excluded from chart display"
+
+# Recent changes and fixes
+recent_changes:
+  - date: 2026-08-14
+    description: "Fixed scheduler data source lookup (job_id vs job.name), implemented OHLC filtering to prevent estimated values in charts, documented Thai holiday data gap as expected behavior"
+    impact: "Charts now show only real OHLC data, automation working correctly, data gaps properly documented"
+  - date: 2026-08-13
+    description: "Initial PostgreSQL database setup, API health checks configured"
+    impact: "System operational with proper database backend"

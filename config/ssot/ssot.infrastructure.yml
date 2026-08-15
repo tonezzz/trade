@@ -1,3 +1,24 @@
+title: Trade Infrastructure Configuration
+subtitle: Single Source of Truth for all infrastructure components, servers, and remote services
+icon: 🏗️
+
+sections:
+  - title: Global Settings
+    icon: ⚙️
+    items: settings
+  - title: Machines
+    icon: 💻
+    items: machines
+  - title: Trade System
+    icon: 📊
+    items: trade_system
+  - title: Database
+    icon: 🗄️
+    items: database
+  - title: Networks
+    icon: 🌐
+    items: networks
+
 # Infrastructure Configuration
 # Single Source of Truth for all infrastructure components, servers, and remote services
 #
@@ -338,6 +359,7 @@ trade_system:
           timeout: 10s
           retries: 3
           start_period: 40s
+        note: "Updated 2026-08-14: Scheduler fixed (job_id vs job.name), OHLC filtering implemented, no estimated values in charts"
       
       trade-automation:
         image: "trade-trade-api"
@@ -364,6 +386,7 @@ trade_system:
           - trade-api
         healthcheck:
           disable: true
+        note: "Updated 2026-08-14: Scheduler fixed (job_id vs job.name), OHLC filtering implemented, no estimated values in charts"
   
   # Database configuration
   database:
@@ -375,6 +398,26 @@ trade_system:
     shared_instance: true
     shared_with:
       - "weaviate"
+    note: "Updated 2026-08-14: PostgreSQL database operational, THB data current as of 2026-08-14, Thai holiday gap Aug 8-11 documented as expected behavior"
+  
+  # Network configuration
+  networks:
+    tailscale:
+      name: "Tailscale VPN"
+      type: "vpn"
+      status: "active"
+      description: "Private network for cross-machine communication"
+      tony_omen_address: "100.75.102.88"
+      tony_dell_address: "100.68.142.13"
+      purpose: "Cross-machine API access and browser verification"
+      note: "Updated 2026-08-14: Used for Playlive browser verification from tony-dell to tony-omen, API endpoint configured to use Tailscale IP (100.75.102.88:9000)"
+    
+    web_default:
+      name: "web_default"
+      type: "docker_network"
+      external: true
+      description: "Docker Compose network for web services"
+      note: "Shared with chaba web stack for PostgreSQL database access"
       - "chaba web stack"
     tables:
       - exchange_rates

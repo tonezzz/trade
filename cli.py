@@ -296,7 +296,7 @@ def main():
     scheduler_parser = subparsers.add_parser('quality-scheduler', help='Manage data quality scheduling')
     scheduler_parser.add_argument('--run-once', action='store_true',
                                  help='Run all quality tasks once and exit')
-    scheduler_parser.add_argument('--config', default='config/data_sources.yml',
+    scheduler_parser.add_argument('--config', default='config/ssot/ssot.data.yml',
                                  help='Path to configuration file')
     
     # Automation scheduler command
@@ -305,7 +305,7 @@ def main():
                                    help='Run all automation jobs once and exit')
     automation_parser.add_argument('--status', action='store_true',
                                    help='Show automation job status')
-    automation_parser.add_argument('--config', default='config/data_sources.yml',
+    automation_parser.add_argument('--config', default='config/ssot/ssot.data.yml',
                                    help='Path to configuration file')
     
     args = parser.parse_args()

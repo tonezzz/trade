@@ -60,7 +60,7 @@ class DataSourcesConfig(BaseModel):
         Load data sources configuration from YAML file.
         
         Args:
-            config_path: Path to config file (default: config/data_sources.yml)
+            config_path: Path to config file (default: config/ssot/ssot.data.yml)
             
         Returns:
             DataSourcesConfig instance

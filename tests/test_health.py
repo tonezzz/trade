@@ -18,8 +18,8 @@ class TestHealthChecker:
     
     def test_health_checker_with_config(self):
         """Test health checker with custom config."""
-        checker = HealthChecker(config_path="config/data_sources.yml")
-        assert checker.config_path == "config/data_sources.yml"
+        checker = HealthChecker(config_path="config/ssot/ssot.data.yml")
+        assert checker.config_path == "config/ssot/ssot.data.yml"
         assert checker.tolerance_settings is not None
     
     def test_load_tolerance_settings(self):

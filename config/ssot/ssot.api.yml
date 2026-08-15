@@ -1,3 +1,21 @@
+title: Trade API Configuration
+subtitle: FastAPI server settings, CORS, authentication, and rate limiting
+icon: 🔌
+
+sections:
+  - title: Server Settings
+    icon: 🖥️
+    items: server
+  - title: CORS Settings
+    icon: 🌐
+    items: cors
+  - title: Authentication
+    icon: 🔐
+    items: authentication
+  - title: Rate Limiting
+    icon: ⚡
+    items: rate_limiting
+
 # FastAPI Configuration
 
 # Server settings

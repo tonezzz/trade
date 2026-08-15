@@ -5,7 +5,7 @@ tags: [trade, docker, postgres, containerization, automation]
 created: 2026-08-13
 updated: 2026-08-13
 category: operations
-related: [config/infrastructure.yml, config/ssot.health.yml, docker-compose.yml, Dockerfile]
+related: [config/ssot/ssot.infrastructure.yml, config/ssot/ssot.health.yml, docker-compose.yml, Dockerfile]
 search_keywords: [trade, docker compose, postgres, trade-api, trade-automation, chaba, web_default]
 ---
 
@@ -39,8 +39,8 @@ Both backend containers share a single PostgreSQL database (`dollar_prices`) on 
 | `.env.example` | Template showing `DB_HOST=postgres` and `DB_USER=chaba`. |
 | `requirements.txt` | Python deps, including `requests` for Alpha Vantage. |
 | `src/legacy_api.py` | Legacy FastAPI app with `/api/health` and UI chart endpoints. |
-| `config/infrastructure.yml` | SSOT documenting the Docker Compose and database configuration. |
-| `config/ssot.health.yml` | Health check definitions for the containerized services. |
+| `config/ssot/ssot.infrastructure.yml` | SSOT documenting the Docker Compose and database configuration. |
+| `config/ssot/ssot.health.yml` | Health check definitions for the containerized services. |
 
 ## Implementation/Architecture
 
@@ -133,8 +133,8 @@ docker compose logs -f trade-automation
 
 ## Related Documentation
 
-- **Infrastructure SSOT**: `config/infrastructure.yml` — Docker and database configuration.
-- **Health SSOT**: `config/ssot.health.yml` — Health check endpoints and recovery notes.
+- **Infrastructure SSOT**: `config/ssot/ssot.infrastructure.yml` — Docker and database configuration.
+- **Health SSOT**: `config/ssot/ssot.health.yml` — Health check endpoints and recovery notes.
 - **Docker Compose**: `docker-compose.yml` — Runtime service definitions.
 
 ## Change History
