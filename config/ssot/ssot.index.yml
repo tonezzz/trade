@@ -7,7 +7,7 @@ ideas:
   - Use ssot-search skill to search across all SSOT content (YAML only)
   - Cross-references central SSOT for shared infrastructure
   - Files without subtitles are config-type (flexible structure, no title required)
-  - Integration with central SSOT at /home/tony/CascadeProjects/chaba-kbman/docs/ssot/ssot.index.yml
+  - Integration with central SSOT at /home/tony/CascadeProjects/chaba/docs/ssot/ssot.index.yml
 
 sections:
   - title: Core Trade Configuration
@@ -94,7 +94,7 @@ sections:
         path: config/ssot/ssot.continuous-improvement.yml
 
       - label: ssot.mcp-tools.yml
-        text: MCP tools policy — local reference to the global chaba-kbman SSOT
+        text: MCP tools policy — local reference to the global chaba SSOT
         path: config/ssot/ssot.mcp-tools.yml
 
   - title: Cross-References
@@ -103,15 +103,15 @@ sections:
     items:
       - label: Central SSOT Index
         text: Master SSOT index for all projects — infrastructure, services, apps
-        path: /home/tony/CascadeProjects/chaba-kbman/docs/ssot/ssot.index.yml
+        path: /home/tony/CascadeProjects/chaba/docs/ssot/ssot.index.yml
 
       - label: Central Health SSOT
         text: Health check configuration for shared services (PostgreSQL, GPU, etc.)
-        path: /home/tony/CascadeProjects/chaba-kbman/docs/ssot/infrastructure/ssot.health.yml
+        path: /home/tony/CascadeProjects/chaba/docs/ssot/infrastructure/ssot.health.yml
 
       - label: Central Infrastructure SSOT
         text: Shared infrastructure configuration — networks, machines, services
-        path: /home/tony/CascadeProjects/chaba-kbman/docs/ssot/infrastructure/ssot.services.yml
+        path: /home/tony/CascadeProjects/chaba/docs/ssot/infrastructure/ssot.services.yml
 
 # Recent changes to Trade SSOT
 recent_changes:
@@ -128,7 +128,7 @@ recent_changes:
     description: "Created ssot.mcp-tools.yml catalog and registered it in the index"
     impact: "Centralized MCP server selection and failure-handling guidance"
   - date: 2026-08-15
-    description: "Moved canonical MCP tools policy to chaba-kbman global SSOT"
+    description: "Moved canonical MCP tools policy to chaba global SSOT"
     impact: "Trade keeps a reference stub; global source avoids cross-project drift"
 
 # Search integration
@@ -139,5 +139,5 @@ search_integration:
       - "template.yml"
     context_lines: 2
   central_ssot:
-    path: "/home/tony/CascadeProjects/chaba-kbman/docs/ssot/ssot.index.yml"
+    path: "/home/tony/CascadeProjects/chaba/docs/ssot/ssot.index.yml"
     cross_reference: true

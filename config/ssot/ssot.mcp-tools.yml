@@ -3,11 +3,11 @@ subtitle: Trade-specific reference to the canonical global MCP tools policy
 status: deprecated
 
 description: |
-  The canonical MCP tools policy has moved to the global chaba-kbman SSOT.
-  This file is kept as a local pointer. Do not edit the policy here; update
-  the global source and use this file only to discover the reference.
+  The canonical MCP tools policy lives in the chaba master SSOT. This file is
+  a local pointer. Do not edit the policy here; update the canonical source in
+  chaba and keep the chaba master worktree pulled for the latest version.
 
-ref: /home/tony/CascadeProjects/chaba-kbman/docs/ssot/infrastructure/ssot.mcp-tools.yml
+ref: /home/tony/CascadeProjects/chaba/docs/ssot/infrastructure/ssot.mcp-tools.yml
 
 recent_changes:
   - date: 2026-08-15

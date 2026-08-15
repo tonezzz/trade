@@ -24,7 +24,7 @@ initiatives:
     refs:
       - config/ssot/ssot.index.yml
       - config/ssot/ssot.mcp-tools.yml
-      - /home/tony/CascadeProjects/chaba-kbman/docs/ssot/infrastructure/ssot.mcp-tools.yml
+      - /home/tony/CascadeProjects/chaba/docs/ssot/infrastructure/ssot.mcp-tools.yml
       - AGENTS.md
     next_steps:
       - Promote the global ssot.mcp-tools.yml status from experimental to active after validation
