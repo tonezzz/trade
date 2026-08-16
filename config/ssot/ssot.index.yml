@@ -78,6 +78,10 @@ sections:
         text: Feature SSOT template for preview on compare2 and promotion to compare/family
         path: config/ssot/ssot.ui.feature.template.yml
 
+      - label: ssot.ui.feature.chart-controls.yml
+        text: Chart controls feature — volume, controls, and markers for the compare family
+        path: config/ssot/ssot.ui.feature.chart-controls.yml
+
       - label: ssot.ui.state.yml
         text: Persisted UI state schema — localStorage keys and default values for currency, timeframe, etc.
         path: config/ssot/ssot.ui.state.yml
