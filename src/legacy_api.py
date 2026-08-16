@@ -550,17 +550,20 @@ async def get_ui_chart_data(
                     timeframe=timeframe
                 )
 
-            # Convert to chart format - only include records with proper OHLC data
+            # Convert to chart format - allow close price as fallback for missing OHLC.
             chart_data = []
             for _, row in df.iterrows():
-                # Skip records without proper OHLC data (no estimated/fallback values)
-                if pd.notna(row['open']) and pd.notna(row['high']) and pd.notna(row['low']) and pd.notna(row['close']):
+                if pd.notna(row['close']):
+                    close_val = float(row['close'])
+                    open_val = float(row['open']) if pd.notna(row['open']) else close_val
+                    high_val = float(row['high']) if pd.notna(row['high']) else close_val
+                    low_val = float(row['low']) if pd.notna(row['low']) else close_val
                     chart_data.append({
                         "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
-                        "open": float(row['open']),
-                        "high": float(row['high']),
-                        "low": float(row['low']),
-                        "close": float(row['close']),
+                        "open": open_val,
+                        "high": high_val,
+                        "low": low_val,
+                        "close": close_val,
                         "volume": float(row['volume']) if pd.notna(row['volume']) else None
                     })
 
@@ -575,7 +578,7 @@ async def get_ui_chart_data(
             start_dt, end_dt = parse_period(timeframe) if timeframe != 'all' else (None, None)
 
             queries = PriceQueries(db)
-            df = queries.get_commodity_prices(commodity, start_dt, end_dt)
+            df = queries.get_commodity_prices(commodity=commodity, start_date=start_dt, end_date=end_dt)
 
             if df.empty:
                 return ChartDataResponse(
@@ -586,17 +589,20 @@ async def get_ui_chart_data(
                     timeframe=timeframe
                 )
 
-            # Convert to chart format - only include records with proper OHLC data
+            # Convert to chart format - allow close price as fallback for missing OHLC.
             chart_data = []
             for _, row in df.iterrows():
-                # Skip records without proper OHLC data (no estimated/fallback values)
-                if pd.notna(row['open']) and pd.notna(row['high']) and pd.notna(row['low']) and pd.notna(row['close']):
+                if pd.notna(row['close']):
+                    close_val = float(row['close'])
+                    open_val = float(row['open']) if pd.notna(row['open']) else close_val
+                    high_val = float(row['high']) if pd.notna(row['high']) else close_val
+                    low_val = float(row['low']) if pd.notna(row['low']) else close_val
                     chart_data.append({
                         "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
-                        "open": float(row['open']),
-                        "high": float(row['high']),
-                        "low": float(row['low']),
-                        "close": float(row['close']),
+                        "open": open_val,
+                        "high": high_val,
+                        "low": low_val,
+                        "close": close_val,
                         "volume": float(row['volume']) if pd.notna(row['volume']) else None
                     })
 
@@ -621,17 +627,20 @@ async def get_ui_chart_data(
                     timeframe=timeframe
                 )
 
-            # Convert to chart format - only include records with proper OHLC data
+            # Convert to chart format - allow close price as fallback for missing OHLC.
             chart_data = []
             for _, row in df.iterrows():
-                # Skip records without proper OHLC data (no estimated/fallback values)
-                if pd.notna(row['open']) and pd.notna(row['high']) and pd.notna(row['low']) and pd.notna(row['close']):
+                if pd.notna(row['close']):
+                    close_val = float(row['close'])
+                    open_val = float(row['open']) if pd.notna(row['open']) else close_val
+                    high_val = float(row['high']) if pd.notna(row['high']) else close_val
+                    low_val = float(row['low']) if pd.notna(row['low']) else close_val
                     chart_data.append({
                         "time": int(datetime.combine(row['date'], datetime.min.time()).timestamp()),
-                        "open": float(row['open']),
-                        "high": float(row['high']),
-                        "low": float(row['low']),
-                        "close": float(row['close']),
+                        "open": open_val,
+                        "high": high_val,
+                        "low": low_val,
+                        "close": close_val,
                         "volume": float(row['volume']) if pd.notna(row['volume']) else None
                     })
 

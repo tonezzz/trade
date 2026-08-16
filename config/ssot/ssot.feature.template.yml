@@ -1,0 +1,44 @@
+title: "<Feature Name>"
+subtitle: "Generic feature SSOT template for any domain/app"
+status: experimental
+
+# Identifiers
+domain: "<domain>"        # e.g. ui, api, data, lib
+feature: "<feature-name>" # e.g. data-source-selector
+
+# Human-readable description of what this feature controls
+description: |
+  Brief description of the feature, which pages/components it affects,
+  and what problem it solves.
+
+# Target SSOT file to promote this feature into when it is validated.
+# e.g. "ssot.ui.compare-family.yml" or "ssot.data.yml"
+promote_to: "ssot.<domain>.<target>.yml"
+
+# Experimental preview target where the feature is first enabled.
+# e.g. "ssot.ui.compare2.yml"
+preview_target: "ssot.<domain>.<preview>.yml"
+
+# Optional ref to the base/family section this feature overrides.
+# When the loader merges, it strips this ref and applies the overrides.
+ref: "ssot.<domain>.yml#<section>"
+
+# Override keys for the targeted section.
+# Add the keys that should override the base/family SSOT when this feature is enabled.
+#
+# Example for a UI feature:
+# strategy_panel:
+#   title: "Strategy Comparison (with new feature)"
+#   features:
+#     new_feature: true
+
+# Experimental toggles.
+toggles:
+  enabled: false
+
+# Promotion checklist; items should be completed before promoting to stable.
+promotion_checklist:
+  - Tested on preview target
+  - No runtime or console errors
+  - Added to ssot.index.yml
+  - Synced to deployment
