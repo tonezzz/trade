@@ -25,7 +25,7 @@ mkdir -p "$BACKUP_DIR"
 cp -r "$DEPLOY_DIR"/* "$BACKUP_DIR/"
 
 # Refresh all UI SSOT files from the authoritative config directory
-for ssot_file in "$SSOT_DIR"/ssot.ui.yml "$SSOT_DIR"/ssot.ui.*.yml; do
+for ssot_file in "$SSOT_DIR"/ssot.ui.yml "$SSOT_DIR"/ssot.ui.*.yml "$SSOT_DIR"/ssot.playlive-tests.yml "$SSOT_DIR"/ssot.*.playlive-tests.yml; do
     if [ -f "$ssot_file" ]; then
         filename=$(basename "$ssot_file")
         echo "Refreshing $filename from $SSOT_DIR"
@@ -44,7 +44,7 @@ for file in $SYNC_FILES; do
 done
 
 # Sync all SSOT UI files (picks up new page/family/feature files automatically)
-for ssot_file in "$DEV_DIR"/ssot.ui.yml "$DEV_DIR"/ssot.ui.*.yml; do
+for ssot_file in "$DEV_DIR"/ssot.ui.yml "$DEV_DIR"/ssot.ui.*.yml "$DEV_DIR"/ssot.playlive-tests.yml "$DEV_DIR"/ssot.*.playlive-tests.yml; do
     if [ -f "$ssot_file" ]; then
         filename=$(basename "$ssot_file")
         echo "Syncing: $filename"
