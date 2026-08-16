@@ -61,6 +61,23 @@ initiatives:
       - Ensure updateUI() runs on both API and fallback data
       - Verify with playlive on a fresh session
 
+  - id: ui-week-timeframe-render
+    title: Fix 1 Week Timeframe Chart Rendering for GOLD and Others
+    status: in_progress
+    priority: high
+    description: |
+      The 1W timeframe chart is empty or incorrectly rendered for GOLD and
+      other symbols. Investigate data density, visible range, and renderer
+      handling of very short timeframes.
+    refs:
+      - config/ssot/ssot.ui.bugs.yml
+      - tradecanvas-ui/chart-data-provider.js
+      - tradecanvas-ui/chart-renderer.js
+    next_steps:
+      - Reproduce with playlive on GOLD 1W
+      - Inspect data length and visible logical range logic
+      - Add fallback zoom / density handling for short timeframes
+
   - id: compare-modularization
     title: Compare / Compare2 Modularization
     status: in_progress
