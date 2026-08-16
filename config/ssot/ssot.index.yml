@@ -82,6 +82,10 @@ sections:
         text: Chart controls feature — volume, controls, and markers for the compare family
         path: config/ssot/ssot.ui.feature.chart-controls.yml
 
+      - label: ssot.ui.playlive-tests.yml
+        text: PlayLive browser test cases for ChartRenderer, ChartDataProvider, ChartLoader, and selectors
+        path: config/ssot/ssot.ui.playlive-tests.yml
+
       - label: ssot.ui.state.yml
         text: Persisted UI state schema — localStorage keys and default values for currency, timeframe, etc.
         path: config/ssot/ssot.ui.state.yml

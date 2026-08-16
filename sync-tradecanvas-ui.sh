@@ -8,7 +8,7 @@ DEV_DIR="/home/tony/CascadeProjects/trade/tradecanvas-ui"
 DEPLOY_DIR="/home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui"
 
 # Files to sync (excluding development-only files)
-SYNC_FILES="app.js chart-data-provider.js chart-renderer.js chart-loader.js compare-new.html compare.html compare2.html compare.js favicon.svg hindsight-strategies-new.js hindsight-strategies.js index.html nav.js styles.css strategy-compare-new.js strategy-compare.js strategies-new.js strategies.js test.html test-strategies.html ui-components.js ui-renderer.js"
+SYNC_FILES="app.js chart-data-provider.js chart-renderer.js chart-loader.js compare-new.html compare.html compare2.html compare.js favicon.svg hindsight-strategies-new.js hindsight-strategies.js index.html nav.js styles.css strategy-compare-new.js strategy-compare.js strategies-new.js strategies.js test-chart.html test.html test-strategies.html ui-components.js ui-renderer.js"
 
 # Authoritative SSOT source directory
 SSOT_DIR="/home/tony/CascadeProjects/trade/config/ssot"
