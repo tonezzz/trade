@@ -1,7 +1,8 @@
 #!/bin/bash
 # Promote a generic SSOT feature from an experimental/preview target to a stable target.
-# Usage: promote-feature.sh <domain> <feature-name>
+# Usage: promote-feature.sh <domain> <feature-name> [ssot-dir]
 # Example: promote-feature.sh ui data-source-selector
+# Example: promote-feature.sh ui data-source-selector /home/tony/CascadeProjects/trade/config/ssot
 
 set -e
 
@@ -9,12 +10,13 @@ DOMAIN="$1"
 FEATURE="$2"
 
 if [ -z "$DOMAIN" ] || [ -z "$FEATURE" ]; then
-    echo "Usage: promote-feature.sh <domain> <feature-name>"
+    echo "Usage: promote-feature.sh <domain> <feature-name> [ssot-dir]"
     echo "Example: promote-feature.sh ui data-source-selector"
+    echo "Example: promote-feature.sh ui data-source-selector /home/tony/CascadeProjects/trade/config/ssot"
     exit 1
 fi
 
-SSOT_DIR="/home/tony/CascadeProjects/trade/config/ssot"
+SSOT_DIR="${3:-/home/tony/CascadeProjects/trade/config/ssot}"
 FEATURE_FILE="ssot.${DOMAIN}.feature.${FEATURE}.yml"
 FEATURE_PATH="$SSOT_DIR/$FEATURE_FILE"
 
