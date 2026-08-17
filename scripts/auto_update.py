@@ -94,6 +94,15 @@ class AutomationController:
             # Print initial status
             self.scheduler.print_status_report()
             
+            # Run catch-up updates on startup if configured in SSOT
+            catch_up_config = self.scheduler.config.get('settings', {}).get('catch_up', {})
+            if catch_up_config.get('enabled', False) and catch_up_config.get('on_startup', False):
+                self.logger.info("Running startup catch-up updates...")
+                catch_up_results = self.scheduler.run_catch_up_updates()
+                successful = sum(1 for r in catch_up_results.values() if r.status == JobStatus.SUCCESS)
+                failed = len(catch_up_results) - successful
+                self.logger.info(f"Catch-up complete: {successful} successful, {failed} failed")
+            
             # Start the scheduler loop
             self.scheduler.start_scheduler()
             

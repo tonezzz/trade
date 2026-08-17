@@ -59,6 +59,8 @@ latest_findings:
     commodity_prices_latest: 2026-08-12
     commodity_prices_notes: "Only GOLD present with 1 row."
   automation_status: "14 jobs scheduled, but most data jobs (THB, WTI, Brent, Copper, Natural Gas) report 'Never run' after scheduler startup."
+  root_cause: "scripts/auto_update.py --scheduled does not invoke src/scheduler.run_catch_up_updates() on startup, even though ssot.data.yml catch_up.on_startup is true. The scheduler only waits for the next scheduled time."
+  fix: "Patch auto_update.py to run scheduler.run_catch_up_updates() when catch_up.on_startup is true before start_scheduler(). This is now tracked in ssot.data.yml catch_up.implementation."
 
 commands:
   list_containers: "podman ps --format \"table {{.Names}}\\t{{.Status}}\\t{{.Ports}}\""

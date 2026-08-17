@@ -107,12 +107,16 @@ settings:
     commodities: 90 # Commodity data: 90 days acceptable (monthly updates)
     currencies: 7  # Currency data: 7 days acceptable
   
-  # Catch-up settings for intermittent availability
+  # Catch-up settings for intermittent availability.
+  # When on_startup is true, the automation scheduler MUST run catch-up
+  # updates before it begins its normal schedule loop.
   catch_up:
     enabled: true
     on_startup: true
     max_gap_days: 30
     check_interval_hours: 6
+    implementation: "scripts/auto_update.py --scheduled runs src/scheduler.run_catch_up_updates() before start_scheduler()"
+    note: "Prevents stale data after a container restart by executing missed jobs immediately."
   
   # API rate limiting
   rate_limit_requests: 10
@@ -521,6 +525,9 @@ data_sources:
 # - Integration: Added to data_quality_agent.py as primary validation source for precious metals
 
 recent_changes:
+  - date: 2026-08-17
+    description: "Clarified catch_up policy: on_startup must trigger src/scheduler.run_catch_up_updates() before the normal schedule loop"
+    impact: "SSOT now explicitly prevents stale data after container restarts by requiring catch-up on startup"
   - date: 2026-08-15
     description: "Consolidated data source SSOT: added data_source_policy, enabled WTI/Brent via Alpha Vantage, documented alternatives/fallbacks/validation sources"
     impact: "Single authoritative provider map, reduced duplicated comments, clearer primary/fallback/validation sources"
