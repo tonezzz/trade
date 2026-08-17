@@ -100,9 +100,11 @@ settings:
   require_ohlc: false    # Whether OHLC data is required
   
   # Tolerance settings for intermittent availability
-  # These define how many days of staleness is acceptable for each data source
+  # These define how many days of staleness is acceptable for each data source.
+  # A value of 0 means "today only".
   tolerance:
-    thb: 2          # THB data: 2 days acceptable
+    thb: 0          # THB data: must be from today
+    gold: 0         # GOLD data: must be from today
     dxy: 30         # DXY data: 30 days acceptable (FRED API limitation)
     commodities: 90 # Commodity data: 90 days acceptable (monthly updates)
     currencies: 7  # Currency data: 7 days acceptable

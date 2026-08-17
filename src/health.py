@@ -80,21 +80,21 @@ class HealthChecker:
             return False
     
     def check_data_freshness(self) -> bool:
-        """Check if data is reasonably recent using type-specific tolerance."""
+        """Check if data is reasonably recent using per-source tolerance from SSOT."""
         try:
             with self.engine.connect() as conn:
-                # Check THB (2-day tolerance)
+                # Check THB
                 self._check_freshness_by_currency(conn, 'THB', self.tolerance_settings.get('thb', 2))
                 
-                # Check DXY (30-day tolerance)
+                # Check DXY
                 self._check_freshness_dxy(conn, self.tolerance_settings.get('dxy', 30))
                 
-                # Check commodities (90-day tolerance)
-                self._check_freshness_commodities(conn, self.tolerance_settings.get('commodities', 90))
+                # Check each commodity by name (GOLD, OIL, COPPER, etc.)
+                self._check_freshness_commodities_by_name(conn)
                 
-                # Check other currencies (7-day tolerance)
+                # Check other currencies
                 for currency in ['JPY', 'CAD', 'CHF', 'AUD', 'NZD']:
-                    self._check_freshness_by_currency(conn, currency, self.tolerance_settings.get('currencies', 7))
+                    self._check_freshness_by_currency(conn, currency, self.tolerance_settings.get(currency.lower(), self.tolerance_settings.get('currencies', 7)))
                 
                 return True
         except Exception as e:
@@ -137,7 +137,7 @@ class HealthChecker:
                 self.warnings.append(f"DXY data is {days_old} days old (tolerance: {tolerance_days} days)")
     
     def _check_freshness_commodities(self, conn, tolerance_days: int):
-        """Check freshness for commodities."""
+        """Check overall freshness for commodities (kept for compatibility)."""
         result = conn.execute(text("""
             SELECT MAX(date) as latest_date 
             FROM commodity_prices
@@ -152,6 +152,34 @@ class HealthChecker:
                 self.issues.append(f"Commodity data is {days_old} days old (tolerance: {tolerance_days} days)")
             elif days_old > tolerance_days:
                 self.warnings.append(f"Commodity data is {days_old} days old (tolerance: {tolerance_days} days)")
+    
+    def _check_freshness_commodities_by_name(self, conn):
+        """Check freshness for each commodity using per-commodity tolerance from SSOT."""
+        result = conn.execute(text("""
+            SELECT commodity, MAX(date) as latest_date 
+            FROM commodity_prices
+            GROUP BY commodity
+        """))
+        
+        for row in result:
+            if not row or not row[1]:
+                continue
+            
+            commodity = row[0]
+            latest_date = self._parse_date(row[1])
+            days_old = (datetime.now().date() - latest_date).days
+            
+            # Look up per-commodity tolerance, then per-symbol, then commodity default
+            tolerance_days = (
+                self.tolerance_settings.get(commodity) or
+                self.tolerance_settings.get(commodity.lower()) or
+                self.tolerance_settings.get('commodities', 90)
+            )
+            
+            if days_old > tolerance_days * 2:
+                self.issues.append(f"{commodity} data is {days_old} days old (tolerance: {tolerance_days} days)")
+            elif days_old > tolerance_days:
+                self.warnings.append(f"{commodity} data is {days_old} days old (tolerance: {tolerance_days} days)")
     
     def _parse_date(self, date_value):
         """Parse date from various formats."""

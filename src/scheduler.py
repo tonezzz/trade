@@ -451,24 +451,30 @@ class JobScheduler:
         if not job:
             return False
         
-        # Determine tolerance based on job type
-        if job.type == 'exchange_rate':
-            if job.quote_currency == 'THB':
-                tolerance = self.tolerance_days.get('thb', 2)
-            else:
+        # Determine tolerance from SSOT, with job, symbol, commodity, and quote-currency overrides
+        tolerance = self.tolerance_days.get(job_id)
+        if tolerance is None and job.symbol:
+            tolerance = self.tolerance_days.get(job.symbol) or self.tolerance_days.get(job.symbol.lower())
+        if tolerance is None and job.commodity:
+            tolerance = self.tolerance_days.get(job.commodity) or self.tolerance_days.get(job.commodity.lower())
+        if tolerance is None and job.quote_currency:
+            tolerance = self.tolerance_days.get(job.quote_currency)
+        if tolerance is None:
+            # Fallback by type
+            if job.type == 'exchange_rate':
                 tolerance = self.tolerance_days.get('currencies', 7)
-        elif job.type == 'dollar_index':
-            tolerance = self.tolerance_days.get('dxy', 30)
-        elif job.type == 'commodity':
-            tolerance = self.tolerance_days.get('commodities', 90)
-        else:
-            tolerance = 7  # Default tolerance
+            elif job.type == 'dollar_index':
+                tolerance = self.tolerance_days.get('dxy', 30)
+            elif job.type == 'commodity':
+                tolerance = self.tolerance_days.get('commodities', 90)
+            else:
+                tolerance = 7  # Default tolerance
         
-        # Check if data is within tolerance
+        # Check if data is within tolerance (0 means "must be today")
         last_update = self.get_last_update(job_id)
         if last_update:
             days_since_update = (datetime.now() - last_update).days
-            if days_since_update < tolerance:
+            if days_since_update <= tolerance:
                 self.logger.info(f"Skipping {job.name}: data is fresh ({days_since_update} days old, tolerance: {tolerance} days)")
                 return False
         
