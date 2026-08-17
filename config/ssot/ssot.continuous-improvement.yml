@@ -63,7 +63,7 @@ initiatives:
 
   - id: ui-week-timeframe-render
     title: Fix 1 Week Timeframe Chart Rendering for GOLD and Others
-    status: in_progress
+    status: completed
     priority: high
     description: |
       The 1W timeframe chart is empty or incorrectly rendered for GOLD and
@@ -74,9 +74,7 @@ initiatives:
       - tradecanvas-ui/chart-data-provider.js
       - tradecanvas-ui/chart-renderer.js
     next_steps:
-      - Verify with playlive that GOLD 1W now renders with the 5-point CSV fallback and single-candle visible range
-      - If verified, mark ui-bug-003 resolved and move this initiative to completed
-      - Restart Trade API on tony-omen so commodity chart requests use fresh API data instead of stale CSV
+      - Done: verified GOLD 1W renders a single real candle from the tony-dell podman API via tony-omen Caddy proxy
 
   - id: compare-modularization
     title: Compare / Compare2 Modularization
