@@ -163,18 +163,19 @@ class FREDSource(BaseDataSource):
                         'volume': None
                     }
                 elif is_exchange_rate:
-                    # FRED returns USD/base, we need base/USD
-                    usd_rate = 1.0 / value if value > 0 else value
+                    # FRED DEX*US series returns quote-currency per 1 USD
+                    # (e.g. DEXTHUS is Thai Baht to 1 US Dollar), so use directly.
+                    rate = value if value > 0 else value
                     
                     row_data = {
                         'date': date_obj.isoformat(),
                         'base_currency': 'USD',
                         'quote_currency': symbol,
-                        'rate': usd_rate,
+                        'rate': rate,
                         'open_price': None,
                         'high_price': None,
                         'low_price': None,
-                        'close_price': usd_rate,
+                        'close_price': rate,
                         'volume': None
                     }
                 else:
