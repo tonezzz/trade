@@ -88,8 +88,8 @@ initiatives:
       - docs/kb/tradecanvas-ui-ssot-workflow.md
       - tradecanvas-ui/ARCHITECTURE.md
     next_steps:
-      - Create docs/ssot/ design registry
-      - Promote existing compare2 features to family or page SSOT
+      - Create docs/ssot/ design registry for the compare family features
+      - Promoted: chart-controls, currency-selector-compact, strategy-panel-hindsight, compact-layout
 
   - id: ssot-streamlining
     title: Streamlined SSOT Structure Across Domains

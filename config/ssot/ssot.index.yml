@@ -90,6 +90,14 @@ sections:
         text: Compact currency selector feature for the compare family
         path: config/ssot/ssot.ui.feature.currency-selector-compact.yml
 
+      - label: ssot.ui.feature.strategy-panel-hindsight.yml
+        text: Hindsight strategy panel defaults for the compare family
+        path: config/ssot/ssot.ui.feature.strategy-panel-hindsight.yml
+
+      - label: ssot.ui.feature.compact-layout.yml
+        text: Compact compare family layout settings
+        path: config/ssot/ssot.ui.feature.compact-layout.yml
+
       - label: ssot.playlive-tests.yml
         text: Central PlayLive test catalog across UIs, APIs, data imports, and health
         path: config/ssot/ssot.playlive-tests.yml
