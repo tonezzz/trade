@@ -300,7 +300,7 @@ data_sources:
     type: "frankfurter"
     symbol: "THB"
     quote_currency: "THB"
-    base_url: "https://api.frankfurter.app/v1"
+    url: "https://api.frankfurter.dev/v1"
     schedule: "daily"
     schedule_time: "18:00"
     import_function: "import_exchange_rates"
