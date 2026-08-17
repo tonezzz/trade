@@ -86,6 +86,10 @@ sections:
         text: Chart controls feature — volume, controls, and markers for the compare family
         path: config/ssot/ssot.ui.feature.chart-controls.yml
 
+      - label: ssot.ui.feature.currency-selector-compact.yml
+        text: Compact currency selector feature for the compare family
+        path: config/ssot/ssot.ui.feature.currency-selector-compact.yml
+
       - label: ssot.playlive-tests.yml
         text: Central PlayLive test catalog across UIs, APIs, data imports, and health
         path: config/ssot/ssot.playlive-tests.yml
