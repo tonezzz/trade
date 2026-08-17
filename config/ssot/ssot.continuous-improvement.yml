@@ -139,19 +139,21 @@ initiatives:
 
   - id: perfect-strategy
     title: Perfect Strategy Benchmarking
-    status: in_progress
+    status: completed
     priority: medium
     description: |
-      Test Perfect strategy auto-detect with full historical data and
-      run "Run All & Compare" against algorithmic strategies.
+      Perfect strategy auto-detect ran on full THB historical data through
+      the compare2 UI. Hindsight-01 and Hindsight-02 produced positive
+      returns, validating the auto-detection and comparison pipeline.
     refs:
       - docs/kb/trade-ui-improvements-2026-08-07.md
       - tradecanvas-ui/strategies.js
       - config/ssot/ssot.ui.yml
+      - docs/ssot/ui-compare-family-design.md
     next_steps:
-      - Run full dataset auto-detect
-      - Benchmark against existing strategies
-      - Document performance findings
+      - THB/1Y Hindsight-01: 22.1% return, 9 trades, 100% win
+      - THB/1Y Hindsight-02: 33.9% return, 69 trades, 72.5% win
+      - Expand to additional symbols and timeframes (GOLD, DXY)
 
   - id: git-push-workflow
     title: Git Push Scope Resolution
