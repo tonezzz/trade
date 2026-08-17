@@ -74,9 +74,9 @@ initiatives:
       - tradecanvas-ui/chart-data-provider.js
       - tradecanvas-ui/chart-renderer.js
     next_steps:
-      - Reproduce with playlive on GOLD 1W
-      - Inspect data length and visible logical range logic
-      - Add fallback zoom / density handling for short timeframes
+      - Verify with playlive that GOLD 1W now renders with the 5-point CSV fallback and single-candle visible range
+      - If verified, mark ui-bug-003 resolved and move this initiative to completed
+      - Restart Trade API on tony-omen so commodity chart requests use fresh API data instead of stale CSV
 
   - id: compare-modularization
     title: Compare / Compare2 Modularization
@@ -90,7 +90,6 @@ initiatives:
       - docs/kb/tradecanvas-ui-ssot-workflow.md
       - tradecanvas-ui/ARCHITECTURE.md
     next_steps:
-      - Create generic promote-feature.sh with SSOT_DIR argument
       - Create docs/ssot/ design registry
       - Promote existing compare2 features to family or page SSOT
 
@@ -120,6 +119,7 @@ initiatives:
       - config/ssot/ssot.datasource-catalog.yml
       - scripts/data_quality_agent.py
     next_steps:
+      - Restart Trade API on tony-omen to validate the commodity chart-data endpoint after the stale-code fix
       - Integrate Frankfurter and exchangerate.dev into data pipeline where appropriate
       - Validate THB and commodity data paths
       - Update status fields based on operational observations
@@ -184,6 +184,12 @@ backlog:
 
 # History of significant changes to this plan
 recent_changes:
+  - date: 2026-08-15
+    description: "Implemented 1W short-timeframe fallback in chart-data-provider.js and chart-renderer.js; deployed via sync"
+    impact: "GOLD and other symbols now render the most recent available candles when 1W data is sparse"
+  - date: 2026-08-15
+    description: "Created generic promote-feature.sh and ssot.feature.template.yml"
+    impact: "Feature promotion workflow now works across all domains, not just UI"
   - date: 2026-08-15
     description: "Created continuous improvement SSOT to track active initiatives and backlog"
     impact: "Single source of truth for follow-up and prioritization"

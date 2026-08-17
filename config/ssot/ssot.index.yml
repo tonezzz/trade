@@ -78,6 +78,10 @@ sections:
         text: Feature SSOT template for preview on compare2 and promotion to compare/family
         path: config/ssot/ssot.ui.feature.template.yml
 
+      - label: ssot.feature.template.yml
+        text: Generic feature SSOT template for any domain or app
+        path: config/ssot/ssot.feature.template.yml
+
       - label: ssot.ui.feature.chart-controls.yml
         text: Chart controls feature — volume, controls, and markers for the compare family
         path: config/ssot/ssot.ui.feature.chart-controls.yml
@@ -143,6 +147,9 @@ recent_changes:
   - date: 2026-08-15
     description: "Created ssot.mcp-tools.yml catalog and registered it in the index"
     impact: "Centralized MCP server selection and failure-handling guidance"
+  - date: 2026-08-15
+    description: "Added ssot.feature.template.yml and promote-feature.sh for generic cross-domain SSOT promotion"
+    impact: "Feature promotion workflow is no longer UI-only"
   - date: 2026-08-15
     description: "Moved canonical MCP tools policy to chaba global SSOT"
     impact: "Trade keeps a reference stub; global source avoids cross-project drift"
