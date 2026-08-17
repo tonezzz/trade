@@ -11,7 +11,7 @@ from src.data_sources.base_source import DataSourceConfig, DataSourceResult, Dat
 from src.data_sources.registry import get_registry, register_default_sources
 from src.data_sources import (
     AlphaVantageSource, FREDSource, ECBSource, 
-    MetalPricesSource, MintedMetalSource, OpenExchangeRatesSource
+    MetalPricesSource, MintedMetalSource, OpenExchangeRatesSource, FrankfurterSource
 )
 import logging
 
@@ -90,7 +90,9 @@ class UnifiedDataDownloader:
         type_mapping = {
             'exchange_rate': DataSourceType.EXCHANGE_RATE,
             'commodity': DataSourceType.COMMODITY,
-            'dollar_index': DataSourceType.DOLLAR_INDEX
+            'dollar_index': DataSourceType.DOLLAR_INDEX,
+            'open_exchange_rates': DataSourceType.EXCHANGE_RATE,
+            'frankfurter': DataSourceType.EXCHANGE_RATE
         }
         return type_mapping.get(source_type, DataSourceType.COMMODITY)
     
@@ -136,6 +138,10 @@ class UnifiedDataDownloader:
             return FREDSource(config)
         elif source_type == 'dollar_index':
             return FREDSource(config)
+        elif source_type == 'open_exchange_rates':
+            return OpenExchangeRatesSource(config)
+        elif source_type == 'frankfurter':
+            return FrankfurterSource(config)
         else:
             return None
     

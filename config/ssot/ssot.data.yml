@@ -293,6 +293,20 @@ data_sources:
     enabled: true
     formatter: "format_thb_data"
 
+  # Thai Baht spot rate via Frankfurter (ECB)
+  thb_frankfurter_spot:
+    name: "USD/THB Frankfurter Spot"
+    description: "USD/THB spot reference rate from Frankfurter (ECB)"
+    type: "frankfurter"
+    symbol: "THB"
+    quote_currency: "THB"
+    base_url: "https://api.frankfurter.app/v1"
+    schedule: "daily"
+    schedule_time: "18:00"
+    import_function: "import_exchange_rates"
+    source: "automated_thb_frankfurter"
+    enabled: true
+
   # US Dollar Index (DXY)
   dxy:
     name: "US Dollar Index"
