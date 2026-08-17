@@ -38,6 +38,10 @@ sections:
         text: Comprehensive catalog of all available data sources for reliability and redundancy
         path: config/ssot/ssot.datasource-catalog.yml
 
+      - label: ssot.data-verification.yml
+        text: Data updating verification — commands, latest findings, and current data freshness status
+        path: config/ssot/ssot.data-verification.yml
+
       - label: ssot.api.yml
         text: API configuration — endpoints, authentication, rate limiting, CORS
         path: config/ssot/ssot.api.yml
@@ -147,6 +151,9 @@ sections:
 
 # Recent changes to Trade SSOT
 recent_changes:
+  - date: 2026-08-17
+    description: "Created ssot.data-verification.yml and registered it in the index; updated ssot.health.yml for Podman port 9002 and current data freshness"
+    impact: "Data updating status is now a tracked SSOT artifact"
   - date: 2026-08-14
     description: "Created Trade SSOT index, moved SSOT files to config/ssot/, standardized structure"
     impact: "Improved searchability, integration with central SSOT system"

@@ -1,0 +1,73 @@
+title: Data Updating Verification
+subtitle: How data updating status is checked and the latest verified state
+icon: 
+version: 1
+
+sections:
+  - title: Verification Method
+    icon: 
+    layout: list
+    items: verification
+  - title: Latest Findings
+    icon: 
+    layout: list
+    items: latest_findings
+  - title: Commands
+    icon: 
+    layout: list
+    items: commands
+  - title: Recent Changes
+    icon: 
+    layout: list
+    items: recent_changes
+
+verification:
+  host: tony-dell
+  runtime: podman
+  container_engine_command: podman
+  note: "Trade services on tony-dell run under Podman, not Docker. Port 9000 is already used by other services (mddb, raceman), so trade-api is exposed on 127.0.0.1:9002."
+
+  trade_api:
+    container: trade-api
+    internal_port: 9000
+    host_port: 9002
+    host_address: 127.0.0.1
+    health_url: http://localhost:9002/api/health
+    data_quality_url: http://localhost:9002/api/data_quality
+    expected_status: 200
+
+  trade_automation:
+    container: trade-automation
+    command: python /app/scripts/auto_update.py --scheduled
+    scheduled_jobs: 14
+
+latest_findings:
+  checked_at: 2026-08-17T12:04:50Z
+  trade_api_status: running
+  trade_automation_status: running
+  data_health: unhealthy
+  overall_health: needs_attention
+  issues:
+    - THB data is 3 days old (tolerance 2 days)
+    - commodity_prices has only 1 row
+    - THB 7-day data gap
+  data_quality_summary:
+    total_records: 16527
+    exchange_rates_latest: 2026-08-14
+    exchange_rates_notes: "Only THB has recent data; other currencies missing for Aug 4-14."
+    dollar_index_latest: 2026-08-07
+    commodity_prices_latest: 2026-08-12
+    commodity_prices_notes: "Only GOLD present with 1 row."
+  automation_status: "14 jobs scheduled, but most data jobs (THB, WTI, Brent, Copper, Natural Gas) report 'Never run' after scheduler startup."
+
+commands:
+  list_containers: "podman ps --format \"table {{.Names}}\\t{{.Status}}\\t{{.Ports}}\""
+  health_check: "curl -s http://localhost:9002/api/health | python3 -m json.tool"
+  data_quality: "curl -s http://localhost:9002/api/data_quality | python3 -m json.tool"
+  auto_update_status: "podman exec trade-automation python /app/scripts/auto_update.py --status"
+  automation_logs: "podman logs trade-automation --tail 30"
+
+recent_changes:
+  - date: 2026-08-17
+    description: "Created ssot.data-verification.yml to record Podman port mapping (9002) and current data freshness findings."
+    impact: "Verification procedure and the latest data-updating status are now in SSOT."

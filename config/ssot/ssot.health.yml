@@ -29,9 +29,9 @@ services:
     expected_state: running
     timeout: 10
     category: api
-    url: http://localhost:9000/api/health
+    url: http://localhost:9002/api/health
     expected_status: 200
-    note: Docker Compose container, PostgreSQL database (dollar_prices), updated 2026-08-14, scheduler fixed (job_id vs job.name), OHLC filtering implemented
+    note: Podman container on tony-dell, PostgreSQL database (dollar_prices), exposed on host 127.0.0.1:9002, updated 2026-08-17
 
   # Trade Automation Service
   - id: trade-automation
@@ -41,7 +41,7 @@ services:
     expected_state: running
     timeout: 10
     category: api
-    note: Docker Compose container, data update scheduler, PostgreSQL (dollar_prices), disabled HTTP healthcheck, updated 2026-08-14, scheduler fixed (job_id vs job.name), OHLC filtering implemented
+    note: Podman container on tony-dell, data update scheduler, PostgreSQL (dollar_prices), disabled HTTP healthcheck, updated 2026-08-17
 
   # Database Health (PostgreSQL)
   - id: trade-database
@@ -58,35 +58,35 @@ services:
 
 # Recovery suggestions for common failure modes
 recovery_actions:
-  container_down: "Check docker compose status: `docker compose ps`, Restart container: `docker compose restart <container>`, Check logs: `docker compose logs <container>`"
-  http_error: "Check if service is running: `docker compose ps`, Check service logs for errors, Verify port is accessible: `curl -v <url>`, Restart service if needed"
+  container_down: "Check podman status: `podman ps`, Restart container: `podman restart <container>`, Check logs: `podman logs <container>`"
+  http_error: "Check if service is running: `podman ps`, Check service logs for errors, Verify port is accessible: `curl -v <url>`, Restart service if needed"
   database_missing: "Check if database file exists: `ls -la data/dollar_prices.db`, Restore from backup if needed, Reinitialize database: `python scripts/setup_database.py`"
-  dns_resolution: "FRED API has DNS issues in containers, use Alpha Vantage API instead, Check network connectivity: `docker exec <container> python -c 'import socket; print(socket.gethostbyname(\"google.com\"))'`"
-  data_freshness: "THB updated 2026-08-14 (current), DXY at 2026-08-07 (7 days old, within 30-day tolerance), Commodities (COPPER, NATURAL_GAS) at 2026-08-05 (9 days old, within 90-day tolerance), FRED currencies (JPY, CAD, CHF, AUD, NZD) at 2026-08-07 (7 days old, within 7-day tolerance), Thai holiday gap Aug 8-11 (Queen's Birthday + bridge holidays) is expected behavior, OHLC filtering implemented - only real OHLC data shown in charts (no estimated values)"
+  dns_resolution: "FRED API has DNS issues in containers, use Alpha Vantage API instead, Check network connectivity: `podman exec <container> python -c 'import socket; print(socket.gethostbyname(\"google.com\"))'`"
+  data_freshness: "THB latest 2026-08-14 (3 days stale, tolerance 2 days), DXY latest 2026-08-07 (7 days old, within 30-day tolerance), commodity_prices has only 1 row (GOLD 2026-08-12), other currencies (JPY, CAD, CHF, AUD, NZD) missing Aug 8-14, Thai holiday gap Aug 8-11 is expected behavior, automation scheduler has 14 jobs but most have never run"
 
 # Testing and debugging guidance
 debugging_guidance:
   local_testing:
     - Use direct localhost URLs for local testing
-    - "Test API endpoints: `curl http://localhost:9000/api/health`"
-    - "Check data quality: `curl http://localhost:9000/api/data_quality`"
-    - "Check container logs: `docker compose logs -f trade-api`"
-    - "Verify database connectivity: `docker exec trade-api python -c \"from src.database import get_db; print('DB OK')\"`"
+    - "Test API endpoints: `curl http://localhost:9002/api/health`"
+    - "Check data quality: `curl http://localhost:9002/api/data_quality`"
+    - "Check container logs: `podman logs -f trade-api`"
+    - "Verify database connectivity: `podman exec trade-api python -c \"from src.database import get_db; print('DB OK')\"`"
 
   service_testing:
-    - 'Check all services: `docker compose ps`'
-    - 'Restart specific service: `docker compose restart trade-api`'
-    - 'View logs: `docker compose logs -f`'
-    - 'Rebuild service: `docker compose up -d --build trade-api`'
-    - 'Test data import: `docker exec trade-api python -c "from src.importer import DataImporter; from src.database import get_db; ..."`'
+    - 'Check all services: `podman ps`'
+    - 'Restart specific service: `podman restart trade-api`'
+    - 'View logs: `podman logs -f trade-api`'
+    - 'Rebuild service: `podman build -t trade-trade-api:latest . && podman rm -f trade-api && <start command from ssot.infrastructure.yml>`'
+    - 'Test data import: `podman exec trade-api python -c "from src.importer import DataImporter; from src.database import get_db; ..."`'
 
   data_validation:
-    - 'Check data quality: `curl http://localhost:9000/api/data_quality`'
-    - 'Verify THB data: `curl http://localhost:9000/api/exchange_rates/THB`'
-    - 'Check commodity data: `curl http://localhost:9000/api/commodity_prices/COPPER`'
+    - 'Check data quality: `curl http://localhost:9002/api/data_quality`'
+    - 'Verify THB data: `curl http://localhost:9002/api/exchange_rates/THB`'
+    - 'Check commodity data: `curl http://localhost:9002/api/commodity_prices/COPPER`'
     - 'Run manual data update: `python download_data.py format_alpha_vantage_commodity`'
     - 'Note: OIL outlier threshold is 100% (vs 50%) due to high volatility'
-    - 'Run freshness monitor: `docker exec trade-api python scripts/data_freshness_monitor.py`'
+    - 'Run freshness monitor: `podman exec trade-api python scripts/data_freshness_monitor.py`'
 
 # Data source configuration notes
 # See config/ssot/ssot.data.yml for the authoritative data source configuration.
@@ -100,6 +100,9 @@ data_sources:
 
 # Recent changes and fixes
 recent_changes:
+  - date: 2026-08-17
+    description: "Verified trade services run on tony-dell via Podman on port 9002; data is unhealthy (THB stale, commodity_prices has 1 row, many jobs never run)"
+    impact: "Updated health check endpoint to :9002 and documented current data freshness recovery guidance"
   - date: 2026-08-14
     description: "Fixed scheduler data source lookup (job_id vs job.name), implemented OHLC filtering to prevent estimated values in charts, documented Thai holiday data gap as expected behavior"
     impact: "Charts now show only real OHLC data, automation working correctly, data gaps properly documented"
