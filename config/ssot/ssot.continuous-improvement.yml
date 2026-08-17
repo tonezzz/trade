@@ -78,18 +78,19 @@ initiatives:
 
   - id: compare-modularization
     title: Compare / Compare2 Modularization
-    status: in_progress
+    status: completed
     priority: high
     description: |
-      Complete the SSOT-driven modularization of compare and compare2 pages,
-      including a generic promote-feature.sh, ui-components.js, and the feature promotion workflow.
+      SSOT-driven modularization of compare and compare2 pages is complete.
+      Generic promote-feature.sh workflow works and all compare2 features have
+      been promoted to compare-family. Design registry created.
     refs:
       - config/ssot/ssot.ui.feature.template.yml
       - docs/kb/tradecanvas-ui-ssot-workflow.md
       - tradecanvas-ui/ARCHITECTURE.md
+      - docs/ssot/ui-compare-family-design.md
     next_steps:
-      - Create docs/ssot/ design registry for the compare family features
-      - Promoted: chart-controls, currency-selector-compact, strategy-panel-hindsight, compact-layout
+      - Monitor for new compare2 page-specific features to promote
 
   - id: ssot-streamlining
     title: Streamlined SSOT Structure Across Domains

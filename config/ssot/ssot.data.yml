@@ -298,6 +298,7 @@ data_sources:
     name: "US Dollar Index"
     description: "US Dollar Index (DXY) daily values"
     type: "dollar_index"
+    symbol: "DXY"
     # Download URL for DXY data (using FRED - DTWEXBGS)
     url: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS"
     # Schedule: daily at 6:00 PM
