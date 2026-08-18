@@ -26,6 +26,10 @@ sections:
         text: Trade system infrastructure — Docker Compose, networks, machines, deployment
         path: config/ssot/ssot.infrastructure.yml
 
+      - label: ssot.urls.yml
+        text: Canonical UI, API, and data endpoints for development, Tailnet, and verification
+        path: config/ssot/ssot.urls.yml
+
   - title: Data & Data Sources
     icon: 📈
     layout: list
