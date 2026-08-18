@@ -228,9 +228,9 @@ health_checks:
 
 development:
   sync_script: ./sync-tradecanvas-ui.sh
-  deployed_path_on_omen: /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade
+  deployed_path_on_omen: /home/tony/CascadeProjects/chaba-omen/stacks/web/public/apps/trade
   caddy_served_path: /srv/public/apps/trade
-  caddyfile: chaba/stacks/web/Caddyfile
+  caddyfile: chaba-omen/stacks/web/Caddyfile
   trade_repo: /home/tony/CascadeProjects/trade
   chaba_repo: /home/tony/CascadeProjects/chaba
 
@@ -244,4 +244,4 @@ playlive:
 
 notes:
   - "tony-omen.local is mDNS and does not resolve over Tailscale; prefer tony-omen or 100.75.102.88."
-  - "Caddy root /srv/public/apps/trade does not exist on tony-omen; the actual deployed files are at /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade, so the Caddy root or a symlink needs fixing before these URLs work."
+  - "Caddy on tony-omen is served by the web Docker container, which bind-mounts /home/tony/CascadeProjects/chaba-omen/stacks/web/Caddyfile and /home/tony/CascadeProjects/chaba-omen/stacks/web/public. The trade routes must be in chaba-omen's Caddyfile, not the trade repo's local chaba Caddyfile."
