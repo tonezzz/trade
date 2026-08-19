@@ -138,7 +138,7 @@ risks:
 caveats:
   - The tony-dell web and bserver are manually started podman containers. For production, add podman systemd units or use the chaba-tony-dell/stacks/web compose with podman-compose.
   - tony-dell has no GPU; ollama, imagen2-inference, and gpu-queue remain on tony-omen and are proxied by their Tailnet IPs in the tony-dell Caddyfile.
-  - 100.68.142.13:443 is already listening; use HTTP on 8080 unless HTTPS is configured separately.
+  - 100.68.142.13:443 is Tailscale HTTPS/Funnel. Public Trade is available at https://tony-dell.taila0626a.ts.net/apps/trade via a /apps -> 127.0.0.1:8080/apps handler.
 
 next_session:
   priority: done

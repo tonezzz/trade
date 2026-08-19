@@ -14,6 +14,11 @@ environments:
     port: 8080
     protocol: http
     note: Tailscale Magic DNS (tony-dell) or Tailscale IP. This is the canonical remote access path; Caddy now runs on tony-dell.
+  public_funnel:
+    host: tony-dell.taila0626a.ts.net
+    protocol: https
+    port: 443
+    note: Public Tailscale Funnel for the Trade UI/API. Routes /apps to the tony-dell Caddy on port 8080 and keeps / on the funnel landing page.
   local_mdns:
     host: tony-omen.local
     port: 8080
@@ -34,6 +39,7 @@ services:
     host: tony-dell
     port: 9002
     tailnet_url: http://100.68.142.13:8080/apps/trade/api
+    funnel_url: https://tony-dell.taila0626a.ts.net/apps/trade/api
     local_url: http://tony-dell:9002
     health: /api/health
     data_quality: /api/data_quality
@@ -43,6 +49,7 @@ services:
   trade_canvas_ui:
     name: TradeCanvas UI
     tailnet_url: http://100.68.142.13:8080/apps/trade/tradecanvas-ui
+    funnel_url: https://tony-dell.taila0626a.ts.net/apps/trade/tradecanvas-ui
     mdns_url: http://tony-omen.local:8080/apps/trade/tradecanvas-ui
     pages:
       index: /index.html
@@ -56,6 +63,7 @@ services:
   wick_ui:
     name: Wick UI
     tailnet_url: http://100.68.142.13:8080/apps/trade/wick-ui
+    funnel_url: https://tony-dell.taila0626a.ts.net/apps/trade/wick-ui
     index: /index.html
 
   data_csv:
