@@ -31,6 +31,13 @@ current_state:
     - trade-automation
   tony_dell_gpu_status: no nvidia-smi found
   tony_dell_disk: 63G available on /home
+  tony_dell_web_status: running via podman
+  tony_dell_web_url: http://100.68.142.13:8080/apps/trade/
+  tony_dell_web_verified:
+    - http://100.68.142.13:8080/apps/trade/api/health
+    - http://100.68.142.13:8080/apps/trade/tradecanvas-ui/compare2.html
+    - http://100.68.142.13:8080/apps/trade/api/ui/chart-data/THB?timeframe=1y
+    - http://100.68.142.13:8080/apps/trade/wick-ui/index.html
 
 service_matrix:
   - service: web
@@ -77,7 +84,7 @@ service_matrix:
 phases:
   - id: 0
     name: Prep and freeze
-    status: pending
+    status: completed
     steps:
       - Decide the canonical Trade URL (http://100.68.142.13:8080 or https://tony-dell).
       - Verify what is listening on tony-dell 100.68.142.13:443 (tailscale serve, nginx, etc.).
@@ -85,7 +92,7 @@ phases:
 
   - id: 1
     name: Build the tony-dell web stack
-    status: pending
+    status: completed
     steps:
       - Copy chaba-omen/stacks/web/Caddyfile (with /apps/trade routes) to chaba-tony-dell/stacks/web/Caddyfile.
       - rsync chaba-omen/stacks/web/public/ to chaba-tony-dell/stacks/web/public/.
@@ -94,14 +101,14 @@ phases:
 
   - id: 2
     name: Start and validate tony-dell web
-    status: pending
+    status: completed
     steps:
       - docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile production up -d
       - Verify /apps/trade/api/health, /apps/trade/tradecanvas-ui/compare2.html, and root bserver path on 100.68.142.13:8080.
 
   - id: 3
     name: Re-point SSOT and DNS
-    status: pending
+    status: in_progress
     steps:
       - Update config/ssot/ssot.urls.yml to use tony-dell (100.68.142.13:8080 or https://tony-dell).
       - Update config/ssot/ssot.infrastructure.yml to reflect tony-dell as the web/api_server host.
@@ -127,6 +134,10 @@ risks:
   - tony-dell /home has only 63G free; copying chaba-omen public/ and bserver-www/ may use significant space.
   - bserver is currently resolved via Docker network on tony-omen. Moving it requires either adding it to tony-dell compose or exposing port 8092.
   - 100.68.142.13:443 is already listening; an HTTPS target needs investigation before switching.
+
+caveats:
+  - The tony-omen Caddy container is still running because bserver (the default site and /new, /decisions, /chatlocal, /infrastructure backends) is only resolvable in the tony-omen Docker network. The Trade routes do not depend on bserver, so Trade is fully on tony-dell, but the other tony-omen web routes remain on tony-omen until bserver is moved or exposed.
+  - The tony-dell web is currently a manually started podman container. For production, add a podman systemd unit or use the chaba-tony-dell/stacks/web compose with podman-compose.
 
 next_session:
   priority: phase 1

@@ -9,16 +9,16 @@ environments:
     protocol: http
     note: Direct API on the trade-api host; no Caddy proxy. Use this for podman debugging on tony-dell.
   tailnet:
-    host: tony-omen
-    ip: 100.75.102.88
+    host: tony-dell
+    ip: 100.68.142.13
     port: 8080
     protocol: http
-    note: Tailscale Magic DNS or Tailscale IP. This is the canonical remote access path.
+    note: Tailscale Magic DNS (tony-dell) or Tailscale IP. This is the canonical remote access path; Caddy now runs on tony-dell.
   local_mdns:
     host: tony-omen.local
     port: 8080
     protocol: http
-    note: mDNS only. Does not resolve over Tailscale, so it does not work for remote development.
+    note: mDNS only. The tony-omen Caddy is no longer the canonical Trade host, but mDNS may still work for other tony-omen apps.
 
 base_paths:
   caddy_root: /apps/trade
@@ -33,7 +33,7 @@ services:
     container: trade-api
     host: tony-dell
     port: 9002
-    tailnet_url: http://100.75.102.88:8080/apps/trade/api
+    tailnet_url: http://100.68.142.13:8080/apps/trade/api
     local_url: http://tony-dell:9002
     health: /api/health
     data_quality: /api/data_quality
@@ -42,7 +42,7 @@ services:
 
   trade_canvas_ui:
     name: TradeCanvas UI
-    tailnet_url: http://100.75.102.88:8080/apps/trade/tradecanvas-ui
+    tailnet_url: http://100.68.142.13:8080/apps/trade/tradecanvas-ui
     mdns_url: http://tony-omen.local:8080/apps/trade/tradecanvas-ui
     pages:
       index: /index.html
@@ -55,12 +55,12 @@ services:
 
   wick_ui:
     name: Wick UI
-    tailnet_url: http://100.75.102.88:8080/apps/trade/wick-ui
+    tailnet_url: http://100.68.142.13:8080/apps/trade/wick-ui
     index: /index.html
 
   data_csv:
     name: Imported CSV data
-    tailnet_url: http://100.75.102.88:8080/apps/trade/data/imported
+    tailnet_url: http://100.68.142.13:8080/apps/trade/data/imported
     pattern: "<symbol>_formatted.csv"
 
 ui_pages:
@@ -68,163 +68,163 @@ ui_pages:
     label: TradeCanvas main
     path: /apps/trade/tradecanvas-ui/index.html
     env: tailnet
-    example: http://100.75.102.88:8080/apps/trade/tradecanvas-ui/index.html
+    example: http://100.68.142.13:8080/apps/trade/tradecanvas-ui/index.html
   - id: compare
     label: Compare
     path: /apps/trade/tradecanvas-ui/compare.html
-    example: http://100.75.102.88:8080/apps/trade/tradecanvas-ui/compare.html
+    example: http://100.68.142.13:8080/apps/trade/tradecanvas-ui/compare.html
   - id: compare2
     label: Compare2
     path: /apps/trade/tradecanvas-ui/compare2.html
-    example: http://100.75.102.88:8080/apps/trade/tradecanvas-ui/compare2.html
+    example: http://100.68.142.13:8080/apps/trade/tradecanvas-ui/compare2.html
   - id: wick
     label: Wick UI
     path: /apps/trade/wick-ui/index.html
-    example: http://100.75.102.88:8080/apps/trade/wick-ui/index.html
+    example: http://100.68.142.13:8080/apps/trade/wick-ui/index.html
 
 api_endpoints:
   - id: health
     path: /api/health
     method: GET
     purpose: Service health
-    example: http://100.75.102.88:8080/apps/trade/api/health
+    example: http://100.68.142.13:8080/apps/trade/api/health
     local_example: http://tony-dell:9002/api/health
 
   - id: data_quality
     path: /api/data_quality
     method: GET
     purpose: Data quality report
-    example: http://100.75.102.88:8080/apps/trade/api/data_quality
+    example: http://100.68.142.13:8080/apps/trade/api/data_quality
 
   - id: available_currencies
     path: /api/available/currencies
     method: GET
     purpose: List available currencies
-    example: http://100.75.102.88:8080/apps/trade/api/available/currencies
+    example: http://100.68.142.13:8080/apps/trade/api/available/currencies
 
   - id: available_commodities
     path: /api/available/commodities
     method: GET
     purpose: List available commodities
-    example: http://100.75.102.88:8080/apps/trade/api/available/commodities
+    example: http://100.68.142.13:8080/apps/trade/api/available/commodities
 
   - id: exchange_rates
     path: /api/exchange_rates/{currency}
     method: GET
     params: { period: "1y", start_date: "YYYY-MM-DD", end_date: "YYYY-MM-DD", limit: 10000, offset: 0 }
     purpose: Exchange rate time series
-    example: http://100.75.102.88:8080/apps/trade/api/exchange_rates/THB?period=1y
+    example: http://100.68.142.13:8080/apps/trade/api/exchange_rates/THB?period=1y
 
   - id: exchange_rates_latest
     path: /api/exchange_rates/{currency}/latest
     method: GET
     purpose: Latest exchange rate
-    example: http://100.75.102.88:8080/apps/trade/api/exchange_rates/THB/latest
+    example: http://100.68.142.13:8080/apps/trade/api/exchange_rates/THB/latest
 
   - id: dollar_index
     path: /api/dollar_index
     method: GET
     purpose: DXY time series
-    example: http://100.75.102.88:8080/apps/trade/api/dollar_index
+    example: http://100.68.142.13:8080/apps/trade/api/dollar_index
 
   - id: dollar_index_latest
     path: /api/dollar_index/latest
     method: GET
     purpose: Latest DXY value
-    example: http://100.75.102.88:8080/apps/trade/api/dollar_index/latest
+    example: http://100.68.142.13:8080/apps/trade/api/dollar_index/latest
 
   - id: commodity_prices
     path: /api/commodity_prices/{commodity}
     method: GET
     purpose: Commodity price time series
-    example: http://100.75.102.88:8080/apps/trade/api/commodity_prices/GOLD?period=1y
+    example: http://100.68.142.13:8080/apps/trade/api/commodity_prices/GOLD?period=1y
 
   - id: commodity_prices_latest
     path: /api/commodity_prices/{commodity}/latest
     method: GET
     purpose: Latest commodity price
-    example: http://100.75.102.88:8080/apps/trade/api/commodity_prices/GOLD/latest
+    example: http://100.68.142.13:8080/apps/trade/api/commodity_prices/GOLD/latest
 
   - id: chart_data
     path: /api/ui/chart-data/{symbol}
     method: GET
     params: { timeframe: "1y" }
     purpose: LightweightCharts OHLC/line data
-    example: http://100.75.102.88:8080/apps/trade/api/ui/chart-data/THB?timeframe=1y
+    example: http://100.68.142.13:8080/apps/trade/api/ui/chart-data/THB?timeframe=1y
 
   - id: performance
     path: /api/performance/{currency}
     method: GET
     purpose: Performance metrics
-    example: http://100.75.102.88:8080/apps/trade/api/performance/THB
+    example: http://100.68.142.13:8080/apps/trade/api/performance/THB
 
   - id: signals_currency
     path: /api/signals/{currency}
     method: GET
     purpose: Trading signals for a currency
-    example: http://100.75.102.88:8080/apps/trade/api/signals/THB
+    example: http://100.68.142.13:8080/apps/trade/api/signals/THB
 
   - id: signals_dxy
     path: /api/signals/dollar_index
     method: GET
     purpose: DXY trading signals
-    example: http://100.75.102.88:8080/apps/trade/api/signals/dollar_index
+    example: http://100.68.142.13:8080/apps/trade/api/signals/dollar_index
 
   - id: signals_commodity
     path: /api/signals/commodity/{commodity}
     method: GET
     purpose: Commodity trading signals
-    example: http://100.75.102.88:8080/apps/trade/api/signals/commodity/GOLD
+    example: http://100.68.142.13:8080/apps/trade/api/signals/commodity/GOLD
 
   - id: signals_history
     path: /api/signals/history
     method: GET
     purpose: Signal history
-    example: http://100.75.102.88:8080/apps/trade/api/signals/history
+    example: http://100.68.142.13:8080/apps/trade/api/signals/history
 
   - id: signals_performance
     path: /api/signals/performance
     method: GET
     purpose: Signal performance summary
-    example: http://100.75.102.88:8080/apps/trade/api/signals/performance
+    example: http://100.68.142.13:8080/apps/trade/api/signals/performance
 
   - id: backtest_run
     path: /api/backtest/run
     method: POST
     purpose: Run a backtest
-    example: http://100.75.102.88:8080/apps/trade/api/backtest/run
+    example: http://100.68.142.13:8080/apps/trade/api/backtest/run
 
   - id: backtest_results
     path: /api/backtest/results/{backtest_id}
     method: GET
     purpose: Backtest result
-    example: http://100.75.102.88:8080/apps/trade/api/backtest/results/123
+    example: http://100.68.142.13:8080/apps/trade/api/backtest/results/123
 
   - id: backtest_strategies
     path: /api/backtest/strategies
     method: GET
     purpose: List backtest strategies
-    example: http://100.75.102.88:8080/apps/trade/api/backtest/strategies
+    example: http://100.68.142.13:8080/apps/trade/api/backtest/strategies
 
   - id: backtest_optimize
     path: /api/backtest/optimize
     method: POST
     purpose: Optimize backtest parameters
-    example: http://100.75.102.88:8080/apps/trade/api/backtest/optimize
+    example: http://100.68.142.13:8080/apps/trade/api/backtest/optimize
 
   - id: ws_status
     path: /ws/status
     method: GET
     purpose: WebSocket status endpoint
-    example: http://100.75.102.88:8080/apps/trade/ws/status
+    example: http://100.68.142.13:8080/apps/trade/ws/status
 
 health_checks:
   trade_api:
     command: "curl -s http://tony-dell:9002/api/health | python3 -m json.tool"
-    tailnet_command: "curl -s http://100.75.102.88:8080/apps/trade/api/health | python3 -m json.tool"
+    tailnet_command: "curl -s http://100.68.142.13:8080/apps/trade/api/health | python3 -m json.tool"
   data_quality:
     command: "curl -s http://tony-dell:9002/api/data_quality | python3 -m json.tool"
-    tailnet_command: "curl -s http://100.75.102.88:8080/apps/trade/api/data_quality | python3 -m json.tool"
+    tailnet_command: "curl -s http://100.68.142.13:8080/apps/trade/api/data_quality | python3 -m json.tool"
 
 development:
   sync_script: ./sync-tradecanvas-ui.sh
@@ -235,8 +235,8 @@ development:
   chaba_repo: /home/tony/CascadeProjects/chaba
 
   quick_curl:
-    health: "curl -s http://100.75.102.88:8080/apps/trade/api/health"
-    chart_thb: "curl -s 'http://100.75.102.88:8080/apps/trade/api/ui/chart-data/THB?timeframe=1y'"
+    health: "curl -s http://100.68.142.13:8080/apps/trade/api/health"
+    chart_thb: "curl -s 'http://100.68.142.13:8080/apps/trade/api/ui/chart-data/THB?timeframe=1y'"
 
 playlive:
   ref: config/ssot/ssot.playlive-tests.yml
