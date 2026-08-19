@@ -1,0 +1,137 @@
+title: Trade / Chaba Migration to tony-dell
+subtitle: Follow-up SSOT for moving the non-GPU tony-omen services to tony-dell
+version: 1
+status: in_progress
+
+decision:
+  goal: Consolidate all moveable containers and services on tony-dell.
+  scope: Move the tony-omen web ingress (Caddy + bserver) to tony-dell. Keep GPU/ML and hardware-sensor services on tony-omen.
+  rationale: tony-dell already hosts the Trade API, database, and most backend services. Only the Caddy web front-end and a few hardware-bound services remain on tony-omen.
+  non_goal: Moving GPU/ML workloads (ollama, imagen2-inference, gpu-queue, gpu-queue-processor) is blocked because tony-dell has no NVIDIA GPU or nvidia-smi.
+
+current_state:
+  tony_omen_active:
+    - web (Caddy, :8080/:8081)
+    - ollama
+    - imagen2-inference
+    - gemini-ollama-proxy
+    - gpu-queue
+    - gpu-queue-processor
+    - sensor-reader
+  tony_dell_active:
+    - chaba-postgres-16
+    - redis
+    - mddb / mddb-panel / mddb-gemini-test / mddb-ollama-test
+    - raceman-php / raceman-web
+    - weaviate
+    - helm
+    - status-data-api
+    - yomi-api
+    - trade-api
+    - trade-automation
+  tony_dell_gpu_status: no nvidia-smi found
+  tony_dell_disk: 63G available on /home
+
+service_matrix:
+  - service: web
+    current_host: tony-omen
+    target_host: tony-dell
+    notes: Caddy container is stateless. Use chaba-tony-dell/stacks/web/docker-compose.yml with --profile production. Must copy chaba-omen Caddyfile (with /apps/trade routes) and public/ to chaba-tony-dell.
+  - service: bserver
+    current_host: tony-omen
+    target_host: tony-dell
+    notes: Static bserver-www site. Add to chaba-tony-dell/stacks/web/docker-compose.yml or expose a port and proxy from tony-dell Caddy.
+  - service: sensor-reader
+    current_host: tony-omen
+    target_host: stay
+    notes: Hard-bound to /sys/class/thermal, hwmon, hp-wmi, and /var/run/docker.sock on tony-omen.
+  - service: ollama
+    current_host: tony-omen
+    target_host: stay
+    notes: Requires NVIDIA GPU and model data.
+  - service: imagen2-inference
+    current_host: tony-omen
+    target_host: stay
+    notes: Requires NVIDIA GPU.
+  - service: gpu-queue
+    current_host: tony-omen
+    target_host: stay
+    notes: Uses tony-omen GPU/ML stack.
+  - service: gpu-queue-processor
+    current_host: tony-omen
+    target_host: stay
+    notes: Uses tony-omen GPU/ML stack.
+  - service: gemini-ollama-proxy
+    current_host: tony-omen
+    target_host: stay
+    notes: Proxies tony-omen ollama.
+  - service: camera-control
+    current_host: tony-omen
+    target_host: stay
+    notes: Not currently running; NVR/camera-related.
+  - service: frigate
+    current_host: tony-omen
+    target_host: stay
+    notes: Not currently running; would require camera/TPU hardware.
+
+phases:
+  - id: 0
+    name: Prep and freeze
+    status: pending
+    steps:
+      - Decide the canonical Trade URL (http://100.68.142.13:8080 or https://tony-dell).
+      - Verify what is listening on tony-dell 100.68.142.13:443 (tailscale serve, nginx, etc.).
+      - Pick a maintenance window; keep tony-omen web running until tony-dell is verified.
+
+  - id: 1
+    name: Build the tony-dell web stack
+    status: pending
+    steps:
+      - Copy chaba-omen/stacks/web/Caddyfile (with /apps/trade routes) to chaba-tony-dell/stacks/web/Caddyfile.
+      - rsync chaba-omen/stacks/web/public/ to chaba-tony-dell/stacks/web/public/.
+      - Add or port the bserver service to chaba-tony-dell/stacks/web/docker-compose.yml.
+      - Do not enable gpu-services profile on tony-dell.
+
+  - id: 2
+    name: Start and validate tony-dell web
+    status: pending
+    steps:
+      - docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile production up -d
+      - Verify /apps/trade/api/health, /apps/trade/tradecanvas-ui/compare2.html, and root bserver path on 100.68.142.13:8080.
+
+  - id: 3
+    name: Re-point SSOT and DNS
+    status: pending
+    steps:
+      - Update config/ssot/ssot.urls.yml to use tony-dell (100.68.142.13:8080 or https://tony-dell).
+      - Update config/ssot/ssot.infrastructure.yml to reflect tony-dell as the web/api_server host.
+      - Update playlive test base_url and any local bookmarks.
+
+  - id: 4
+    name: Cut over
+    status: pending
+    steps:
+      - Stop the tony-omen web container.
+      - Update tony-dell Caddyfile so tony-omen GPU/AI endpoints (ollama, imagen, gpu-queue) are proxied by their Tailnet IPs (100.75.102.88:...).
+      - Keep sensor-reader, ollama, imagen, gpu-queue, gpu-queue-processor on tony-omen.
+
+  - id: 5
+    name: Cleanup
+    status: pending
+    steps:
+      - Remove or park tony-omen web and bserver compose services.
+      - Commit the final chaba-omen and chaba-tony-dell Caddyfile/compose changes.
+
+risks:
+  - tony-dell has no GPU, so ollama/imagen/gpu-queue cannot move.
+  - tony-dell /home has only 63G free; copying chaba-omen public/ and bserver-www/ may use significant space.
+  - bserver is currently resolved via Docker network on tony-omen. Moving it requires either adding it to tony-dell compose or exposing port 8092.
+  - 100.68.142.13:443 is already listening; an HTTPS target needs investigation before switching.
+
+next_session:
+  priority: phase 1
+  actions:
+    - Copy chaba-omen/stacks/web/Caddyfile to chaba-tony-dell/stacks/web/Caddyfile.
+    - rsync chaba-omen/stacks/web/public/ to chaba-tony-dell/stacks/web/public/.
+    - Start chaba-tony-dell web with docker compose --profile production.
+    - Validate http://100.68.142.13:8080/apps/trade/ endpoints.

@@ -30,6 +30,10 @@ sections:
         text: Canonical UI, API, and data endpoints for development, Tailnet, and verification
         path: config/ssot/ssot.urls.yml
 
+      - label: ssot.tony-dell-migration.yml
+        text: Migration plan for moving the non-GPU tony-omen services to tony-dell
+        path: config/ssot/ssot.tony-dell-migration.yml
+
   - title: Data & Data Sources
     icon: 📈
     layout: list
