@@ -25,3 +25,9 @@ apps:
     label: Service Health
     test_files:
       - config/ssot/ssot.health.playlive-tests.yml
+
+presets:
+  - id: usd-thb-1y-candle-default
+    label: USD/THB 1Y Candle Default
+    description: Verifies that compare2.html loads with USD/THB, 1Y, candlestick default and that GOLD still renders candlesticks.
+    file: config/ssot/ssot.playlive.preset.usd-thb-1y.yml

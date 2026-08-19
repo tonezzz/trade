@@ -46,6 +46,7 @@ navigation:
 
 chart_settings:
   default_timeframe: "1Y"
+  default_chart_type: "candlestick"
   available_timeframes:
     - "1D"
     - "1W"

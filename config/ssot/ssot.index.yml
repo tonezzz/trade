@@ -130,6 +130,10 @@ sections:
         text: TradeCanvas UI bug tracker — symptoms, repro steps, and next actions
         path: config/ssot/ssot.ui.bugs.yml
 
+      - label: ssot.playlive.preset.usd-thb-1y.yml
+        text: PlayLive preset for verifying the USD/THB 1Y candlestick default on compare2.html
+        path: config/ssot/ssot.playlive.preset.usd-thb-1y.yml
+
   - title: Planning and Improvement
     layout: list
     items:

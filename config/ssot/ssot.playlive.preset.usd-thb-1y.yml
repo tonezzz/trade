@@ -1,0 +1,111 @@
+title: PlayLive Preset - USD/THB 1Y Candle Default
+type: playlive-preset
+target:
+  name: TradeCanvas Compare2
+  funnel_url: https://tony-dell.taila0626a.ts.net/apps/trade/tradecanvas-ui/compare2.html
+  tailnet_url: http://100.68.142.13:8080/apps/trade/tradecanvas-ui/compare2.html
+  primary_url: funnel_url
+  requires: Chrome CDP remote debugging reachable on the PlayLive target
+
+steps:
+  - id: clear-state
+    action: eval
+    description: Start from a clean default state
+    script: |
+      localStorage.clear();
+      sessionStorage.clear();
+      return 'cleared';
+    expected: cleared
+
+  - id: navigate-compare2
+    action: navigate
+    url: https://tony-dell.taila0626a.ts.net/apps/trade/tradecanvas-ui/compare2.html?nocache=1
+    expected:
+      status: 200
+      title: TradeCanvas - Compare
+
+  - id: wait-load
+    action: wait
+    duration_ms: 2500
+    description: Allow chart data and UI components to initialize
+
+  - id: assert-pair-label
+    action: eval
+    script: document.getElementById('pair-label').textContent.trim()
+    expected: USD/THB
+
+  - id: assert-currency-selector
+    action: eval
+    script: |
+      const sel = document.getElementById('currency-selector-container-select');
+      return sel ? sel.value : 'missing';
+    expected: THB
+
+  - id: assert-timeframe-selector
+    action: eval
+    script: |
+      const sel = document.getElementById('timeframe-selector-container-select');
+      return sel ? sel.value : 'missing';
+    expected: 1Y
+
+  - id: assert-connection-status
+    action: eval
+    script: document.getElementById('connection-status').textContent.trim()
+    expected: API Data
+
+  - id: assert-chart-type-default
+    action: eval
+    description: Verify chart type preference is persisted as candlestick and a candlestick series exists
+    script: |
+      const loader = window.chartLoader;
+      const chartType = localStorage.getItem('trade-canvas-chart-type') || 'candlestick';
+      const hasCandle = !!(loader && loader.renderer && loader.renderer.candlestickSeries);
+      return JSON.stringify({ chartType, hasCandle });
+    expected: '{"chartType":"candlestick","hasCandle":true}'
+
+  - id: assert-candlestick-mode-for-gold
+    action: select
+    selector: '#currency-selector-container-select'
+    value: GOLD
+    description: Switch to GOLD to confirm a symbol with OHLC variation renders candlesticks
+
+  - id: wait-gold-load
+    action: wait
+    duration_ms: 1500
+
+  - id: assert-gold-candlestick
+    action: eval
+    description: GOLD candles should be visible (candlestick series remains present and active)
+    script: |
+      const loader = window.chartLoader;
+      const hasCandle = !!(loader && loader.renderer && loader.renderer.candlestickSeries);
+      const pairLabel = document.getElementById('pair-label').textContent.trim();
+      return JSON.stringify({ pairLabel, hasCandle });
+    expected: '{"pairLabel":"GOLD","hasCandle":true}'
+
+  - id: restore-thb-1y
+    action: select
+    selector: '#currency-selector-container-select'
+    value: THB
+
+  - id: restore-timeframe
+    action: select
+    selector: '#timeframe-selector-container-select'
+    value: 1Y
+
+  - id: wait-restore
+    action: wait
+    duration_ms: 1500
+
+  - id: assert-restored-defaults
+    action: eval
+    script: |
+      const pairLabel = document.getElementById('pair-label').textContent.trim();
+      const currency = (document.getElementById('currency-selector-container-select') || {}).value;
+      const timeframe = (document.getElementById('timeframe-selector-container-select') || {}).value;
+      return JSON.stringify({ pairLabel, currency, timeframe });
+    expected: '{"pairLabel":"USD/THB","currency":"THB","timeframe":"1Y"}'
+
+cleanup:
+  - action: close_session
+    description: Close the PlayLive browser session

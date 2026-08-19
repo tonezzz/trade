@@ -56,10 +56,12 @@ state_schema:
         - area
       pages:
         - index.html
-      status: candidate
+        - compare2.html
+      status: active
       notes: |
-        Not yet implemented. Add when chart-type controls are wired to the
-        shared ChartLoader.
+        Read by ChartLoader/Renderer on initialization. compare2.html defaults
+        to candlestick and falls back to line only when the data has no OHLC
+        variation and the user has not explicitly requested candlestick.
 
     - key: trade-canvas-active-indicators
       label: "Active Chart Indicators"
