@@ -153,7 +153,7 @@ class TimeframeSelector extends UIComponent {
             { value: 'all', label: 'All' }
         ];
         
-        this.selectedTimeframe = options.selectedTimeframe || '1Y';
+        this.selectedTimeframe = options.selectedTimeframe || '1D';
         this.chartLoader = options.chartLoader || null;
         this.className = options.className || 'timeframe-selector';
     }
@@ -333,6 +333,90 @@ class StatusIndicator extends UIComponent {
 }
 
 /**
+ * Chart Type Selector Component
+ * Provides chart type selection (candlestick, line, area) with chart integration
+ */
+class ChartTypeSelector extends UIComponent {
+    constructor(options = {}) {
+        super(options);
+
+        // Chart type configuration
+        this.chartTypes = options.chartTypes || [
+            { value: 'candlestick', label: 'Candlestick' },
+            { value: 'line', label: 'Line' },
+            { value: 'area', label: 'Area' }
+        ];
+
+        this.selectedChartType = options.selectedChartType || 'candlestick';
+        this.chartLoader = options.chartLoader || null;
+        this.className = options.className || 'chart-type-selector';
+    }
+
+    render() {
+        if (!this.container) {
+            console.error('ChartTypeSelector container not found:', this.containerId);
+            return;
+        }
+
+        const select = document.createElement('select');
+        select.id = this.containerId + '-select';
+        select.className = this.className;
+
+        // Add chart type options
+        this.chartTypes.forEach(chartType => {
+            const option = document.createElement('option');
+            option.value = chartType.value;
+            option.textContent = chartType.label;
+            option.selected = chartType.value === this.selectedChartType;
+            select.appendChild(option);
+        });
+
+        // Event listener for chart type changes
+        select.addEventListener('change', (e) => {
+            this.handleChartTypeChange(e.target.value);
+        });
+
+        this.container.innerHTML = '';
+        this.container.appendChild(select);
+        select.value = this.selectedChartType;
+
+        this.selectElement = select;
+        return select;
+    }
+
+    handleChartTypeChange(newChartType) {
+        this.selectedChartType = newChartType;
+
+        // Update chart loader if available
+        if (this.chartLoader) {
+            this.chartLoader.updateChartType(newChartType);
+        }
+
+        // Emit change event
+        this.emit('chartTypeChange', {
+            chartType: newChartType,
+            label: this.getChartTypeLabel(newChartType)
+        });
+    }
+
+    getChartTypeLabel(value) {
+        const chartType = this.chartTypes.find(t => t.value === value);
+        return chartType ? chartType.label : value;
+    }
+
+    setChartType(value) {
+        if (this.selectElement) {
+            this.selectElement.value = value;
+            this.handleChartTypeChange(value);
+        }
+    }
+
+    getCurrentChartType() {
+        return this.selectedChartType;
+    }
+}
+
+/**
  * Component Factory
  * Helper for creating components with consistent configuration
  */
@@ -346,6 +430,13 @@ class ComponentFactory {
 
     static createTimeframeSelector(containerId, options = {}) {
         return new TimeframeSelector({
+            containerId,
+            ...options
+        });
+    }
+
+    static createChartTypeSelector(containerId, options = {}) {
+        return new ChartTypeSelector({
             containerId,
             ...options
         });
@@ -372,6 +463,7 @@ if (typeof module !== 'undefined' && module.exports) {
         UIComponent,
         CurrencySelector,
         TimeframeSelector,
+        ChartTypeSelector,
         ControlButton,
         StatusIndicator,
         ComponentFactory

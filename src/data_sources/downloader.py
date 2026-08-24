@@ -70,9 +70,10 @@ class UnifiedDataDownloader:
                     enabled=True,
                     api_key=self._get_api_key(source_id),
                     base_url=source_config.get('url'),
-                    timeout=self.config.get('settings', {}).get('rate_limit_period', 60),
-                    max_retries=self.config.get('settings', {}).get('max_retries', 3),
-                    retry_delay=self.config.get('settings', {}).get('retry_delay', 5)
+                    timeout=source_config.get('timeout', self.config.get('settings', {}).get('rate_limit_period', 60)),
+                    max_retries=source_config.get('max_retries', self.config.get('settings', {}).get('max_retries', 3)),
+                    retry_delay=source_config.get('retry_delay', self.config.get('settings', {}).get('retry_delay', 5)),
+                    custom_params=source_config
                 )
                 
                 # Create appropriate data source instance
@@ -92,7 +93,8 @@ class UnifiedDataDownloader:
             'commodity': DataSourceType.COMMODITY,
             'dollar_index': DataSourceType.DOLLAR_INDEX,
             'open_exchange_rates': DataSourceType.EXCHANGE_RATE,
-            'frankfurter': DataSourceType.EXCHANGE_RATE
+            'frankfurter': DataSourceType.EXCHANGE_RATE,
+            'alpha_vantage_fx': DataSourceType.EXCHANGE_RATE
         }
         return type_mapping.get(source_type, DataSourceType.COMMODITY)
     
@@ -106,9 +108,9 @@ class UnifiedDataDownloader:
         source_config = data_sources.get(source_id, {})
         source_type = source_config.get('type')
         
-        if source_type == 'commodity':
-            # Alpha Vantage uses a single API key for all commodities
-            api_key = os.getenv('ALPHA_VANTAGE_API_KEY')
+        if source_type == 'commodity' or source_type == 'alpha_vantage_fx':
+            # Alpha Vantage uses a single API key for all commodities and forex
+            api_key = os.getenv('ALPHA_VANTAGE_API_KEY') or source_config.get('api_key')
             if api_key:
                 return api_key
         
@@ -142,6 +144,8 @@ class UnifiedDataDownloader:
             return OpenExchangeRatesSource(config)
         elif source_type == 'frankfurter':
             return FrankfurterSource(config)
+        elif source_type == 'alpha_vantage_fx':
+            return AlphaVantageSource(config)
         else:
             return None
     

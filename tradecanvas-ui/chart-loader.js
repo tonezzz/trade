@@ -6,7 +6,7 @@ class ChartLoader {
         this.config = {
             containerId: options.containerId || 'main-chart',
             symbol: options.symbol || localStorage.getItem('trade-canvas-selected-currency') || 'THB',
-            timeframe: options.timeframe || localStorage.getItem('trade-canvas-selected-timeframe') || '1Y',
+            timeframe: options.timeframe || localStorage.getItem('trade-canvas-selected-timeframe') || '1D',
             chartType: options.chartType || localStorage.getItem('trade-canvas-chart-type') || 'candlestick',
             showVolume: options.showVolume !== false,
             showIndicators: options.showIndicators || false,
@@ -200,6 +200,16 @@ class ChartLoader {
         this.config.timeframe = timeframe;
         try { localStorage.setItem('trade-canvas-selected-timeframe', timeframe); } catch (e) {}
         this.loadData();
+    }
+
+    updateChartType(chartType) {
+        this.config.chartType = chartType;
+        try { localStorage.setItem('trade-canvas-chart-type', chartType); } catch (e) {}
+        if (this.data && this.data.length > 0) {
+            this.renderer.updateChart(this.data, this.config.chartType);
+        } else {
+            this.loadData();
+        }
     }
 
     refresh() {

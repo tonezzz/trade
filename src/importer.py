@@ -42,6 +42,15 @@ class DataImporter:
         """
         df = pd.read_csv(csv_path)
         
+        # Determine the quote currency and skip already-stored dates to avoid duplicates
+        existing_dates = set()
+        if 'quote_currency' in df.columns and not df['quote_currency'].dropna().empty:
+            quote_currency = str(df['quote_currency'].dropna().iloc[0]).upper()
+            existing_records = self.session.query(ExchangeRate.date).filter(
+                ExchangeRate.quote_currency == quote_currency
+            ).all()
+            existing_dates = {r[0] for r in existing_records}
+        
         # Validate data before import
         data_list = df.to_dict('records')
         validation_results = validate_csv_data('exchange_rates', data_list)
@@ -59,6 +68,10 @@ class DataImporter:
         count = 0
         for _, row in df.iterrows():
             try:
+                row_date = pd.to_datetime(row['date']).date()
+                if row_date in existing_dates:
+                    continue
+                
                 # Use validated data
                 exchange_rate = ExchangeRate(
                     date=pd.to_datetime(row['date']).date(),

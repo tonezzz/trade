@@ -1,5 +1,5 @@
 """
-Alpha Vantage data source for commodities and financial data.
+Alpha Vantage data source for commodities, financial data, and forex.
 """
 from typing import Optional, Dict, Any, List
 from datetime import date, datetime, timedelta
@@ -10,9 +10,9 @@ from src.data_sources.base_source import BaseDataSource, DataSourceConfig, DataS
 
 
 class AlphaVantageSource(BaseDataSource):
-    """Alpha Vantage data source for commodities and financial data."""
+    """Alpha Vantage data source for commodities, financial data, and forex."""
     
-    # Alpha Vantage function mappings
+    # Alpha Vantage function mappings for physical commodities
     FUNCTION_MAPPING = {
         'WTI': 'WTI',
         'BRENT': 'BRENT',
@@ -26,6 +26,12 @@ class AlphaVantageSource(BaseDataSource):
         super().__init__(config)
         self.base_url = "https://www.alphavantage.co/query"
     
+    def _is_forex(self, symbol: str) -> bool:
+        """Check if a symbol should be treated as a forex currency pair."""
+        symbol = self.normalize_symbol(symbol)
+        # Three-letter currency codes (USD, THB, EUR, etc.) use the FX_ endpoints
+        return len(symbol) == 3 and symbol.isalpha()
+    
     def fetch_data(
         self,
         symbol: str,
@@ -34,16 +40,16 @@ class AlphaVantageSource(BaseDataSource):
         **kwargs
     ) -> DataSourceResult:
         """
-        Fetch commodity data from Alpha Vantage.
+        Fetch data from Alpha Vantage.
         
         Args:
-            symbol: Commodity symbol (WTI, BRENT, WHEAT, CORN, COPPER, NATURAL_GAS)
+            symbol: Commodity symbol (WTI, BRENT, ...) or currency code (THB, EUR, ...)
             start_date: Start date for data range
             end_date: End date for data range
             **kwargs: Additional parameters (function, interval, etc.)
             
         Returns:
-            DataSourceResult with commodity data
+            DataSourceResult with fetched data
         """
         if not self.config.api_key:
             return self.handle_error(ValueError("API key not configured"), "Alpha Vantage API key required")
@@ -66,6 +72,9 @@ class AlphaVantageSource(BaseDataSource):
         # Normalize symbol
         symbol = self.normalize_symbol(symbol)
         
+        # Determine if this is a forex request
+        is_forex = self._is_forex(symbol)
+        
         # Get Alpha Vantage function
         function = kwargs.get('function', self._get_function_for_symbol(symbol))
         if not function:
@@ -76,12 +85,21 @@ class AlphaVantageSource(BaseDataSource):
             )
         
         # Build request parameters
-        params = {
-            'function': function,
-            'symbol': symbol,
-            'apikey': self.config.api_key,
-            'outputsize': 'full'
-        }
+        if is_forex or function.startswith('FX_'):
+            params = {
+                'function': function,
+                'from_symbol': kwargs.get('from_symbol') or self.config.custom_params.get('from_symbol', 'USD'),
+                'to_symbol': kwargs.get('to_symbol') or self.config.custom_params.get('to_symbol', symbol),
+                'apikey': self.config.api_key,
+                'outputsize': 'full'
+            }
+        else:
+            params = {
+                'function': function,
+                'symbol': symbol,
+                'apikey': self.config.api_key,
+                'outputsize': 'full'
+            }
         
         # Add optional parameters
         if 'interval' in kwargs:
@@ -109,7 +127,14 @@ class AlphaVantageSource(BaseDataSource):
                 )
             
             # Parse and format data
-            formatted_data = self._parse_alpha_vantage_response(data, symbol)
+            if is_forex or function.startswith('FX_'):
+                formatted_data = self._parse_fx_response(
+                    data,
+                    kwargs.get('from_symbol') or self.config.custom_params.get('from_currency', 'USD'),
+                    kwargs.get('to_symbol') or self.config.custom_params.get('to_currency', symbol)
+                )
+            else:
+                formatted_data = self._parse_alpha_vantage_response(data, symbol)
             
             # Filter by date range if specified
             if start_date or end_date:
@@ -135,12 +160,73 @@ class AlphaVantageSource(BaseDataSource):
     def validate_symbol(self, symbol: str) -> bool:
         """Validate if symbol is supported by Alpha Vantage."""
         symbol = self.normalize_symbol(symbol)
-        return symbol in self.FUNCTION_MAPPING or symbol in ['WTI', 'BRENT', 'WHEAT', 'CORN', 'COPPER', 'NATURAL_GAS']
+        if self._is_forex(symbol):
+            return True
+        return symbol in self.FUNCTION_MAPPING
     
     def _get_function_for_symbol(self, symbol: str) -> Optional[str]:
         """Get Alpha Vantage function for a symbol."""
         symbol = self.normalize_symbol(symbol)
+        if self._is_forex(symbol):
+            return 'FX_DAILY'
         return self.FUNCTION_MAPPING.get(symbol)
+    
+    def _parse_fx_response(
+        self,
+        data: Dict[str, Any],
+        from_currency: str,
+        to_currency: str
+    ) -> List[Dict[str, Any]]:
+        """Parse Alpha Vantage FX (forex) daily OHLC response."""
+        formatted_data = []
+        
+        # Find the time series key
+        time_series_key = None
+        for key in data.keys():
+            if 'Time Series FX' in key:
+                time_series_key = key
+                break
+        
+        if not time_series_key:
+            self.logger.warning(f"No FX time series data found in response")
+            return formatted_data
+        
+        time_series = data.get(time_series_key, {})
+        base = from_currency.upper()
+        quote = to_currency.upper()
+        
+        for date_str, values in time_series.items():
+            try:
+                # Parse date (Alpha Vantage format: YYYY-MM-DD)
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+                
+                open_p = float(values.get('1. open', values.get('open', 0)))
+                high_p = float(values.get('2. high', values.get('high', 0)))
+                low_p = float(values.get('3. low', values.get('low', 0)))
+                close_p = float(values.get('4. close', values.get('close', 0)))
+                
+                row = {
+                    'date': date_obj.isoformat(),
+                    'base_currency': base,
+                    'quote_currency': quote,
+                    'rate': close_p,
+                    'open_price': open_p,
+                    'high_price': high_p,
+                    'low_price': low_p,
+                    'close_price': close_p,
+                    'volume': None
+                }
+                
+                formatted_data.append(row)
+                
+            except (ValueError, KeyError) as e:
+                self.logger.warning(f"Skipping invalid FX data point for {date_str}: {e}")
+                continue
+        
+        # Sort by date (oldest first)
+        formatted_data.sort(key=lambda x: x['date'])
+        
+        return formatted_data
     
     def _parse_alpha_vantage_response(self, data: Dict[str, Any], symbol: str) -> List[Dict[str, Any]]:
         """Parse Alpha Vantage API response."""
@@ -304,7 +390,7 @@ class AlphaVantageSource(BaseDataSource):
         return filtered_data
     
     def get_supported_symbols(self) -> List[str]:
-        """Get list of supported commodity symbols."""
+        """Get list of supported symbols."""
         return list(self.FUNCTION_MAPPING.keys())
     
     def format_data_for_import(self, raw_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

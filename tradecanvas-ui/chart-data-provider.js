@@ -37,7 +37,24 @@ class ChartDataProvider {
                 const apiData = await response.json();
                 console.log('Loaded data from API:', apiData.data.length, 'points');
                 console.log('Last updated:', apiData.last_updated);
-                return { data: apiData.data, isSampleData: false, loadedFromAPI: true };
+                if (apiData.data && apiData.data.length > 0) {
+                    return { data: apiData.data, isSampleData: false, loadedFromAPI: true };
+                }
+                // For 1D, fall back to the most recent available daily candle(s) from the API.
+                if (timeframe.toLowerCase() === '1d') {
+                    const recentUrl = `/apps/trade/api/ui/chart-data/${symbol}?timeframe=1y`;
+                    console.log('No 1D data; fetching recent candles from API:', recentUrl);
+                    const recentResponse = await fetch(recentUrl);
+                    if (recentResponse.ok) {
+                        const recentData = await recentResponse.json();
+                        const recent = (recentData.data || []).slice(-5);
+                        if (recent.length > 0) {
+                            console.log('Loaded recent candles from API:', recent.length, 'points');
+                            return { data: recent, isSampleData: false, loadedFromAPI: true };
+                        }
+                    }
+                }
+                console.log('API returned empty data, falling back to CSV');
             } else {
                 console.log('API not available, falling back to CSV');
             }

@@ -103,7 +103,7 @@ settings:
   # These define how many days of staleness is acceptable for each data source.
   # A value of 0 means "today only".
   tolerance:
-    thb: 0          # THB data: must be from today
+    thb: 1          # THB data: within 1 day
     gold: 0         # GOLD data: must be from today
     dxy: 30         # DXY data: 30 days acceptable (FRED API limitation)
     commodities: 90 # Commodity data: 90 days acceptable (monthly updates)
@@ -210,94 +210,100 @@ data_sources:
   # Japanese Yen
   jpy_exchange_rates:
     name: "USD/JPY Exchange Rates"
-    description: "USD to Japanese Yen daily exchange rates"
-    type: "exchange_rate"
+    description: "USD to Japanese Yen daily OHLC exchange rates from Alpha Vantage"
+    type: "alpha_vantage_fx"
     symbol: "JPY"
     quote_currency: "JPY"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXJPUS"
+    from_symbol: "USD"
+    to_symbol: "JPY"
+    url: "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=USD&to_symbol=JPY"
     schedule: "daily"
     schedule_time: "17:00"
     import_function: "import_exchange_rates"
-    source: "automated_jpy"
+    source: "alphavantage_fx_jpy"
     enabled: true
-    formatter: "format_currency_data"
 
   # Canadian Dollar
   cad_exchange_rates:
     name: "USD/CAD Exchange Rates"
-    description: "USD to Canadian Dollar daily exchange rates"
-    type: "exchange_rate"
+    description: "USD to Canadian Dollar daily OHLC exchange rates from Alpha Vantage"
+    type: "alpha_vantage_fx"
     symbol: "CAD"
     quote_currency: "CAD"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXCAUS"
+    from_symbol: "USD"
+    to_symbol: "CAD"
+    url: "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=USD&to_symbol=CAD"
     schedule: "daily"
     schedule_time: "17:00"
     import_function: "import_exchange_rates"
-    source: "automated_cad"
+    source: "alphavantage_fx_cad"
     enabled: true
-    formatter: "format_currency_data"
 
   # Swiss Franc
   chf_exchange_rates:
     name: "USD/CHF Exchange Rates"
-    description: "USD to Swiss Franc daily exchange rates"
-    type: "exchange_rate"
+    description: "USD to Swiss Franc daily OHLC exchange rates from Alpha Vantage"
+    type: "alpha_vantage_fx"
     symbol: "CHF"
     quote_currency: "CHF"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXSZUS"
+    from_symbol: "USD"
+    to_symbol: "CHF"
+    url: "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=USD&to_symbol=CHF"
     schedule: "daily"
     schedule_time: "17:00"
     import_function: "import_exchange_rates"
-    source: "automated_chf"
+    source: "alphavantage_fx_chf"
     enabled: true
-    formatter: "format_currency_data"
 
   # Australian Dollar
   aud_exchange_rates:
     name: "USD/AUD Exchange Rates"
-    description: "USD to Australian Dollar daily exchange rates"
-    type: "exchange_rate"
+    description: "USD to Australian Dollar daily OHLC exchange rates from Alpha Vantage"
+    type: "alpha_vantage_fx"
     symbol: "AUD"
     quote_currency: "AUD"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXUSAL"
+    from_symbol: "USD"
+    to_symbol: "AUD"
+    url: "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=USD&to_symbol=AUD"
     schedule: "daily"
     schedule_time: "17:00"
     import_function: "import_exchange_rates"
-    source: "automated_aud"
+    source: "alphavantage_fx_aud"
     enabled: true
-    formatter: "format_currency_data"
 
   # New Zealand Dollar
   nzd_exchange_rates:
     name: "USD/NZD Exchange Rates"
-    description: "USD to New Zealand Dollar daily exchange rates"
-    type: "exchange_rate"
+    description: "USD to New Zealand Dollar daily OHLC exchange rates from Alpha Vantage"
+    type: "alpha_vantage_fx"
     symbol: "NZD"
     quote_currency: "NZD"
-    url: "https://api.fred.stlouisfed.org/graph/fredgraph.csv?id=DEXUSNZ"
+    from_symbol: "USD"
+    to_symbol: "NZD"
+    url: "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=USD&to_symbol=NZD"
     schedule: "daily"
     schedule_time: "17:00"
     import_function: "import_exchange_rates"
-    source: "automated_nzd"
+    source: "alphavantage_fx_nzd"
     enabled: true
-    formatter: "format_currency_data"
 
   # Thai Baht
   thb_exchange_rates:
     name: "USD/THB Exchange Rates"
-    description: "USD to Thai Baht daily exchange rates"
-    type: "exchange_rate"
+    description: "USD to Thai Baht daily OHLC exchange rates from Alpha Vantage"
+    type: "alpha_vantage_fx"
     symbol: "THB"
     quote_currency: "THB"
-    url: "https://open.er-api.com/v6/latest/USD"
-    fallback_url: "https://api.exchangerate-api.com/v4/latest/USD"
+    from_symbol: "USD"
+    to_symbol: "THB"
+    url: "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=USD&to_symbol=THB"
+    fallback_url: "https://open.er-api.com/v6/latest/USD"
     validation_url: "https://open.er-api.com/v6/latest/USD"
     schedule: "daily"
     schedule_time: "17:00"
     import_function: "import_exchange_rates"
-    source: "automated_thb"
+    source: "alphavantage_fx_thb"
     enabled: true
-    formatter: "format_thb_data"
 
   # Thai Baht spot rate via Frankfurter (ECB)
   thb_frankfurter_spot:

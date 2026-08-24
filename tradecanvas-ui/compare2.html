@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <script src="ui-components.js?v=4"></script>
+    <script src="ui-components.js?v=6"></script>
     <style>
         /* Full page layout styles */
         body {
@@ -75,7 +75,8 @@
         }
 
         .symbol-panel .currency-selector,
-        .symbol-panel .timeframe-selector {
+        .symbol-panel .timeframe-selector,
+        .symbol-panel .chart-type-selector {
             width: 100%;
             margin-bottom: 10px;
             padding: 6px 10px;
@@ -148,7 +149,7 @@
                 <nav class="nav-compact">
                     <a href="index.html" class="nav-link">Dashboard</a>
                     <a href="compare.html" class="nav-link">Compare</a>
-                    <a href="compare2.html?v=11" class="nav-link active">Compare2</a>
+                    <a href="compare2.html?v=13" class="nav-link active">Compare2</a>
                 </nav>
             </div>
             <div class="header-right"></div>
@@ -166,6 +167,7 @@
                     </div>
                     <div id="currency-selector-container"></div>
                     <div id="timeframe-selector-container"></div>
+                    <div id="chart-type-selector-container"></div>
                     <div class="market-info">
                         <div class="market-info-row">
                             <span class="pair-label" id="pair-label">USD/THB</span>
@@ -194,12 +196,12 @@
         </footer>
     </div>
 
-    <script src="chart-data-provider.js?v=9"></script>
-    <script src="chart-renderer.js?v=10"></script>
-    <script src="chart-loader.js?v=9"></script>
+    <script src="chart-data-provider.js?v=11"></script>
+    <script src="chart-renderer.js?v=11"></script>
+    <script src="chart-loader.js?v=11"></script>
     <script src="strategies-new.js"></script>
     <script src="hindsight-strategies-new.js"></script>
-    <script src="strategy-compare-new.js?v=15"></script>
+    <script src="strategy-compare-new.js?v=16"></script>
     <script>
         // Verify all required classes are available
         console.log('Strategy class available:', typeof Strategy !== 'undefined');
@@ -215,7 +217,8 @@
 
             // Restore last selections from localStorage
             const savedCurrency = localStorage.getItem('trade-canvas-selected-currency') || 'THB';
-            const savedTimeframe = localStorage.getItem('trade-canvas-selected-timeframe') || '1Y';
+            const savedTimeframe = localStorage.getItem('trade-canvas-selected-timeframe') || '1D';
+            const savedChartType = localStorage.getItem('trade-canvas-chart-type') || 'candlestick';
 
             const currencyLabels = {
                 'THB': 'USD/THB',
@@ -236,6 +239,7 @@
                 containerId: 'main-chart',
                 symbol: savedCurrency,
                 timeframe: savedTimeframe,
+                chartType: savedChartType,
                 showVolume: true,
                 showIndicators: false,
                 enableControls: true,
@@ -284,6 +288,19 @@
 
                     timeframeSelector.render();
                     window.timeframeSelector = timeframeSelector;
+                }
+
+                // Initialize chart type selector after chart loader is ready
+                if (typeof ChartTypeSelector !== 'undefined') {
+                    const chartTypeSelector = new ChartTypeSelector({
+                        containerId: 'chart-type-selector-container',
+                        chartLoader: chartLoader,
+                        selectedChartType: savedChartType,
+                        className: 'currency-selector compact'
+                    });
+
+                    chartTypeSelector.render();
+                    window.chartTypeSelector = chartTypeSelector;
                 }
             }).catch(error => {
                 console.error('Chart loader init failed:', error);

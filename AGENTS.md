@@ -122,6 +122,10 @@ Make the changes directly - this is implementation work."
 - **browser-helper**: Can delegate UI testing to sub-agents
 - **deployment-sync**: Can delegate deployment investigation and file synchronization to sub-agents
 
+## MCP Tools Policy
+
+Before using any MCP server, use `ssot-search` or `grep` to read only the relevant `policy.<domain>` section in `docs/ssot/infrastructure/ssot.mcp-tools.yml`. Avoid full-file reads. Do not silently fall back without user confirmation.
+
 ## MCP Server Integration
 
 ### Alpha Vantage MCP Server

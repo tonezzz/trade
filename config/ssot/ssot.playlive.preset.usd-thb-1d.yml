@@ -1,4 +1,4 @@
-title: PlayLive Preset - USD/THB 1Y Candle Default
+title: PlayLive Preset - USD/THB 1D Candle Default
 type: playlive-preset
 target:
   name: TradeCanvas Compare2
@@ -46,7 +46,7 @@ steps:
     script: |
       const sel = document.getElementById('timeframe-selector-container-select');
       return sel ? sel.value : 'missing';
-    expected: 1Y
+    expected: 1D
 
   - id: assert-connection-status
     action: eval
@@ -91,7 +91,7 @@ steps:
   - id: restore-timeframe
     action: select
     selector: '#timeframe-selector-container-select'
-    value: 1Y
+    value: 1D
 
   - id: wait-restore
     action: wait
@@ -104,7 +104,7 @@ steps:
       const currency = (document.getElementById('currency-selector-container-select') || {}).value;
       const timeframe = (document.getElementById('timeframe-selector-container-select') || {}).value;
       return JSON.stringify({ pairLabel, currency, timeframe });
-    expected: '{"pairLabel":"USD/THB","currency":"THB","timeframe":"1Y"}'
+    expected: '{"pairLabel":"USD/THB","currency":"THB","timeframe":"1D"}'
 
 cleanup:
   - action: close_session
