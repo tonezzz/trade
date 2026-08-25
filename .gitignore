@@ -54,6 +54,9 @@ data/imported/
 data/*.csv
 !data/templates/*.csv
 
+# Generated SSOT files in tradecanvas-ui (authoritative source is config/ssot)
+tradecanvas-ui/ssot*.yml
+
 # Logs
 logs/
 *.log
