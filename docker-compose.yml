@@ -21,6 +21,8 @@ services:
       - ./logs:/app/logs
     networks:
       - web_default
+    depends_on:
+      - postgres
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
@@ -28,6 +30,26 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DB_USER:-chaba}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-chabapass}
+      - POSTGRES_DB=${DB_NAME:-trade}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - web_default
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-chaba} -d ${DB_NAME:-trade}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   trade-automation:
     image: trade-trade-api
@@ -57,4 +79,8 @@ services:
 
 networks:
   web_default:
+    external: true
+
+volumes:
+  postgres_data:
     external: true
