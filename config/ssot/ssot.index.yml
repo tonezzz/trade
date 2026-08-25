@@ -145,6 +145,14 @@ sections:
         text: MCP tools policy — local reference to the global chaba SSOT
         path: config/ssot/ssot.mcp-tools.yml
 
+  - title: Validation
+    icon: ✅
+    layout: list
+    items:
+      - label: scripts/ssot-validate.py
+        text: Trade SSOT validator — parses all config/ssot/*.yml files and resolves ref, *_ref, and allowed_values_ref pointers
+        path: scripts/ssot-validate.py
+
   - title: Cross-References
     icon: 🔗
     layout: list

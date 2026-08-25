@@ -16,6 +16,7 @@ policy:
   - Split by domain (e.g., one file per data source category).
   - Archive completed or stale SSOT files to config/ssot/archive/.
   - Runtime state and logs do not belong in SSOT; move them to reports/ or data/runtime/.
+  - Validate all SSOT files with `python3 scripts/ssot-validate.py` before committing; it catches broken ref, *_ref, and allowed_values_ref pointers.
 
 known_oversized:
   - file: config/ssot/ssot.datasource-catalog.yml

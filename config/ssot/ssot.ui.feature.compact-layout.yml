@@ -4,7 +4,7 @@ status: active
 promote_to: ssot.ui.compare-family.yml
 preview_target: ssot.ui.compare2.yml
 
-ref: ssot.ui.compare-family.yml#layout
+ref: ssot.ui.compare2.yml#page.layout
 
 layout:
   full_viewport: true
