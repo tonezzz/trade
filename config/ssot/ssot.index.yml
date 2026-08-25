@@ -78,6 +78,10 @@ sections:
         text: TradeCanvas UI base configuration — colors, symbols, APIs, strategy panel defaults
         path: config/ssot/ssot.ui.yml
 
+      - label: ssot.ui.defaults.yml
+        text: Canonical UI defaults shared across pages, state, and selectors
+        path: config/ssot/ssot.ui.defaults.yml
+
       - label: ssot.ui.compare-family.yml
         text: TradeCanvas Compare family configuration — shared settings for compare and compare2
         path: config/ssot/ssot.ui.compare-family.yml

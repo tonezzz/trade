@@ -1,6 +1,8 @@
 title: TradeCanvas UI State SSOT
 subtitle: Canonical definition of persistable UI state across TradeCanvas pages
+version: 2
 status: active
+defaults_ref: ssot.ui.defaults.yml
 
 # Scope
 # Defines what user selections and view state should be remembered across
@@ -13,13 +15,13 @@ persistence:
   scope: "same-origin"
 
 state_schema:
-  version: "1"
+  version: "2"
   fields:
     - key: trade-canvas-selected-currency
       label: "Selected Currency / Symbol"
       type: string
-      default: "THB"
-      allowed_values_ref: "ssot.ui.compare-family.yml#currency_selector.currencies"
+      default_ref: ssot.ui.defaults.yml#currency.symbol
+      allowed_values_ref: "ssot.ui.defaults.yml#currencies"
       pages:
         - compare2.html
         - compare.html
@@ -31,16 +33,8 @@ state_schema:
     - key: trade-canvas-selected-timeframe
       label: "Selected Timeframe"
       type: string
-      default: "1D"
-      allowed_values:
-        - "1D"
-        - "1W"
-        - "1M"
-        - "3M"
-        - "6M"
-        - "1Y"
-        - "5Y"
-        - "ALL"
+      default_ref: ssot.ui.defaults.yml#timeframe
+      allowed_values_ref: ssot.ui.defaults.yml#timeframes
       pages:
         - compare2.html
       notes: |
@@ -49,11 +43,8 @@ state_schema:
     - key: trade-canvas-chart-type
       label: "Chart Type"
       type: string
-      default: "candlestick"
-      allowed_values:
-        - candlestick
-        - line
-        - area
+      default_ref: ssot.ui.defaults.yml#chart_type
+      allowed_values_ref: ssot.ui.defaults.yml#chart_types
       pages:
         - index.html
         - compare2.html
@@ -80,3 +71,6 @@ recent_changes:
   - date: 2026-08-15
     description: "Created ssot.ui.state.yml to canonicalize localStorage keys and selection defaults"
     impact: "Single contract for UI state persistence"
+  - date: 2026-08-25
+    description: "Reference canonical defaults from ssot.ui.defaults.yml"
+    impact: "Default values are now single-source and consistent with page and family configs"

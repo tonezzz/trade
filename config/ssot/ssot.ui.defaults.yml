@@ -1,0 +1,69 @@
+title: TradeCanvas UI Defaults
+subtitle: Canonical defaults shared across TradeCanvas pages, state, and selectors
+version: 1
+status: active
+
+# Purpose
+# Single source of truth for UI defaults. Page configs and state schema should
+# reference these values instead of hard-coding them.
+
+currency:
+  symbol: THB
+  label: USD/THB
+  csv: thb_formatted.csv
+
+timeframe: 1D
+
+chart_type: candlestick
+
+chart_loader:
+  symbol_ref: currency.symbol
+  timeframe_ref: timeframe
+  data_source: api
+  api_endpoint: /apps/trade/api/ui/chart-data
+  show_indicators: false
+  enable_web_socket: false
+  auto_refresh: false
+
+currencies:
+  - value: THB
+    label: USD/THB
+    csv: thb_formatted.csv
+  - value: EUR
+    label: EUR/USD
+    csv: eur_formatted.csv
+  - value: GBP
+    label: GBP/USD
+    csv: gbp_formatted.csv
+  - value: JPY
+    label: USD/JPY
+    csv: jpy_formatted.csv
+  - value: GOLD
+    label: GOLD
+    csv: gold_formatted.csv
+  - value: DXY
+    label: DXY
+    csv: dxy_formatted.csv
+  - value: OIL
+    label: OIL
+    csv: wti_formatted.csv
+
+timeframes:
+  - "1D"
+  - "1W"
+  - "1M"
+  - "3M"
+  - "6M"
+  - "1Y"
+  - "5Y"
+  - "ALL"
+
+chart_types:
+  - candlestick
+  - line
+  - area
+
+recent_changes:
+  - date: 2026-08-25
+    description: "Created ssot.ui.defaults.yml to centralize symbol, timeframe, chart type, and currency list defaults"
+    impact: "Defaults are now referenced from one place, reducing drift between pages and localStorage contract"

@@ -1,42 +1,22 @@
 title: TradeCanvas Compare Family Configuration
 subtitle: Shared settings for compare and compare2 pages
+version: 2
+status: active
+defaults_ref: ssot.ui.defaults.yml
+defaults: {}
 family:
   members:
   - compare
   - compare2
 chart_loader:
-  symbol: THB
-  timeframe: all
-  data_source: api
-  api_endpoint: /apps/trade/api/ui/chart-data
+  ref: ssot.ui.defaults.yml#chart_loader
   show_indicators: false
   enable_web_socket: false
   auto_refresh: false
 currency_selector:
   container_id: currency-selector-container
-  selected_currency: THB
-  currencies:
-  - value: THB
-    label: USD/THB
-    csv: thb_formatted.csv
-  - value: EUR
-    label: EUR/USD
-    csv: eur_formatted.csv
-  - value: GBP
-    label: GBP/USD
-    csv: gbp_formatted.csv
-  - value: JPY
-    label: USD/JPY
-    csv: jpy_formatted.csv
-  - value: GOLD
-    label: GOLD
-    csv: gold_formatted.csv
-  - value: DXY
-    label: DXY
-    csv: dxy_formatted.csv
-  - value: OIL
-    label: OIL
-    csv: wti_formatted.csv
+  selected_currency_ref: ssot.ui.defaults.yml#currency.symbol
+  currencies_ref: ssot.ui.defaults.yml#currencies
 strategy_panel:
   ref: ssot.ui.yml#strategy_panel
   enabled: true
@@ -49,7 +29,13 @@ scripts:
   - hindsight-strategies-new.js
   - strategy-compare-new.js
 features:
-- ssot.ui.feature.chart-controls.yml
-- ssot.ui.feature.currency-selector-compact.yml
-- ssot.ui.feature.strategy-panel-hindsight.yml
-- ssot.ui.feature.compact-layout.yml
+  inherit:
+    - ssot.ui.feature.chart-controls.yml
+    - ssot.ui.feature.currency-selector-compact.yml
+    - ssot.ui.feature.strategy-panel-hindsight.yml
+    - ssot.ui.feature.compact-layout.yml
+
+recent_changes:
+  - date: 2026-08-25
+    description: "Reference canonical defaults from ssot.ui.defaults.yml instead of hard-coding values"
+    impact: "Reduces drift with ssot.ui.state.yml and pages; currency list is single-source"

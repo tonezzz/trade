@@ -1,7 +1,12 @@
 title: TradeCanvas Compare2 Page Configuration
 subtitle: Page-specific settings for compare2.html
+version: 2
+status: active
+defaults_ref: ssot.ui.defaults.yml
+state_ref: ssot.ui.state.yml
 family: compare-family
-features: []
+features:
+  inherit: true
 page:
   id: compare2
   html_file: compare2.html
@@ -21,6 +26,12 @@ scripts:
 - strategies-new.js
 - hindsight-strategies-new.js
 - strategy-compare-new.js
+
+# Note on strategies-new.js:
+# This is the compare2 candidate that uses the modular signal system.
+# It is intentionally separate from strategies.js while compare2 is evaluated.
+# Do not merge until feature parity with compare.html is confirmed.
+
 cache_busting:
   query_param: v
   versions:
