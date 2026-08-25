@@ -38,6 +38,7 @@ initiatives:
       a page refresh by driving persistence from ssot.ui.state.yml.
     refs:
       - config/ssot/ssot.ui.state.yml
+      - config/ssot/ssot.ui.defaults.yml
       - tradecanvas-ui/ui-components.js
       - tradecanvas-ui/chart-loader.js
     next_steps:
@@ -94,18 +95,19 @@ initiatives:
 
   - id: ssot-streamlining
     title: Streamlined SSOT Structure Across Domains
-    status: proposed
+    status: completed
     priority: medium
     description: |
       Apply the four-layer SSOT pattern (base, family, page, feature) across
       apps, libraries, APIs, data, and infrastructure.
     refs:
       - config/ssot/ssot.index.yml
+      - config/ssot/ssot.file-control.yml
       - docs/kb/tradecanvas-ui-ssot-workflow.md
     next_steps:
-      - Define naming convention ssot.<domain>.<layer>.<component>.yml
-      - Catalog existing SSOT files and identify structural gaps
-      - Update ssot.index.yml to reflect new organization
+      - Document the ssot.<domain>.<layer>.<component>.yml naming convention in ssot.file-control.yml
+      - Enforce file-control thresholds for any new SSOT files
+      - Monitor remaining API and infrastructure SSOTs for family/page splits
 
   - id: datasource-reliability
     title: Data Source Reliability and Catalog
@@ -194,3 +196,6 @@ recent_changes:
   - date: 2026-08-15
     description: "Created continuous improvement SSOT to track active initiatives and backlog"
     impact: "Single source of truth for follow-up and prioritization"
+  - date: 2026-08-25
+    description: "Completed SSOT modularization cleanup: removed duplicated UI SSOTs, archived completed/stale files, consolidated playlive tests, split datasource catalog, added ssot.file-control.yml, and introduced ssot.ui.defaults.yml as canonical UI defaults"
+    impact: "Authoritative SSOT source is config/ssot/; UI contract is now single-source with defaults, state, family, page, and feature overlays"
