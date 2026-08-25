@@ -1,0 +1,28 @@
+title: Trade SSOT File Control
+subtitle: Size thresholds and splitting rules for maintainable SSOT files
+version: 1
+
+thresholds:
+  soft_max_lines: 200
+  hard_max_lines: 400
+  soft_max_words: 1500
+  hard_max_words: 3000
+  soft_max_bytes: 12000
+  hard_max_bytes: 24000
+
+policy:
+  - When a file exceeds soft thresholds, plan to split or archive.
+  - When a file exceeds hard thresholds, split or archive in the same session.
+  - Split by domain (e.g., one file per data source category).
+  - Archive completed or stale SSOT files to config/ssot/archive/.
+  - Runtime state and logs do not belong in SSOT; move them to reports/ or data/runtime/.
+
+known_oversized:
+  - file: config/ssot/ssot.datasource-catalog.yml
+    status: split_planned
+    action: Move exchange/commodity/index/validation/alternative source lists to per-category catalog files
+
+recent_changes:
+  - date: 2026-08-25
+    description: Created ssot.file-control.yml to govern SSOT file size and splitting.
+    impact: Bloat is now tracked and bounded.

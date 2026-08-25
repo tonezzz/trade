@@ -2,29 +2,143 @@ title: Trade PlayLive Test Catalog
 subtitle: Browser-driven and endpoint verification tests across Trade UIs, APIs, and connected apps
 urls_source: config/ssot/ssot.urls.yml
 
-base_url: http://100.68.142.13:8080/apps/trade/tradecanvas-ui
-api_base_url: http://100.68.142.13:8080/apps/trade/api
+base_url: http://tony-omen.local:8080/apps/trade/tradecanvas-ui
+api_base_url: http://tony-omen.local:8080/apps/trade/api
 
 apps:
   - id: tradecanvas
     label: TradeCanvas
-    test_files:
-      - config/ssot/ssot.ui.playlive-tests.yml
+    components:
+      - name: ChartRenderer
+        test_page: test-chart.html
+        cases:
+          - step: Load test-chart.html?nocache=1 and click "Load Sample Data"
+            expected: The chart canvas contains non-transparent candle pixels; sample data length is logged.
+          - step: Click "Load Data" for GOLD / all
+            expected: Data loads from the API/CSV; visible logical range is shown; canvas has drawn candles.
+          - step: Resize the browser window
+            expected: Chart resizes without error and the status log stays clean.
+
+      - name: ChartDataProvider
+        test_page: test-chart.html
+        cases:
+          - step: Click "Load Data" for THB / 1Y
+            expected: Returns 200+ points, isSampleData=false, loadedFromAPI=true.
+          - step: Click "Load Data" for an unknown symbol (e.g. XYZ)
+            expected: Falls back to sample data with isSampleData=true.
+
+      - name: ChartLoader
+        test_page: compare2.html
+        cases:
+          - step: Fresh load with empty localStorage
+            expected: Defaults to THB / 1Y; pairLabel shows USD/THB; connection-status shows API Data; selectors show THB and 1Y.
+          - step: Select GOLD from the currency dropdown in the Symbol / Timeframe panel
+            expected: pairLabel updates to GOLD; GOLD data loads; visible logical range is a recent subset if all is selected.
+          - step: Set localStorage to {currency: GOLD, timeframe: all}, then reload
+            expected: Page restores GOLD / all on reload.
+
+      - name: CurrencySelector
+        test_page: compare2.html
+        cases:
+          - step: Render with a preselected currency
+            expected: Dropdown value matches the preselected currency.
+          - step: Select a different currency
+            expected: Emits currencyChange, ChartLoader.updateSymbol is called, chart reloads.
+
+      - name: TimeframeSelector
+        test_page: compare2.html
+        cases:
+          - step: Render with a preselected timeframe
+            expected: Dropdown value matches the preselected timeframe.
+          - step: Select 1Y vs all
+            expected: Emits timeframeChange, ChartLoader.updateTimeframe is called, data point count changes.
+
+      - name: Compare2 Layout
+        test_page: compare2.html
+        cases:
+          - step: Load compare2.html
+            expected: Header shows pairLabel, price, change, and status. Symbol / Timeframe panel is above Strategy Comparison panel.
+
+      - name: Dashboard Page
+        test_page: index.html
+        cases:
+          - step: Load index.html
+            expected: Header, main chart, currency selector, and strategy panel render without JS errors.
+          - step: Switch currency and timeframe
+            expected: Chart reloads and the displayed symbol updates.
+
+      - name: Compare Page
+        test_page: compare.html
+        cases:
+          - step: Load compare.html
+            expected: Chart renders, selectors work, and strategy comparison loads.
+
+      - name: Compare-New Page
+        test_page: compare-new.html
+        cases:
+          - step: Load compare-new.html
+            expected: Chart renders and the new strategy panel initializes.
 
   - id: trade-api
     label: Trade API
-    test_files:
-      - config/ssot/ssot.api.playlive-tests.yml
+    components:
+      - name: chart-data-endpoint
+        endpoint: /api/ui/chart-data/{SYMBOL}?timeframe={TIMEFRAME}
+        cases:
+          - step: GET /api/ui/chart-data/THB?timeframe=1y
+            expected: HTTP 200, JSON with data array of 200+ points, last_updated, and valid OHLC fields
+          - step: GET /api/ui/chart-data/GOLD?timeframe=all
+            expected: HTTP 200, data array around 3600+ points, no null OHLC values
+          - step: GET /api/ui/chart-data/UNKNOWN?timeframe=all
+            expected: HTTP 404 or empty data; no unhandled exception
+
+      - name: datasource-routing
+        endpoint: /api/ui/chart-data/{SYMBOL}
+        cases:
+          - step: GET GOLD with no timeframe
+            expected: Defaults to a usable timeframe and returns data
+          - step: Verify response structure
+            expected: Contains data, source, and last_updated or equivalent metadata
+
+      - name: health-and-status
+        endpoint: /api/health
+        cases:
+          - step: GET /api/health
+            expected: HTTP 200 and a status object indicating the API is up
 
   - id: trade-data-imports
     label: Trade Data Imports
-    test_files:
-      - config/ssot/ssot.data-imports.playlive-tests.yml
+    components:
+      - name: csv-files
+        test_page: test-chart.html
+        cases:
+          - step: Fetch ../data/imported/thb_formatted.csv
+            expected: HTTP 200, first line contains date, open_price, high_price, low_price, close_price
+          - step: Fetch ../data/imported/gold_formatted.csv
+            expected: HTTP 200 and at least 1000 data rows
+          - step: Parse a CSV row into chart points
+            expected: Produces { time, open, high, low, close } with valid numbers
 
   - id: health
     label: Service Health
-    test_files:
-      - config/ssot/ssot.health.playlive-tests.yml
+    components:
+      - name: web-ui
+        test_page: index.html
+        cases:
+          - step: Load any TradeCanvas page
+            expected: Page renders HTTP 200, no console errors
+
+      - name: trade-api
+        endpoint: http://tony-omen.local:9000/api/health
+        cases:
+          - step: GET /api/health
+            expected: HTTP 200 with a healthy status
+
+      - name: chaba-web-server
+        test_page: http://tony-omen.local:8080/apps/trade/tradecanvas-ui/test-chart.html
+        cases:
+          - step: Load the static UI
+            expected: HTTP 200, scripts load, no 404s for shared JS/CSS
 
 presets:
   - id: usd-thb-1d-candle-default

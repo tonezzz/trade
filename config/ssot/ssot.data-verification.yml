@@ -1,7 +1,7 @@
 title: Data Updating Verification
-subtitle: How data updating status is checked and the latest verified state
+subtitle: How data updating status is checked and where the latest verified state is stored
 icon: 
-version: 1
+version: 2
 
 sections:
   - title: Verification Method
@@ -20,6 +20,8 @@ sections:
     icon: 
     layout: list
     items: recent_changes
+
+runtime_state_file: reports/DATA_VERIFICATION_STATE.json
 
 verification:
   host: tony-dell
@@ -41,27 +43,6 @@ verification:
     command: python /app/scripts/auto_update.py --scheduled
     scheduled_jobs: 14
 
-latest_findings:
-  checked_at: 2026-08-17T12:04:50Z
-  trade_api_status: running
-  trade_automation_status: running
-  data_health: unhealthy
-  overall_health: needs_attention
-  issues:
-    - THB data is 3 days old (tolerance 2 days)
-    - commodity_prices has only 1 row
-    - THB 7-day data gap
-  data_quality_summary:
-    total_records: 16527
-    exchange_rates_latest: 2026-08-14
-    exchange_rates_notes: "Only THB has recent data; other currencies missing for Aug 4-14."
-    dollar_index_latest: 2026-08-07
-    commodity_prices_latest: 2026-08-12
-    commodity_prices_notes: "Only GOLD present with 1 row."
-  automation_status: "14 jobs scheduled, but most data jobs (THB, WTI, Brent, Copper, Natural Gas) report 'Never run' after scheduler startup."
-  root_cause: "scripts/auto_update.py --scheduled does not invoke src/scheduler.run_catch_up_updates() on startup, even though ssot.data.yml catch_up.on_startup is true. The scheduler only waits for the next scheduled time."
-  fix: "Patch auto_update.py to run scheduler.run_catch_up_updates() when catch_up.on_startup is true before start_scheduler(). This is now tracked in ssot.data.yml catch_up.implementation."
-
 commands:
   list_containers: "podman ps --format \"table {{.Names}}\\t{{.Status}}\\t{{.Ports}}\""
   health_check: "curl -s http://localhost:9002/api/health | python3 -m json.tool"
@@ -73,3 +54,7 @@ recent_changes:
   - date: 2026-08-17
     description: "Created ssot.data-verification.yml to record Podman port mapping (9002) and current data freshness findings."
     impact: "Verification procedure and the latest data-updating status are now in SSOT."
+
+  - date: 2026-08-25
+    description: "Moved runtime findings to reports/DATA_VERIFICATION_STATE.json. ssot.data-verification.yml now only describes the procedure."
+    impact: "Separation of configuration/state reduces SSOT churn and git noise."

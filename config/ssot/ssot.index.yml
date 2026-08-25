@@ -30,9 +30,9 @@ sections:
         text: Canonical UI, API, and data endpoints for development, Tailnet, and verification
         path: config/ssot/ssot.urls.yml
 
-      - label: ssot.tony-dell-migration.yml
-        text: Migration plan for moving the non-GPU tony-omen services to tony-dell
-        path: config/ssot/ssot.tony-dell-migration.yml
+      - label: ssot.file-control.yml
+        text: SSOT file size thresholds, splitting policy, and known oversized files
+        path: config/ssot/ssot.file-control.yml
 
   - title: Data & Data Sources
     icon: 📈
@@ -43,11 +43,15 @@ sections:
         path: config/ssot/ssot.data.yml
 
       - label: ssot.datasource-catalog.yml
-        text: Comprehensive catalog of all available data sources for reliability and redundancy
+        text: Index and policy for all available data sources
         path: config/ssot/ssot.datasource-catalog.yml
 
+      - label: ssot.datasource-catalog.sources.yml
+        text: Detailed source listings for the data source catalog
+        path: config/ssot/ssot.datasource-catalog.sources.yml
+
       - label: ssot.data-verification.yml
-        text: Data updating verification — commands, latest findings, and current data freshness status
+        text: Data updating verification procedure and commands
         path: config/ssot/ssot.data-verification.yml
 
       - label: ssot.api.yml
@@ -111,16 +115,8 @@ sections:
         path: config/ssot/ssot.ui.feature.compact-layout.yml
 
       - label: ssot.playlive-tests.yml
-        text: Central PlayLive test catalog across UIs, APIs, data imports, and health
+        text: Consolidated PlayLive test catalog across UIs, APIs, data imports, and health
         path: config/ssot/ssot.playlive-tests.yml
-
-      - label: ssot.ui.playlive-tests.yml
-        text: PlayLive browser test cases for TradeCanvas components
-        path: config/ssot/ssot.ui.playlive-tests.yml
-
-      - label: ssot.api.playlive-tests.yml
-        text: PlayLive test cases for Trade API endpoints
-        path: config/ssot/ssot.api.playlive-tests.yml
 
       - label: ssot.ui.state.yml
         text: Persisted UI state schema — localStorage keys and default values for currency, timeframe, etc.

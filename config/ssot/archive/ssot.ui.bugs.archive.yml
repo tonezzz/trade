@@ -1,0 +1,50 @@
+title: TradeCanvas UI Bugs Archive
+subtitle: Resolved bugs from ssot.ui.bugs.yml
+status: archived
+
+bugs:
+  - id: ui-bug-001
+    title: Compare2 starts in "Disconnected" state
+    status: resolved
+    severity: high
+    pages:
+      - compare2.html
+    symptom: |
+      On initial load the page shows the connection status badge as
+      "Disconnected" and the chart only updates after the user manually
+      changes the currency or timeframe selection.
+    refs:
+      - config/ssot/ssot.ui.compare2.yml
+      - tradecanvas-ui/chart-loader.js
+      - tradecanvas-ui/chart-renderer.js
+
+  - id: ui-bug-002
+    title: Selections not remembered on page refresh
+    status: resolved
+    severity: high
+    pages:
+      - compare2.html
+      - compare.html
+      - index.html
+    symptom: |
+      After the user chooses a currency or timeframe and refreshes the
+      page, the selectors and chart revert to a hard-coded default instead
+      of the previous selection.
+    refs:
+      - config/ssot/ssot.ui.state.yml
+      - tradecanvas-ui/ui-components.js
+      - tradecanvas-ui/chart-loader.js
+
+  - id: ui-bug-003
+    title: Week timeframe chart does not render correctly for GOLD and others
+    status: resolved
+    severity: high
+    pages:
+      - compare2.html
+    symptom: |
+      Selecting the 1W timeframe on GOLD (and other symbols) shows an empty
+      or incorrectly rendered chart, while longer timeframes work.
+    refs:
+      - config/ssot/ssot.ui.state.yml
+      - tradecanvas-ui/chart-data-provider.js
+      - tradecanvas-ui/chart-renderer.js
