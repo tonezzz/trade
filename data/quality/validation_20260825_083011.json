@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "timestamp": "2026-08-25T08:30:11.747431",
+    "duration_seconds": 2.560852,
+    "total_validations": 4,
+    "failed_validations": 1,
+    "success_rate": 75.0,
+    "exchange_rates_validated": 3,
+    "commodities_validated": 0,
+    "dollar_index_validated": 1,
+    "tolerance_pct": 2.0,
+    "max_freshness_days": 2
+  },
+  "detailed_results": [
+    {
+      "symbol": "CHF",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:30:09.197547",
+      "db_value": 0.8023,
+      "external_value": 0.802299,
+      "difference_pct": 0.00012464181060038162,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 136.05442176870747,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "CAD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:30:09.261237",
+      "db_value": 1.3842,
+      "external_value": 1.38376,
+      "difference_pct": 0.03179742151818205,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 136.05442176870747,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "JPY",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:30:09.325137",
+      "db_value": 159.08,
+      "external_value": 159.125396,
+      "difference_pct": 0.028528444321975138,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 136.05442176870747,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "DXY",
+      "data_type": "dollar_index",
+      "timestamp": "2026-08-25 08:30:09.414867",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    }
+  ]
+}

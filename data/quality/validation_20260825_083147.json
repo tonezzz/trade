@@ -1,0 +1,135 @@
+{
+  "summary": {
+    "timestamp": "2026-08-25T08:31:47.199139",
+    "duration_seconds": 1.441604,
+    "total_validations": 9,
+    "failed_validations": 0,
+    "success_rate": 100.0,
+    "exchange_rates_validated": 6,
+    "commodities_validated": 2,
+    "dollar_index_validated": 1,
+    "tolerance_pct": 2.0,
+    "max_freshness_days": 2
+  },
+  "detailed_results": [
+    {
+      "symbol": "AUD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:31:45.765233",
+      "db_value": 1.3988,
+      "external_value": 1.397593,
+      "difference_pct": 0.08636276798752984,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 136.05442176870747,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "CAD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:31:45.825008",
+      "db_value": 1.3842,
+      "external_value": 1.38376,
+      "difference_pct": 0.03179742151818205,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 136.05442176870747,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "CHF",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:31:45.886236",
+      "db_value": 0.8023,
+      "external_value": 0.802299,
+      "difference_pct": 0.00012464181060038162,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 136.05442176870747,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "JPY",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:31:45.944319",
+      "db_value": 159.08,
+      "external_value": 159.125396,
+      "difference_pct": 0.028528444321975138,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 136.05442176870747,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "NZD",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:31:45.999096",
+      "db_value": 1.67813,
+      "external_value": 1.677241,
+      "difference_pct": 0.05300371264474918,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 136.05442176870747,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "THB",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:31:46.065497",
+      "db_value": 32.7,
+      "external_value": 32.696136,
+      "difference_pct": 0.011817910226456391,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 83.6734693877551,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "GOLD",
+      "data_type": "commodities",
+      "timestamp": "2026-08-25 08:31:46.134690",
+      "db_value": 4582.1,
+      "external_value": 4582.1,
+      "difference_pct": 0.0,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [],
+      "external_source": "minted-metal-api"
+    },
+    {
+      "symbol": "SILVER",
+      "data_type": "commodities",
+      "timestamp": "2026-08-25 08:31:46.262598",
+      "db_value": 69.51,
+      "external_value": 69.51,
+      "difference_pct": 0.0,
+      "is_accurate": true,
+      "freshness_days": 0,
+      "completeness_pct": null,
+      "issues": [],
+      "external_source": "minted-metal-api"
+    },
+    {
+      "symbol": "DXY",
+      "data_type": "dollar_index",
+      "timestamp": "2026-08-25 08:31:46.385369",
+      "db_value": 118.0628,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": true,
+      "freshness_days": 4,
+      "completeness_pct": null,
+      "issues": [
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    }
+  ]
+}

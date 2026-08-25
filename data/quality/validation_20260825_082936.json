@@ -1,0 +1,45 @@
+{
+  "summary": {
+    "timestamp": "2026-08-25T08:29:36.407761",
+    "duration_seconds": 0.779125,
+    "total_validations": 2,
+    "failed_validations": 1,
+    "success_rate": 50.0,
+    "exchange_rates_validated": 1,
+    "commodities_validated": 0,
+    "dollar_index_validated": 1,
+    "tolerance_pct": 2.0,
+    "max_freshness_days": 2
+  },
+  "detailed_results": [
+    {
+      "symbol": "JPY",
+      "data_type": "exchange_rates",
+      "timestamp": "2026-08-25 08:29:35.631505",
+      "db_value": 159.08,
+      "external_value": 159.125396,
+      "difference_pct": 0.028528444321975138,
+      "is_accurate": true,
+      "freshness_days": 1,
+      "completeness_pct": 136.05442176870747,
+      "issues": [],
+      "external_source": "open.er-api.com"
+    },
+    {
+      "symbol": "DXY",
+      "data_type": "dollar_index",
+      "timestamp": "2026-08-25 08:29:35.709023",
+      "db_value": null,
+      "external_value": null,
+      "difference_pct": null,
+      "is_accurate": false,
+      "freshness_days": null,
+      "completeness_pct": null,
+      "issues": [
+        "No data found in database",
+        "Could not fetch external reference value"
+      ],
+      "external_source": "none"
+    }
+  ]
+}
