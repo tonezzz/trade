@@ -8,6 +8,7 @@ send one SSH command and receive JSON.
 """
 import argparse
 import json
+import re
 import sys
 import time
 import urllib.request
@@ -43,6 +44,32 @@ def normalize(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
 
+PARAM_RE = re.compile(r"\$\{(\w+)\}")
+
+
+def build_params(preset, cli_overrides):
+    """Collect params from preset defaults and CLI --param KEY=VALUE."""
+    params = {}
+    for p in preset.get("params", []):
+        params[p["name"]] = p.get("default", "")
+    for override in cli_overrides:
+        if "=" in override:
+            k, v = override.split("=", 1)
+            params[k] = v
+    return params
+
+
+def render_step(step, params):
+    """Substitute ${param} in step string fields; leave script/expected untouched."""
+    rendered = {}
+    for k, v in step.items():
+        if k in ("script", "expected") or not isinstance(v, str):
+            rendered[k] = v
+        else:
+            rendered[k] = PARAM_RE.sub(lambda m: str(params.get(m.group(1), "")), v)
+    return rendered
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run a PlayLive preset on tony-dell"
@@ -62,13 +89,20 @@ def main():
         "--output", "-o", default="-", help="Output file or - for stdout"
     )
     parser.add_argument("--verbose", "-v", action="store_true")
+    parser.add_argument(
+        "--param",
+        action="append",
+        default=[],
+        help="Override a preset param, e.g. --param symbol=MAJOR",
+    )
     args = parser.parse_args()
 
     with open(args.preset_file, "r", encoding="utf-8") as f:
         preset = yaml.safe_load(f)
 
-    steps = preset.get("steps", [])
-    cleanup = preset.get("cleanup", [])
+    params = build_params(preset, args.param)
+    steps = [render_step(s, params) for s in preset.get("steps", [])]
+    cleanup = [render_step(c, params) for c in preset.get("cleanup", [])]
     base = args.playlive_url.rstrip("/")
     session_id = None
     results = []

@@ -46,8 +46,8 @@ steps:
 
   - id: navigate-symbol
     action: navigate
-    url: https://www.settrade.com/th/equities/quote/PTT/overview
-    description: Load the SETTRADE quote page for the default symbol PTT.
+    url: https://www.settrade.com/th/equities/quote/${symbol}/overview
+    description: Load the SETTRADE quote page. The default symbol is PTT; override with --param symbol=MAJOR.
 
   - id: wait-for-render
     action: wait
