@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANPU + PTT Momentum Backtest</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html" class="nav-link">TradeCanvas</a></li>
+                <li class="nav-item"><a href="settrade-research.html" class="nav-link">SETTRADE Research</a></li>
+                <li class="nav-item"><a href="banpu-ptt-momentum.html" class="nav-link active">BANPU+PTT Momentum</a></li>
+                <li class="nav-item"><a href="thb-atr.html" class="nav-link">THB ATR</a></li>
+                <li class="nav-item"><a href="/apps/gold/conclusion.html" class="nav-link">Gold/THB Research</a></li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <h1>BANPU + PTT Momentum Backtest</h1>
+            <div class="header-controls">
+                <span id="status" class="status disconnected">Loading...</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h2>Dual Momentum 20 Strategy vs Buy &amp; Hold</h2>
+                    <div class="chart-info">
+                        <span id="record-count">--</span>
+                        <span id="date-range">--</span>
+                    </div>
+                </div>
+                <div id="sma-chart" class="chart-container"></div>
+            </div>
+
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Stats</h3>
+                <table class="data-table" id="stats-table">
+                    <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+                    <tbody id="stats-body"></tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        async function loadSma() {
+            const statusEl = document.getElementById('status');
+            try {
+                const res = await fetch('data/banpu_ptt_momentum.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const d = await res.json();
+
+                document.getElementById('record-count').textContent = d.combined_series.length + ' days';
+                document.getElementById('date-range').textContent = d.start_date + ' → ' + d.end_date;
+
+                const chart = LightweightCharts.createChart(document.getElementById('sma-chart'), {
+                    width: document.getElementById('sma-chart').clientWidth,
+                    height: 500,
+                    layout: { background: { color: '#1a1a2e' }, textColor: '#e0e0e0' },
+                    grid: { vertLines: { color: '#2a2a3e' }, horzLines: { color: '#2a2a3e' } },
+                    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+                    rightPriceScale: { borderColor: '#2a2a3e' },
+                    timeScale: { borderColor: '#2a2a3e' }
+                });
+
+                const s1 = chart.addLineSeries({ color: '#26a69a', lineWidth: 2, title: 'Strategy' });
+                const s2 = chart.addLineSeries({ color: '#7e7e8e', lineWidth: 1, title: 'Buy & Hold' });
+                s1.setData(d.combined_series.map(r => ({ time: r.date, value: r.equity })));
+                s2.setData(d.combined_series.map(r => ({ time: r.date, value: r.buyhold })));
+                chart.timeScale().fitContent();
+
+                const stats = [
+                    ['Strategy total return', d.stats.total_return_pct + '%'],
+                    ['Buy-hold total return', d.stats.buyhold_return_pct + '%'],
+                    ['Max drawdown', d.stats.max_drawdown_pct + '%'],
+                    ['Switches', d.stats.switches],
+                    ['Momentum window', d.momentum_window],
+                    ['Days in BANPU', d.stats.days_in_banpu],
+                    ['Days in PTT', d.stats.days_in_ptt],
+                    ['Days in cash', d.stats.days_in_cash],
+                ];
+                document.getElementById('stats-body').innerHTML = stats.map(s => `<tr><td>${s[0]}</td><td>${s[1]}</td></tr>`).join('');
+
+                statusEl.textContent = 'Loaded';
+                statusEl.classList.remove('disconnected');
+                statusEl.classList.add('connected');
+            } catch (e) {
+                statusEl.textContent = 'Error: ' + e.message;
+                statusEl.classList.add('error');
+                console.error(e);
+            }
+        }
+
+        loadSma();
+    </script>
+</body>
+</html>
