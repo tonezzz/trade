@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SETTRADE Research - BANPU Historical Prices</title>
+    <title>SETTRADE Research</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -29,7 +29,7 @@
         <div class="main-content">
             <div class="chart-section">
                 <div class="chart-header">
-                    <h2 id="chart-title">BANPU - Historical Prices</h2>
+                    <h2 id="chart-title">Historical Prices</h2>
                     <div class="chart-info">
                         <span id="record-count">--</span>
                         <span id="date-range">--</span>
@@ -45,19 +45,12 @@
 
                 <p class="info-text" id="event-note" style="margin: 0.5rem 0;"></p>
 
-                <div id="banpu-chart" class="chart-container"></div>
+                <div id="stock-chart" class="chart-container"></div>
             </div>
 
             <section class="data-section" style="margin-top: 2rem;">
                 <h3>Historical OHLC Records</h3>
-                <p class="info-text">
-                    Post-event data from the public SETTRADE
-                    <code>/api/set/stock/BANPU/historical-trading</code> endpoint (16 sessions).
-                    Pre-event data from the Settrade SDK <code>BANPUU 1D</code> candles
-                    (701 sessions) is back-adjusted by
-                    <code>1 / 0.38242 = 2.6149</code> to reflect the 4 Aug 2026 BANPU/BPP
-                    restructuring (par 1 -> 10 THB, swap ratio 1 old = 0.38242 new).
-                </p>
+                <p class="info-text" id="data-note">Source details are shown above the chart.</p>
                 <div class="table-wrapper" style="overflow-x: auto; margin-top: 1rem;">
                     <table class="data-table" id="records-table">
                         <thead>
@@ -79,20 +72,24 @@
 
             <section class="raw-data" style="margin-top: 2rem;">
                 <h3>Raw Data</h3>
-                <p class="info-text">Full JSON (raw + adjusted): <a href="data/banpu_history.json" target="_blank">data/banpu_history.json</a>.</p>
+                <p class="info-text">Full JSON (raw + adjusted): <a id="json-link" href="#" target="_blank">data/<symbol>_history.json</a>.</p>
             </section>
         </div>
     </div>
 
     <script>
-        let chart, candleSeries, volSeries, currentData, currentAscending, rawMode = false;
+        const params = new URLSearchParams(window.location.search);
+        const symbol = (params.get('symbol') || 'BANPU').toUpperCase();
+        const dataFile = 'data/' + symbol.toLowerCase() + '_history.json';
+
+        let chart, candleSeries, volSeries, currentData, currentAscending, currentMeta = null, rawMode = false;
 
         function field(rec, adjKey, rawKey) {
             return rawMode ? (rec[rawKey] ?? rec[adjKey]) : rec[adjKey];
         }
 
-        function renderChart() {
-            const container = document.getElementById('banpu-chart');
+        function renderChart(eventDate, eventLabel) {
+            const container = document.getElementById('stock-chart');
             if (chart) { chart.remove(); }
             chart = LightweightCharts.createChart(container, {
                 width: container.clientWidth,
@@ -122,13 +119,15 @@
             }));
             candleSeries.setData(candles);
 
-            candleSeries.setMarkers([{
-                time: '2026-08-04',
-                position: 'aboveBar',
-                color: '#f1c40f',
-                shape: 'arrowDown',
-                text: 'BANPU/BPP restructuring'
-            }]);
+            if (eventDate) {
+                candleSeries.setMarkers([{
+                    time: eventDate,
+                    position: 'aboveBar',
+                    color: '#f1c40f',
+                    shape: 'arrowDown',
+                    text: eventLabel || 'Event'
+                }]);
+            }
 
             volSeries = chart.addHistogramSeries({
                 priceFormat: { type: 'volume' },
@@ -165,10 +164,14 @@
             });
         }
 
-        async function loadBanpu() {
+        async function loadData() {
             const statusEl = document.getElementById('status');
             try {
-                const res = await fetch('data/banpu_history.json');
+                document.getElementById('chart-title').textContent = symbol + ' - Historical Prices';
+                document.getElementById('json-link').textContent = dataFile;
+                document.getElementById('json-link').href = dataFile;
+
+                const res = await fetch(dataFile);
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
 
@@ -176,14 +179,15 @@
                     throw new Error('No records found');
                 }
 
+                currentMeta = data;
                 currentData = data.records;
                 currentAscending = [...data.records].sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 document.getElementById('record-count').textContent = data.count + ' records';
                 document.getElementById('date-range').textContent = currentAscending[0].date + ' -> ' + currentAscending[currentAscending.length - 1].date;
-                document.getElementById('event-note').textContent = data.note;
+                document.getElementById('event-note').textContent = data.note || '';
 
-                renderChart();
+                renderChart(data.eventDate, data.eventLabel);
                 renderTable();
 
                 statusEl.textContent = rawMode ? 'Raw (unadjusted)' : 'Adjusted';
@@ -199,17 +203,18 @@
 
         document.getElementById('raw-toggle').addEventListener('change', (e) => {
             rawMode = e.target.checked;
-            renderChart();
-            renderTable();
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = rawMode ? 'Raw (unadjusted)' : 'Adjusted';
+            if (currentData) {
+                renderChart(currentMeta && currentMeta.eventDate, currentMeta && currentMeta.eventLabel);
+                renderTable();
+                document.getElementById('status').textContent = rawMode ? 'Raw (unadjusted)' : 'Adjusted';
+            }
         });
 
         window.addEventListener('resize', () => {
-            if (chart) chart.resize(document.getElementById('banpu-chart').clientWidth, 500);
+            if (chart) chart.resize(document.getElementById('stock-chart').clientWidth, 500);
         });
 
-        loadBanpu();
+        loadData();
     </script>
 </body>
 </html>
