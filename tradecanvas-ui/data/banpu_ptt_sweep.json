@@ -1,0 +1,1517 @@
+{
+  "total_runs": 77,
+  "start_date": "2023-08-28",
+  "end_date": "2026-08-26",
+  "symbols": [
+    "BANPU",
+    "PTT"
+  ],
+  "top_by_return": [
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 25,
+        "overbought": 65
+      },
+      "banpu_final": 1.1446,
+      "ptt_final": 1.5738,
+      "combined_final": 1.3592,
+      "banpu_max_dd_pct": 37.1,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 24.11,
+      "total_return_pct": 35.92,
+      "risk_adjusted": 1.4901
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 65
+      },
+      "banpu_final": 0.987,
+      "ptt_final": 1.5756,
+      "combined_final": 1.2813,
+      "banpu_max_dd_pct": 39.53,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 25.32,
+      "total_return_pct": 28.13,
+      "risk_adjusted": 1.1109
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 20,
+        "overbought": 75
+      },
+      "banpu_final": 1.445,
+      "ptt_final": 1.0,
+      "combined_final": 1.2225,
+      "banpu_max_dd_pct": 35.65,
+      "ptt_max_dd_pct": 0.0,
+      "combined_max_dd_pct": 17.83,
+      "total_return_pct": 22.25,
+      "risk_adjusted": 1.2481
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 20,
+        "overbought": 65
+      },
+      "banpu_final": 1.185,
+      "ptt_final": 1.2417,
+      "combined_final": 1.2134,
+      "banpu_max_dd_pct": 37.1,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 24.11,
+      "total_return_pct": 21.34,
+      "risk_adjusted": 0.8852
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 25,
+        "overbought": 70
+      },
+      "banpu_final": 0.9531,
+      "ptt_final": 1.4446,
+      "combined_final": 1.1988,
+      "banpu_max_dd_pct": 44.14,
+      "ptt_max_dd_pct": 13.58,
+      "combined_max_dd_pct": 28.86,
+      "total_return_pct": 19.88,
+      "risk_adjusted": 0.689
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 70
+      },
+      "banpu_final": 0.8406,
+      "ptt_final": 1.5241,
+      "combined_final": 1.1823,
+      "banpu_max_dd_pct": 48.18,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 29.65,
+      "total_return_pct": 18.23,
+      "risk_adjusted": 0.6151
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 20,
+        "overbought": 65
+      },
+      "banpu_final": 1.0675,
+      "ptt_final": 1.2567,
+      "combined_final": 1.1621,
+      "banpu_max_dd_pct": 28.64,
+      "ptt_max_dd_pct": 12.79,
+      "combined_max_dd_pct": 20.71,
+      "total_return_pct": 16.21,
+      "risk_adjusted": 0.7824
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 20,
+        "overbought": 75
+      },
+      "banpu_final": 0.8134,
+      "ptt_final": 1.458,
+      "combined_final": 1.1357,
+      "banpu_max_dd_pct": 50.52,
+      "ptt_max_dd_pct": 13.19,
+      "combined_max_dd_pct": 31.86,
+      "total_return_pct": 13.57,
+      "risk_adjusted": 0.4261
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 20,
+        "overbought": 65
+      },
+      "banpu_final": 1.2655,
+      "ptt_final": 1.0,
+      "combined_final": 1.1328,
+      "banpu_max_dd_pct": 35.65,
+      "ptt_max_dd_pct": 0.0,
+      "combined_max_dd_pct": 17.83,
+      "total_return_pct": 13.28,
+      "risk_adjusted": 0.7447
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 20,
+        "overbought": 70
+      },
+      "banpu_final": 1.2381,
+      "ptt_final": 1.0,
+      "combined_final": 1.119,
+      "banpu_max_dd_pct": 35.65,
+      "ptt_max_dd_pct": 0.0,
+      "combined_max_dd_pct": 17.83,
+      "total_return_pct": 11.9,
+      "risk_adjusted": 0.6678
+    }
+  ],
+  "top_by_risk_adjusted": [
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 25,
+        "overbought": 65
+      },
+      "banpu_final": 1.1446,
+      "ptt_final": 1.5738,
+      "combined_final": 1.3592,
+      "banpu_max_dd_pct": 37.1,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 24.11,
+      "total_return_pct": 35.92,
+      "risk_adjusted": 1.4901
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 20,
+        "overbought": 75
+      },
+      "banpu_final": 1.445,
+      "ptt_final": 1.0,
+      "combined_final": 1.2225,
+      "banpu_max_dd_pct": 35.65,
+      "ptt_max_dd_pct": 0.0,
+      "combined_max_dd_pct": 17.83,
+      "total_return_pct": 22.25,
+      "risk_adjusted": 1.2481
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 65
+      },
+      "banpu_final": 0.987,
+      "ptt_final": 1.5756,
+      "combined_final": 1.2813,
+      "banpu_max_dd_pct": 39.53,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 25.32,
+      "total_return_pct": 28.13,
+      "risk_adjusted": 1.1109
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 20,
+        "overbought": 65
+      },
+      "banpu_final": 1.185,
+      "ptt_final": 1.2417,
+      "combined_final": 1.2134,
+      "banpu_max_dd_pct": 37.1,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 24.11,
+      "total_return_pct": 21.34,
+      "risk_adjusted": 0.8852
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 20,
+        "overbought": 65
+      },
+      "banpu_final": 1.0675,
+      "ptt_final": 1.2567,
+      "combined_final": 1.1621,
+      "banpu_max_dd_pct": 28.64,
+      "ptt_max_dd_pct": 12.79,
+      "combined_max_dd_pct": 20.71,
+      "total_return_pct": 16.21,
+      "risk_adjusted": 0.7824
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 20,
+        "overbought": 65
+      },
+      "banpu_final": 1.2655,
+      "ptt_final": 1.0,
+      "combined_final": 1.1328,
+      "banpu_max_dd_pct": 35.65,
+      "ptt_max_dd_pct": 0.0,
+      "combined_max_dd_pct": 17.83,
+      "total_return_pct": 13.28,
+      "risk_adjusted": 0.7447
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 25,
+        "overbought": 70
+      },
+      "banpu_final": 0.9531,
+      "ptt_final": 1.4446,
+      "combined_final": 1.1988,
+      "banpu_max_dd_pct": 44.14,
+      "ptt_max_dd_pct": 13.58,
+      "combined_max_dd_pct": 28.86,
+      "total_return_pct": 19.88,
+      "risk_adjusted": 0.689
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 20,
+        "overbought": 70
+      },
+      "banpu_final": 1.2381,
+      "ptt_final": 1.0,
+      "combined_final": 1.119,
+      "banpu_max_dd_pct": 35.65,
+      "ptt_max_dd_pct": 0.0,
+      "combined_max_dd_pct": 17.83,
+      "total_return_pct": 11.9,
+      "risk_adjusted": 0.6678
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 70
+      },
+      "banpu_final": 0.8406,
+      "ptt_final": 1.5241,
+      "combined_final": 1.1823,
+      "banpu_max_dd_pct": 48.18,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 29.65,
+      "total_return_pct": 18.23,
+      "risk_adjusted": 0.6151
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 20,
+        "overbought": 75
+      },
+      "banpu_final": 0.8134,
+      "ptt_final": 1.458,
+      "combined_final": 1.1357,
+      "banpu_max_dd_pct": 50.52,
+      "ptt_max_dd_pct": 13.19,
+      "combined_max_dd_pct": 31.86,
+      "total_return_pct": 13.57,
+      "risk_adjusted": 0.4261
+    }
+  ],
+  "all_results": [
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 5,
+        "slow": 20
+      },
+      "banpu_final": 0.6745,
+      "ptt_final": 0.6817,
+      "combined_final": 0.6781,
+      "banpu_max_dd_pct": 33.78,
+      "ptt_max_dd_pct": 35.6,
+      "combined_max_dd_pct": 34.69,
+      "total_return_pct": -32.19,
+      "risk_adjusted": -0.9277
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 5,
+        "slow": 30
+      },
+      "banpu_final": 0.6504,
+      "ptt_final": 0.7293,
+      "combined_final": 0.6899,
+      "banpu_max_dd_pct": 39.65,
+      "ptt_max_dd_pct": 33.62,
+      "combined_max_dd_pct": 36.64,
+      "total_return_pct": -31.01,
+      "risk_adjusted": -0.8465
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 5,
+        "slow": 40
+      },
+      "banpu_final": 0.7482,
+      "ptt_final": 0.6574,
+      "combined_final": 0.7028,
+      "banpu_max_dd_pct": 42.2,
+      "ptt_max_dd_pct": 38.4,
+      "combined_max_dd_pct": 40.3,
+      "total_return_pct": -29.72,
+      "risk_adjusted": -0.7375
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 5,
+        "slow": 50
+      },
+      "banpu_final": 0.7811,
+      "ptt_final": 0.6146,
+      "combined_final": 0.6979,
+      "banpu_max_dd_pct": 39.05,
+      "ptt_max_dd_pct": 40.68,
+      "combined_max_dd_pct": 39.87,
+      "total_return_pct": -30.21,
+      "risk_adjusted": -0.7578
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 5,
+        "slow": 60
+      },
+      "banpu_final": 0.7534,
+      "ptt_final": 0.6554,
+      "combined_final": 0.7044,
+      "banpu_max_dd_pct": 37.52,
+      "ptt_max_dd_pct": 36.29,
+      "combined_max_dd_pct": 36.91,
+      "total_return_pct": -29.56,
+      "risk_adjusted": -0.8009
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 5,
+        "slow": 70
+      },
+      "banpu_final": 0.7246,
+      "ptt_final": 0.6702,
+      "combined_final": 0.6974,
+      "banpu_max_dd_pct": 45.12,
+      "ptt_max_dd_pct": 32.98,
+      "combined_max_dd_pct": 39.05,
+      "total_return_pct": -30.26,
+      "risk_adjusted": -0.7749
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 5,
+        "slow": 80
+      },
+      "banpu_final": 0.7654,
+      "ptt_final": 0.7177,
+      "combined_final": 0.7415,
+      "banpu_max_dd_pct": 44.67,
+      "ptt_max_dd_pct": 29.73,
+      "combined_max_dd_pct": 37.2,
+      "total_return_pct": -25.85,
+      "risk_adjusted": -0.6948
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 5,
+        "slow": 90
+      },
+      "banpu_final": 0.8151,
+      "ptt_final": 0.6634,
+      "combined_final": 0.7393,
+      "banpu_max_dd_pct": 41.07,
+      "ptt_max_dd_pct": 33.66,
+      "combined_max_dd_pct": 37.36,
+      "total_return_pct": -26.07,
+      "risk_adjusted": -0.6978
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 5,
+        "slow": 100
+      },
+      "banpu_final": 0.8651,
+      "ptt_final": 0.7049,
+      "combined_final": 0.785,
+      "banpu_max_dd_pct": 43.24,
+      "ptt_max_dd_pct": 31.47,
+      "combined_max_dd_pct": 37.35,
+      "total_return_pct": -21.5,
+      "risk_adjusted": -0.5755
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 10,
+        "slow": 20
+      },
+      "banpu_final": 0.7328,
+      "ptt_final": 0.6505,
+      "combined_final": 0.6917,
+      "banpu_max_dd_pct": 31.81,
+      "ptt_max_dd_pct": 41.65,
+      "combined_max_dd_pct": 36.73,
+      "total_return_pct": -30.83,
+      "risk_adjusted": -0.8394
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 10,
+        "slow": 30
+      },
+      "banpu_final": 0.5535,
+      "ptt_final": 0.603,
+      "combined_final": 0.5783,
+      "banpu_max_dd_pct": 48.12,
+      "ptt_max_dd_pct": 44.3,
+      "combined_max_dd_pct": 46.21,
+      "total_return_pct": -42.17,
+      "risk_adjusted": -0.9125
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 10,
+        "slow": 40
+      },
+      "banpu_final": 0.677,
+      "ptt_final": 0.6075,
+      "combined_final": 0.6423,
+      "banpu_max_dd_pct": 44.3,
+      "ptt_max_dd_pct": 43.5,
+      "combined_max_dd_pct": 43.9,
+      "total_return_pct": -35.77,
+      "risk_adjusted": -0.815
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 10,
+        "slow": 50
+      },
+      "banpu_final": 0.7597,
+      "ptt_final": 0.5791,
+      "combined_final": 0.6694,
+      "banpu_max_dd_pct": 36.86,
+      "ptt_max_dd_pct": 44.11,
+      "combined_max_dd_pct": 40.48,
+      "total_return_pct": -33.06,
+      "risk_adjusted": -0.8165
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 10,
+        "slow": 60
+      },
+      "banpu_final": 0.7373,
+      "ptt_final": 0.6246,
+      "combined_final": 0.681,
+      "banpu_max_dd_pct": 41.66,
+      "ptt_max_dd_pct": 39.28,
+      "combined_max_dd_pct": 40.47,
+      "total_return_pct": -31.9,
+      "risk_adjusted": -0.7882
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 10,
+        "slow": 70
+      },
+      "banpu_final": 0.7985,
+      "ptt_final": 0.6083,
+      "combined_final": 0.7034,
+      "banpu_max_dd_pct": 43.33,
+      "ptt_max_dd_pct": 39.17,
+      "combined_max_dd_pct": 41.25,
+      "total_return_pct": -29.66,
+      "risk_adjusted": -0.719
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 10,
+        "slow": 80
+      },
+      "banpu_final": 0.7757,
+      "ptt_final": 0.6913,
+      "combined_final": 0.7335,
+      "banpu_max_dd_pct": 43.39,
+      "ptt_max_dd_pct": 32.32,
+      "combined_max_dd_pct": 37.85,
+      "total_return_pct": -26.65,
+      "risk_adjusted": -0.7039
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 10,
+        "slow": 90
+      },
+      "banpu_final": 0.7952,
+      "ptt_final": 0.6881,
+      "combined_final": 0.7417,
+      "banpu_max_dd_pct": 42.76,
+      "ptt_max_dd_pct": 31.19,
+      "combined_max_dd_pct": 36.98,
+      "total_return_pct": -25.83,
+      "risk_adjusted": -0.6986
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 10,
+        "slow": 100
+      },
+      "banpu_final": 0.8601,
+      "ptt_final": 0.6863,
+      "combined_final": 0.7732,
+      "banpu_max_dd_pct": 42.52,
+      "ptt_max_dd_pct": 33.28,
+      "combined_max_dd_pct": 37.9,
+      "total_return_pct": -22.68,
+      "risk_adjusted": -0.5985
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 15,
+        "slow": 20
+      },
+      "banpu_final": 0.6043,
+      "ptt_final": 0.629,
+      "combined_final": 0.6167,
+      "banpu_max_dd_pct": 39.94,
+      "ptt_max_dd_pct": 40.58,
+      "combined_max_dd_pct": 40.26,
+      "total_return_pct": -38.33,
+      "risk_adjusted": -0.9521
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 15,
+        "slow": 30
+      },
+      "banpu_final": 0.5238,
+      "ptt_final": 0.6,
+      "combined_final": 0.5619,
+      "banpu_max_dd_pct": 48.98,
+      "ptt_max_dd_pct": 45.4,
+      "combined_max_dd_pct": 47.19,
+      "total_return_pct": -43.81,
+      "risk_adjusted": -0.9284
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 15,
+        "slow": 40
+      },
+      "banpu_final": 0.6043,
+      "ptt_final": 0.5987,
+      "combined_final": 0.6015,
+      "banpu_max_dd_pct": 44.31,
+      "ptt_max_dd_pct": 43.48,
+      "combined_max_dd_pct": 43.89,
+      "total_return_pct": -39.85,
+      "risk_adjusted": -0.9079
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 15,
+        "slow": 50
+      },
+      "banpu_final": 0.7577,
+      "ptt_final": 0.5585,
+      "combined_final": 0.6581,
+      "banpu_max_dd_pct": 41.87,
+      "ptt_max_dd_pct": 46.49,
+      "combined_max_dd_pct": 44.18,
+      "total_return_pct": -34.19,
+      "risk_adjusted": -0.7739
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 15,
+        "slow": 60
+      },
+      "banpu_final": 0.6952,
+      "ptt_final": 0.5707,
+      "combined_final": 0.6329,
+      "banpu_max_dd_pct": 49.44,
+      "ptt_max_dd_pct": 44.53,
+      "combined_max_dd_pct": 46.99,
+      "total_return_pct": -36.71,
+      "risk_adjusted": -0.7813
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 15,
+        "slow": 70
+      },
+      "banpu_final": 0.81,
+      "ptt_final": 0.6714,
+      "combined_final": 0.7407,
+      "banpu_max_dd_pct": 44.27,
+      "ptt_max_dd_pct": 32.86,
+      "combined_max_dd_pct": 38.56,
+      "total_return_pct": -25.93,
+      "risk_adjusted": -0.6724
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 15,
+        "slow": 80
+      },
+      "banpu_final": 0.8153,
+      "ptt_final": 0.6756,
+      "combined_final": 0.7455,
+      "banpu_max_dd_pct": 46.29,
+      "ptt_max_dd_pct": 33.85,
+      "combined_max_dd_pct": 40.07,
+      "total_return_pct": -25.45,
+      "risk_adjusted": -0.6352
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 15,
+        "slow": 90
+      },
+      "banpu_final": 0.8742,
+      "ptt_final": 0.7022,
+      "combined_final": 0.7882,
+      "banpu_max_dd_pct": 41.0,
+      "ptt_max_dd_pct": 29.78,
+      "combined_max_dd_pct": 35.39,
+      "total_return_pct": -21.18,
+      "risk_adjusted": -0.5985
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 15,
+        "slow": 100
+      },
+      "banpu_final": 0.9167,
+      "ptt_final": 0.7505,
+      "combined_final": 0.8336,
+      "banpu_max_dd_pct": 38.12,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 33.48,
+      "total_return_pct": -16.64,
+      "risk_adjusted": -0.4971
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 20,
+        "slow": 30
+      },
+      "banpu_final": 0.5533,
+      "ptt_final": 0.5687,
+      "combined_final": 0.561,
+      "banpu_max_dd_pct": 47.23,
+      "ptt_max_dd_pct": 47.11,
+      "combined_max_dd_pct": 47.17,
+      "total_return_pct": -43.9,
+      "risk_adjusted": -0.9307
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 20,
+        "slow": 40
+      },
+      "banpu_final": 0.5504,
+      "ptt_final": 0.5981,
+      "combined_final": 0.5743,
+      "banpu_max_dd_pct": 52.05,
+      "ptt_max_dd_pct": 43.53,
+      "combined_max_dd_pct": 47.79,
+      "total_return_pct": -42.57,
+      "risk_adjusted": -0.8908
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 20,
+        "slow": 50
+      },
+      "banpu_final": 0.8545,
+      "ptt_final": 0.671,
+      "combined_final": 0.7628,
+      "banpu_max_dd_pct": 42.08,
+      "ptt_max_dd_pct": 34.77,
+      "combined_max_dd_pct": 38.43,
+      "total_return_pct": -23.72,
+      "risk_adjusted": -0.6174
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 20,
+        "slow": 60
+      },
+      "banpu_final": 0.9286,
+      "ptt_final": 0.7043,
+      "combined_final": 0.8164,
+      "banpu_max_dd_pct": 40.1,
+      "ptt_max_dd_pct": 32.16,
+      "combined_max_dd_pct": 36.13,
+      "total_return_pct": -18.36,
+      "risk_adjusted": -0.5081
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 20,
+        "slow": 70
+      },
+      "banpu_final": 0.9472,
+      "ptt_final": 0.7466,
+      "combined_final": 0.8469,
+      "banpu_max_dd_pct": 41.37,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 35.1,
+      "total_return_pct": -15.31,
+      "risk_adjusted": -0.4362
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 20,
+        "slow": 80
+      },
+      "banpu_final": 0.9284,
+      "ptt_final": 0.7512,
+      "combined_final": 0.8398,
+      "banpu_max_dd_pct": 41.34,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 35.09,
+      "total_return_pct": -16.02,
+      "risk_adjusted": -0.4567
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 20,
+        "slow": 90
+      },
+      "banpu_final": 0.6841,
+      "ptt_final": 0.7391,
+      "combined_final": 0.7116,
+      "banpu_max_dd_pct": 49.92,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 39.38,
+      "total_return_pct": -28.84,
+      "risk_adjusted": -0.7323
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 20,
+        "slow": 100
+      },
+      "banpu_final": 0.6936,
+      "ptt_final": 0.7959,
+      "combined_final": 0.7448,
+      "banpu_max_dd_pct": 52.35,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 40.59,
+      "total_return_pct": -25.52,
+      "risk_adjusted": -0.6288
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 25,
+        "slow": 30
+      },
+      "banpu_final": 0.6435,
+      "ptt_final": 0.6821,
+      "combined_final": 0.6628,
+      "banpu_max_dd_pct": 46.95,
+      "ptt_max_dd_pct": 37.04,
+      "combined_max_dd_pct": 41.99,
+      "total_return_pct": -33.72,
+      "risk_adjusted": -0.803
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 25,
+        "slow": 40
+      },
+      "banpu_final": 0.9002,
+      "ptt_final": 0.6888,
+      "combined_final": 0.7945,
+      "banpu_max_dd_pct": 36.33,
+      "ptt_max_dd_pct": 34.01,
+      "combined_max_dd_pct": 35.17,
+      "total_return_pct": -20.55,
+      "risk_adjusted": -0.5844
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 25,
+        "slow": 50
+      },
+      "banpu_final": 1.0037,
+      "ptt_final": 0.6819,
+      "combined_final": 0.8428,
+      "banpu_max_dd_pct": 38.81,
+      "ptt_max_dd_pct": 33.72,
+      "combined_max_dd_pct": 36.27,
+      "total_return_pct": -15.72,
+      "risk_adjusted": -0.4335
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 25,
+        "slow": 60
+      },
+      "banpu_final": 1.0693,
+      "ptt_final": 0.7135,
+      "combined_final": 0.8914,
+      "banpu_max_dd_pct": 40.57,
+      "ptt_max_dd_pct": 30.73,
+      "combined_max_dd_pct": 35.65,
+      "total_return_pct": -10.86,
+      "risk_adjusted": -0.3046
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 25,
+        "slow": 70
+      },
+      "banpu_final": 0.866,
+      "ptt_final": 0.7991,
+      "combined_final": 0.8326,
+      "banpu_max_dd_pct": 43.81,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 36.32,
+      "total_return_pct": -16.74,
+      "risk_adjusted": -0.461
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 25,
+        "slow": 80
+      },
+      "banpu_final": 0.7716,
+      "ptt_final": 0.7678,
+      "combined_final": 0.7697,
+      "banpu_max_dd_pct": 44.44,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 36.63,
+      "total_return_pct": -23.03,
+      "risk_adjusted": -0.6286
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 25,
+        "slow": 90
+      },
+      "banpu_final": 0.7556,
+      "ptt_final": 0.8049,
+      "combined_final": 0.7803,
+      "banpu_max_dd_pct": 42.81,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 35.82,
+      "total_return_pct": -21.97,
+      "risk_adjusted": -0.6134
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 25,
+        "slow": 100
+      },
+      "banpu_final": 0.8122,
+      "ptt_final": 0.8392,
+      "combined_final": 0.8257,
+      "banpu_max_dd_pct": 42.01,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 35.42,
+      "total_return_pct": -17.43,
+      "risk_adjusted": -0.492
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 30,
+        "slow": 40
+      },
+      "banpu_final": 1.2231,
+      "ptt_final": 0.6662,
+      "combined_final": 0.9446,
+      "banpu_max_dd_pct": 34.3,
+      "ptt_max_dd_pct": 35.89,
+      "combined_max_dd_pct": 35.1,
+      "total_return_pct": -5.54,
+      "risk_adjusted": -0.1578
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 30,
+        "slow": 50
+      },
+      "banpu_final": 0.9677,
+      "ptt_final": 0.7272,
+      "combined_final": 0.8475,
+      "banpu_max_dd_pct": 39.41,
+      "ptt_max_dd_pct": 32.49,
+      "combined_max_dd_pct": 35.95,
+      "total_return_pct": -15.25,
+      "risk_adjusted": -0.4242
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 30,
+        "slow": 60
+      },
+      "banpu_final": 0.9878,
+      "ptt_final": 0.7465,
+      "combined_final": 0.8671,
+      "banpu_max_dd_pct": 40.16,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 34.5,
+      "total_return_pct": -13.29,
+      "risk_adjusted": -0.3851
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 30,
+        "slow": 70
+      },
+      "banpu_final": 0.8459,
+      "ptt_final": 0.7368,
+      "combined_final": 0.7913,
+      "banpu_max_dd_pct": 41.7,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 35.27,
+      "total_return_pct": -20.87,
+      "risk_adjusted": -0.5916
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 30,
+        "slow": 80
+      },
+      "banpu_final": 0.8267,
+      "ptt_final": 0.7873,
+      "combined_final": 0.807,
+      "banpu_max_dd_pct": 43.98,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 36.41,
+      "total_return_pct": -19.3,
+      "risk_adjusted": -0.5302
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 30,
+        "slow": 90
+      },
+      "banpu_final": 0.9902,
+      "ptt_final": 0.7776,
+      "combined_final": 0.8839,
+      "banpu_max_dd_pct": 37.61,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 33.22,
+      "total_return_pct": -11.61,
+      "risk_adjusted": -0.3496
+    },
+    {
+      "kind": "sma",
+      "params": {
+        "fast": 30,
+        "slow": 100
+      },
+      "banpu_final": 0.9005,
+      "ptt_final": 0.7712,
+      "combined_final": 0.8359,
+      "banpu_max_dd_pct": 37.22,
+      "ptt_max_dd_pct": 28.83,
+      "combined_max_dd_pct": 33.03,
+      "total_return_pct": -16.41,
+      "risk_adjusted": -0.4969
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 20,
+        "overbought": 65
+      },
+      "banpu_final": 1.0675,
+      "ptt_final": 1.2567,
+      "combined_final": 1.1621,
+      "banpu_max_dd_pct": 28.64,
+      "ptt_max_dd_pct": 12.79,
+      "combined_max_dd_pct": 20.71,
+      "total_return_pct": 16.21,
+      "risk_adjusted": 0.7824
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 20,
+        "overbought": 70
+      },
+      "banpu_final": 0.8545,
+      "ptt_final": 1.2938,
+      "combined_final": 1.0741,
+      "banpu_max_dd_pct": 39.16,
+      "ptt_max_dd_pct": 13.88,
+      "combined_max_dd_pct": 26.52,
+      "total_return_pct": 7.41,
+      "risk_adjusted": 0.2795
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 20,
+        "overbought": 75
+      },
+      "banpu_final": 0.8134,
+      "ptt_final": 1.458,
+      "combined_final": 1.1357,
+      "banpu_max_dd_pct": 50.52,
+      "ptt_max_dd_pct": 13.19,
+      "combined_max_dd_pct": 31.86,
+      "total_return_pct": 13.57,
+      "risk_adjusted": 0.4261
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 25,
+        "overbought": 65
+      },
+      "banpu_final": 0.9009,
+      "ptt_final": 1.0914,
+      "combined_final": 0.9962,
+      "banpu_max_dd_pct": 32.34,
+      "ptt_max_dd_pct": 12.79,
+      "combined_max_dd_pct": 22.56,
+      "total_return_pct": -0.38,
+      "risk_adjusted": -0.0169
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 25,
+        "overbought": 70
+      },
+      "banpu_final": 0.7149,
+      "ptt_final": 1.132,
+      "combined_final": 0.9235,
+      "banpu_max_dd_pct": 46.7,
+      "ptt_max_dd_pct": 13.88,
+      "combined_max_dd_pct": 30.29,
+      "total_return_pct": -7.65,
+      "risk_adjusted": -0.2527
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 25,
+        "overbought": 75
+      },
+      "banpu_final": 0.7314,
+      "ptt_final": 1.2757,
+      "combined_final": 1.0035,
+      "banpu_max_dd_pct": 55.71,
+      "ptt_max_dd_pct": 13.19,
+      "combined_max_dd_pct": 34.45,
+      "total_return_pct": 0.35,
+      "risk_adjusted": 0.0103
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 30,
+        "overbought": 65
+      },
+      "banpu_final": 0.7858,
+      "ptt_final": 1.0157,
+      "combined_final": 0.9007,
+      "banpu_max_dd_pct": 33.18,
+      "ptt_max_dd_pct": 14.12,
+      "combined_max_dd_pct": 23.65,
+      "total_return_pct": -9.93,
+      "risk_adjusted": -0.4197
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 30,
+        "overbought": 70
+      },
+      "banpu_final": 0.664,
+      "ptt_final": 1.0076,
+      "combined_final": 0.8358,
+      "banpu_max_dd_pct": 44.77,
+      "ptt_max_dd_pct": 17.85,
+      "combined_max_dd_pct": 31.31,
+      "total_return_pct": -16.42,
+      "risk_adjusted": -0.5244
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 7,
+        "oversold": 30,
+        "overbought": 75
+      },
+      "banpu_final": 0.7054,
+      "ptt_final": 1.1896,
+      "combined_final": 0.9475,
+      "banpu_max_dd_pct": 52.33,
+      "ptt_max_dd_pct": 17.19,
+      "combined_max_dd_pct": 34.76,
+      "total_return_pct": -5.25,
+      "risk_adjusted": -0.151
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 20,
+        "overbought": 65
+      },
+      "banpu_final": 1.185,
+      "ptt_final": 1.2417,
+      "combined_final": 1.2134,
+      "banpu_max_dd_pct": 37.1,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 24.11,
+      "total_return_pct": 21.34,
+      "risk_adjusted": 0.8852
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 20,
+        "overbought": 70
+      },
+      "banpu_final": 0.9868,
+      "ptt_final": 1.2309,
+      "combined_final": 1.1088,
+      "banpu_max_dd_pct": 43.76,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 27.43,
+      "total_return_pct": 10.88,
+      "risk_adjusted": 0.3967
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 20,
+        "overbought": 75
+      },
+      "banpu_final": 0.752,
+      "ptt_final": 1.1358,
+      "combined_final": 0.9439,
+      "banpu_max_dd_pct": 52.68,
+      "ptt_max_dd_pct": 19.26,
+      "combined_max_dd_pct": 35.97,
+      "total_return_pct": -5.61,
+      "risk_adjusted": -0.156
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 25,
+        "overbought": 65
+      },
+      "banpu_final": 1.1446,
+      "ptt_final": 1.5738,
+      "combined_final": 1.3592,
+      "banpu_max_dd_pct": 37.1,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 24.11,
+      "total_return_pct": 35.92,
+      "risk_adjusted": 1.4901
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 25,
+        "overbought": 70
+      },
+      "banpu_final": 0.9531,
+      "ptt_final": 1.4446,
+      "combined_final": 1.1988,
+      "banpu_max_dd_pct": 44.14,
+      "ptt_max_dd_pct": 13.58,
+      "combined_max_dd_pct": 28.86,
+      "total_return_pct": 19.88,
+      "risk_adjusted": 0.689
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 25,
+        "overbought": 75
+      },
+      "banpu_final": 0.7263,
+      "ptt_final": 1.4135,
+      "combined_final": 1.0699,
+      "banpu_max_dd_pct": 53.0,
+      "ptt_max_dd_pct": 19.26,
+      "combined_max_dd_pct": 36.13,
+      "total_return_pct": 6.99,
+      "risk_adjusted": 0.1935
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 65
+      },
+      "banpu_final": 0.987,
+      "ptt_final": 1.5756,
+      "combined_final": 1.2813,
+      "banpu_max_dd_pct": 39.53,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 25.32,
+      "total_return_pct": 28.13,
+      "risk_adjusted": 1.1109
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 70
+      },
+      "banpu_final": 0.8406,
+      "ptt_final": 1.5241,
+      "combined_final": 1.1823,
+      "banpu_max_dd_pct": 48.18,
+      "ptt_max_dd_pct": 11.11,
+      "combined_max_dd_pct": 29.65,
+      "total_return_pct": 18.23,
+      "risk_adjusted": 0.6151
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 75
+      },
+      "banpu_final": 0.6406,
+      "ptt_final": 1.341,
+      "combined_final": 0.9908,
+      "banpu_max_dd_pct": 56.4,
+      "ptt_max_dd_pct": 20.44,
+      "combined_max_dd_pct": 38.42,
+      "total_return_pct": -0.92,
+      "risk_adjusted": -0.024
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 20,
+        "overbought": 65
+      },
+      "banpu_final": 1.2655,
+      "ptt_final": 1.0,
+      "combined_final": 1.1328,
+      "banpu_max_dd_pct": 35.65,
+      "ptt_max_dd_pct": 0.0,
+      "combined_max_dd_pct": 17.83,
+      "total_return_pct": 13.28,
+      "risk_adjusted": 0.7447
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 20,
+        "overbought": 70
+      },
+      "banpu_final": 1.2381,
+      "ptt_final": 1.0,
+      "combined_final": 1.119,
+      "banpu_max_dd_pct": 35.65,
+      "ptt_max_dd_pct": 0.0,
+      "combined_max_dd_pct": 17.83,
+      "total_return_pct": 11.9,
+      "risk_adjusted": 0.6678
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 20,
+        "overbought": 75
+      },
+      "banpu_final": 1.445,
+      "ptt_final": 1.0,
+      "combined_final": 1.2225,
+      "banpu_max_dd_pct": 35.65,
+      "ptt_max_dd_pct": 0.0,
+      "combined_max_dd_pct": 17.83,
+      "total_return_pct": 22.25,
+      "risk_adjusted": 1.2481
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 25,
+        "overbought": 65
+      },
+      "banpu_final": 0.9322,
+      "ptt_final": 1.1398,
+      "combined_final": 1.036,
+      "banpu_max_dd_pct": 50.83,
+      "ptt_max_dd_pct": 4.72,
+      "combined_max_dd_pct": 27.78,
+      "total_return_pct": 3.6,
+      "risk_adjusted": 0.1296
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 25,
+        "overbought": 70
+      },
+      "banpu_final": 1.0123,
+      "ptt_final": 1.1726,
+      "combined_final": 1.0924,
+      "banpu_max_dd_pct": 50.83,
+      "ptt_max_dd_pct": 4.72,
+      "combined_max_dd_pct": 27.78,
+      "total_return_pct": 9.24,
+      "risk_adjusted": 0.3327
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 25,
+        "overbought": 75
+      },
+      "banpu_final": 0.9222,
+      "ptt_final": 1.2464,
+      "combined_final": 1.0843,
+      "banpu_max_dd_pct": 51.56,
+      "ptt_max_dd_pct": 4.72,
+      "combined_max_dd_pct": 28.14,
+      "total_return_pct": 8.43,
+      "risk_adjusted": 0.2997
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 30,
+        "overbought": 65
+      },
+      "banpu_final": 0.7796,
+      "ptt_final": 1.2333,
+      "combined_final": 1.0065,
+      "banpu_max_dd_pct": 56.64,
+      "ptt_max_dd_pct": 15.5,
+      "combined_max_dd_pct": 36.07,
+      "total_return_pct": 0.65,
+      "risk_adjusted": 0.018
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 30,
+        "overbought": 70
+      },
+      "banpu_final": 0.8465,
+      "ptt_final": 1.1777,
+      "combined_final": 1.0121,
+      "banpu_max_dd_pct": 56.64,
+      "ptt_max_dd_pct": 16.5,
+      "combined_max_dd_pct": 36.57,
+      "total_return_pct": 1.21,
+      "risk_adjusted": 0.0332
+    },
+    {
+      "kind": "rsi",
+      "params": {
+        "period": 21,
+        "oversold": 30,
+        "overbought": 75
+      },
+      "banpu_final": 0.8058,
+      "ptt_final": 1.1889,
+      "combined_final": 0.9973,
+      "banpu_max_dd_pct": 57.28,
+      "ptt_max_dd_pct": 24.31,
+      "combined_max_dd_pct": 40.79,
+      "total_return_pct": -0.27,
+      "risk_adjusted": -0.0066
+    }
+  ]
+}
