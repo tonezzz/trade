@@ -142,6 +142,10 @@ sections:
         text: PlayLive preset for extracting a Thai stock quote page from SETTRADE (default symbol PTT)
         path: config/ssot/ssot.playlive.preset.settrade-symbol-quote.yml
 
+      - label: ssot.playlive.preset.settrade-symbol-history.yml
+        text: PlayLive preset for extracting the latest daily OHLC historical trading records for a Thai stock from SETTRADE (default BANPU)
+        path: config/ssot/ssot.playlive.preset.settrade-symbol-history.yml
+
   - title: Planning and Improvement
     layout: list
     items:
@@ -179,6 +183,10 @@ sections:
 
 # Recent changes to Trade SSOT
 recent_changes:
+  - date: 2026-08-27
+    description: "Created ssot.playlive.preset.settrade-symbol-history.yml and registered it; added a one-button remote-test.sh for running SETTRADE presets on tony-dell"
+    impact: "SETTRADE historical price extraction is now a tracked, parameterized PlayLive preset"
+
   - date: 2026-08-17
     description: "Created ssot.data-verification.yml and registered it in the index; updated ssot.health.yml for Podman port 9002 and current data freshness"
     impact: "Data updating status is now a tracked SSOT artifact"

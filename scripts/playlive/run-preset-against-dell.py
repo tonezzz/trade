@@ -60,10 +60,10 @@ def build_params(preset, cli_overrides):
 
 
 def render_step(step, params):
-    """Substitute ${param} in step string fields; leave script/expected untouched."""
+    """Substitute ${param} in step string fields and scripts; leave expected untouched."""
     rendered = {}
     for k, v in step.items():
-        if k in ("script", "expected") or not isinstance(v, str):
+        if k == "expected" or not isinstance(v, str):
             rendered[k] = v
         else:
             rendered[k] = PARAM_RE.sub(lambda m: str(params.get(m.group(1), "")), v)

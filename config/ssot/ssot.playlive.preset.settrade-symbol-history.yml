@@ -1,0 +1,120 @@
+title: PlayLive Preset - SETTRADE Symbol Historical Prices
+
+type: playlive-preset
+
+target:
+  name: SETTRADE Symbol Historical Prices
+  url: https://www.settrade.com/th/equities/quote/${symbol}/historical-trading
+  primary_url: https://www.settrade.com/th/equities/quote/${symbol}/historical-trading
+  description: |
+    Extract the daily historical price records the public SETTRADE history page
+    exposes for a Thai stock. The page's internal /historical-trading API returns
+    the most recent ~17 trading sessions with full OHLC, volume, and value.
+  source: https://www.settrade.com
+  requires: Internet access and a PlayLive Chrome session.
+
+params:
+  - name: symbol
+    default: BANPU
+    description: Thai stock symbol to look up.
+
+output_schema:
+  type: json
+  fields:
+    - ok: boolean extraction success
+    - symbol: stock symbol
+    - count: number of records returned
+    - first: first (most recent) record
+    - last: last (oldest) record
+    - records: array of { date, open, high, low, close, average, volume, value, change, percentChange }
+    - raw: error / fallback message
+    - errors: list of parsing errors
+
+steps:
+  - id: clear-state
+    action: eval
+    description: Start from a clean browser state
+    script: |
+      (() => {
+        try { localStorage.clear(); } catch {}
+        try { sessionStorage.clear(); } catch {}
+        return 'cleared';
+      })();
+    expected: cleared
+
+  - id: navigate-history
+    action: navigate
+    url: https://www.settrade.com/th/equities/quote/${symbol}/historical-trading
+    description: Load the SETTRADE historical trading page to set cookies/origin.
+
+  - id: wait-for-render
+    action: wait
+    duration_ms: 2500
+    description: Allow the history page to establish the API context.
+
+  - id: extract-history
+    action: eval
+    description: |
+      Call the SETTRADE /historical-trading API and return the full daily OHLC
+      records the public page exposes for the symbol.
+    script: |
+      (() => {
+        const symbol = '${symbol}';
+        return (async () => {
+          const output = {
+            ok: false,
+            source: 'settrade-symbol-history',
+            extractedAt: new Date().toISOString(),
+            url: window.location.href,
+            symbol,
+            count: 0,
+            first: null,
+            last: null,
+            records: [],
+            raw: '',
+            errors: []
+          };
+          try {
+            const res = await fetch(`/api/set/stock/${symbol}/historical-trading`);
+            if (!res.ok) {
+              output.raw = 'HTTP ' + res.status;
+            } else {
+              const data = await res.json();
+              const arr = Array.isArray(data) ? data : (data.data || []);
+              output.records = arr
+                .filter(r => r && r.date && r.close !== null)
+                .map(r => ({
+                  date: r.date,
+                  open: r.open,
+                  high: r.high,
+                  low: r.low,
+                  close: r.close,
+                  average: r.average,
+                  volume: r.totalVolume,
+                  value: r.totalValue,
+                  change: r.change,
+                  percentChange: r.percentChange
+                }));
+              output.count = output.records.length;
+              output.first = output.records[0] || null;
+              output.last = output.records[output.records.length - 1] || null;
+              output.ok = output.count > 0;
+            }
+          } catch (e) {
+            output.errors.push(e.message);
+            output.raw = e.message;
+          }
+          window.__settradeHistory = { ok: output.ok, count: output.count };
+          return JSON.stringify(output, null, 2);
+        })();
+      })();
+
+  - id: verify-history
+    action: eval
+    description: Confirm that historical records were loaded.
+    script: (() => !!(window.__settradeHistory && window.__settradeHistory.ok && window.__settradeHistory.count > 0))();
+    expected: true
+
+cleanup:
+  - action: close_session
+    description: Close the PlayLive browser session

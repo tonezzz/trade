@@ -155,3 +155,8 @@ presets:
     label: SETTRADE Symbol Quote
     description: Extract a Thai stock quote page from SETTRADE (default PTT) as a structured JSON snapshot.
     file: config/ssot/ssot.playlive.preset.settrade-symbol-quote.yml
+
+  - id: settrade-symbol-history
+    label: SETTRADE Symbol History
+    description: Extract the latest daily OHLC historical trading records for a Thai stock from SETTRADE (default BANPU) as a structured JSON array.
+    file: config/ssot/ssot.playlive.preset.settrade-symbol-history.yml
