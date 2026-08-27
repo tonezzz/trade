@@ -1,7 +1,7 @@
 title: Trade Project Health Check Configuration
 subtitle: Health check endpoints and monitoring for trade services
 icon: 🏥
-version: 3
+version: 4
 
 sections:
   - title: Services
@@ -29,9 +29,9 @@ services:
     expected_state: running
     timeout: 10
     category: api
-    url: http://localhost:9002/api/health
+    url: http://localhost:8080/apps/trade/api/health
     expected_status: 200
-    note: Podman container on tony-dell, PostgreSQL database (dollar_prices), exposed on host 127.0.0.1:9002, updated 2026-08-17
+    note: Podman container on tony-dell, PostgreSQL database (dollar_prices), exposed on host 0.0.0.0:9002->9000/tcp; health check via Caddy on port 8080 (localhost:9002 is not reachable from tony-dell shell, use 8080), updated 2026-08-27
 
   # Trade Automation Service
   - id: trade-automation
@@ -41,7 +41,7 @@ services:
     expected_state: running
     timeout: 10
     category: api
-    note: Podman container on tony-dell, data update scheduler, PostgreSQL (dollar_prices), disabled HTTP healthcheck, updated 2026-08-17
+    note: Podman container on tony-dell, data update scheduler, PostgreSQL (dollar_prices), disabled HTTP healthcheck, 14 jobs scheduled, catch-up 8/8 successful, DataQualityAgent 100% validation success, updated 2026-08-27
 
   # Database Health (PostgreSQL)
   - id: trade-database
@@ -62,14 +62,14 @@ recovery_actions:
   http_error: "Check if service is running: `podman ps`, Check service logs for errors, Verify port is accessible: `curl -v <url>`, Restart service if needed"
   database_missing: "Check if database file exists: `ls -la data/dollar_prices.db`, Restore from backup if needed, Reinitialize database: `python scripts/setup_database.py`"
   dns_resolution: "FRED API has DNS issues in containers, use Alpha Vantage API instead, Check network connectivity: `podman exec <container> python -c 'import socket; print(socket.gethostbyname(\"google.com\"))'`"
-  data_freshness: "THB latest 2026-08-14 (3 days stale, tolerance 2 days), DXY latest 2026-08-07 (7 days old, within 30-day tolerance), commodity_prices has only 1 row (GOLD 2026-08-12), other currencies (JPY, CAD, CHF, AUD, NZD) missing Aug 8-14, Thai holiday gap Aug 8-11 is expected behavior, automation scheduler has 14 jobs but most have never run"
+  data_freshness: "As of 2026-08-27: THB latest 2026-08-26 (fresh), DXY latest 2026-08-21 (6 days old, acceptable), commodity_prices latest 2026-08-27 (fresh, GOLD 4615.45). All 6 currencies (AUD, CAD, CHF, JPY, NZD, THB) current. Automation 14 jobs scheduled, catch-up 8/8 successful, DataQualityAgent 100% validation. Known issues: 5 dates in May 2025 with incomplete currency coverage, COPPER 222/OIL 52/NATURAL_GAS 85 potential outliers, GOLD only 2 records (spot-only), SILVER only 1 record"
 
 # Testing and debugging guidance
 debugging_guidance:
   local_testing:
-    - Use direct localhost URLs for local testing
-    - "Test API endpoints: `curl http://localhost:9002/api/health`"
-    - "Check data quality: `curl http://localhost:9002/api/data_quality`"
+    - Use Caddy-proxied URLs on port 8080 (localhost:9002 is not reachable from tony-dell shell)
+    - "Test API endpoints: `curl http://localhost:8080/apps/trade/api/health`"
+    - "Check data quality: `curl http://localhost:8080/apps/trade/api/data_quality`"
     - "Check container logs: `podman logs -f trade-api`"
     - "Verify database connectivity: `podman exec trade-api python -c \"from src.database import get_db; print('DB OK')\"`"
 
@@ -81,9 +81,9 @@ debugging_guidance:
     - 'Test data import: `podman exec trade-api python -c "from src.importer import DataImporter; from src.database import get_db; ..."`'
 
   data_validation:
-    - 'Check data quality: `curl http://localhost:9002/api/data_quality`'
-    - 'Verify THB data: `curl http://localhost:9002/api/exchange_rates/THB`'
-    - 'Check commodity data: `curl http://localhost:9002/api/commodity_prices/COPPER`'
+    - 'Check data quality: `curl http://localhost:8080/apps/trade/api/data_quality`'
+    - 'Verify THB data: `curl http://localhost:8080/apps/trade/api/exchange_rates/THB`'
+    - 'Check commodity data: `curl http://localhost:8080/apps/trade/api/commodity_prices/COPPER`'
     - 'Run manual data update: `python download_data.py format_alpha_vantage_commodity`'
     - 'Note: OIL outlier threshold is 100% (vs 50%) due to high volatility'
     - 'Run freshness monitor: `podman exec trade-api python scripts/data_freshness_monitor.py`'
@@ -91,18 +91,21 @@ debugging_guidance:
 # Data source configuration notes
 # See config/ssot/ssot.data.yml for the authoritative data source configuration.
 data_sources:
-  thb: "open.er-api.com (primary), exchangerate-api.com (fallback), current as of 2026-08-14, Thai holiday gap Aug 8-11 is expected behavior"
-  dxy: "FRED API (DTWEXBGS series), no Alpha Vantage support, latest 2026-07-31"
-  commodities: "Alpha Vantage API (WTI, BRENT, COPPER, NATURAL_GAS monthly data) - WHEAT/CORN removed 2026-08-10"
-  currencies: "FRED API (JPY, CAD, CHF, AUD, NZD), validated against open.er-api.com / exchangerate-api.com"
-  precious_metals: "GitHub datasets (GOLD/XAU, SILVER/XAG) with Minted Metal validation and MetalPrices fallback"
+  thb: "open.er-api.com (primary), exchangerate-api.com (fallback), Frankfurter ECB spot (daily), current as of 2026-08-26, rate 32.745"
+  dxy: "FRED API (DTWEXBGS series), no Alpha Vantage support, latest 2026-08-21, value 118.0628"
+  commodities: "Alpha Vantage API (WTI, BRENT, COPPER, NATURAL_GAS monthly data) - WHEAT/CORN removed 2026-08-10, OIL latest 2026-08-27"
+  currencies: "FRED API (JPY, CAD, CHF, AUD, NZD), validated against open.er-api.com / exchangerate-api.com, all current as of 2026-08-26"
+  precious_metals: "GitHub datasets (GOLD/XAU, SILVER/XAG) with Minted Metal validation and MetalPrices fallback; GOLD has only 2 records (spot-only, no historical series), SILVER has only 1 record"
   ohlc_policy: "Only real OHLC data shown in charts - no estimated/fallback values, records without proper OHLC are excluded from chart display"
 
 # Recent changes and fixes
 recent_changes:
+  - date: 2026-08-27
+    description: "Full system assessment: API healthy (all 6 checks pass), automation 14 jobs running with 8/8 catch-up success, DataQualityAgent 100% validation. Data is fresh: THB 2026-08-26, DXY 2026-08-21, commodities 2026-08-27. Known issues: 5 May 2025 dates with incomplete currency coverage, commodity outlier counts (COPPER 222, OIL 52, NATURAL_GAS 85), GOLD/SILVER spot-only (2 and 1 records). Health check URL changed from localhost:9002 to localhost:8080 (9002 not reachable from tony-dell shell)."
+    impact: "SSOT now reflects actual healthy state; previous stale data_freshness guidance from 2026-08-17 replaced"
   - date: 2026-08-17
-    description: "Verified trade services run on tony-dell via Podman on port 9002; data is unhealthy (THB stale, commodity_prices has 1 row, many jobs never run)"
-    impact: "Updated health check endpoint to :9002 and documented current data freshness recovery guidance"
+    description: "Verified trade services run on tony-dell via Podman on port 9002; data was unhealthy (THB stale, commodity_prices had 1 row, many jobs never run)"
+    impact: "Updated health check endpoint to :9002 and documented data freshness recovery guidance (now superseded by 2026-08-27 entry)"
   - date: 2026-08-14
     description: "Fixed scheduler data source lookup (job_id vs job.name), implemented OHLC filtering to prevent estimated values in charts, documented Thai holiday data gap as expected behavior"
     impact: "Charts now show only real OHLC data, automation working correctly, data gaps properly documented"
