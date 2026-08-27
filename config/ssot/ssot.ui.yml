@@ -176,8 +176,8 @@ data_policy:
   
 # API configuration
 api:
-  base_url: "http://100.75.102.88:9000"
-  chart_endpoint: "/api/ui/chart-data/{symbol}?timeframe={timeframe}"
+  base_url: "http://100.68.142.13:8080"
+  chart_endpoint: "/apps/trade/api/ui/chart-data/{symbol}?timeframe={timeframe}"
   available_symbols:
     currencies: ["THB", "EUR", "GBP", "JPY", "CAD", "CHF", "AUD", "NZD"]
     commodities: ["GOLD", "SILVER", "OIL", "WTI", "BRENT", "COPPER", "NATURAL_GAS"]

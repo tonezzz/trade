@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Trade API FastAPI backend has been successfully deployed to the web server at `http://tony-omen.local:8080/apps/trade/api`. The deployment uses Docker containers integrated with the existing Caddy reverse proxy infrastructure.
+The Trade API FastAPI backend has been successfully deployed to the web server at `http://100.68.142.13:8080/apps/trade/api`. The deployment uses Docker containers integrated with the existing Caddy reverse proxy infrastructure.
 
 ## Database Setup
 
@@ -41,9 +41,9 @@ This replaces the manual database setup process and provides a user-friendly gui
 
 ### Deployment Method
 
-**Option A: Docker Container (Implemented)** ✅
+**Option A: Docker Container (Implemented)** 
 
-The FastAPI application is deployed as a Docker container within the existing web stack. This approach was chosen because:
+The FastAPI application is deployed as a Docker container within the existing tony-dell web stack. This approach was chosen because:
 - Consistent with existing infrastructure (all other services use Docker)
 - Easy to manage and scale
 - Integrated with existing Docker Compose setup
@@ -113,35 +113,35 @@ handle_path /apps/trade/api/* {
 
 ### API Endpoints
 
-- **API Root**: `http://tony-omen.local:8080/apps/trade/api`
-- **Health Check**: `http://tony-omen.local:8080/apps/trade/api/api/health`
-- **Swagger UI**: `http://tony-omen.local:8080/apps/trade/api/docs`
-- **ReDoc**: `http://tony-omen.local:8080/apps/trade/api/redoc`
-- **OpenAPI Schema**: `http://tony-omen.local:8080/apps/trade/api/openapi.json`
+- **API Root**: `http://100.68.142.13:8080/apps/trade/api`
+- **Health Check**: `http://100.68.142.13:8080/apps/trade/api/api/health`
+- **Swagger UI**: `http://100.68.142.13:8080/apps/trade/api/docs`
+- **ReDoc**: `http://100.68.142.13:8080/apps/trade/api/redoc`
+- **OpenAPI Schema**: `http://100.68.142.13:8080/apps/trade/api/openapi.json`
 
 ### Example API Calls
 
 ```bash
 # Root endpoint
-curl http://tony-omen.local:8080/apps/trade/api/
+curl http://100.68.142.13:8080/apps/trade/api/
 
 # Health check
-curl http://tony-omen.local:8080/apps/trade/api/api/health
+curl http://100.68.142.13:8080/apps/trade/api/api/health
 
 # Available currencies
-curl http://tony-omen.local:8080/apps/trade/api/api/available/currencies
+curl http://100.68.142.13:8080/apps/trade/api/api/available/currencies
 
 # Available commodities
-curl http://tony-omen.local:8080/apps/trade/api/api/available/commodities
+curl http://100.68.142.13:8080/apps/trade/api/api/available/commodities
 
 # Exchange rates for EUR (paginated)
-curl "http://tony-omen.local:8080/apps/trade/api/api/exchange_rates/EUR?limit=5"
+curl "http://100.68.142.13:8080/apps/trade/api/api/exchange_rates/EUR?limit=5"
 
 # Dollar index data
-curl "http://tony-omen.local:8080/apps/trade/api/api/dollar_index?limit=5"
+curl "http://100.68.142.13:8080/apps/trade/api/api/dollar_index?limit=5"
 
 # Commodity prices
-curl "http://tony-omen.local:8080/apps/trade/api/api/commodity_prices/OIL?limit=5"
+curl "http://100.68.142.13:8080/apps/trade/api/api/commodity_prices/OIL?limit=5"
 ```
 
 ## Management
@@ -211,7 +211,7 @@ docker exec web caddy reload --config /etc/caddy/Caddyfile
 ### ✅ Health Check
 
 ```bash
-curl http://tony-omen.local:8080/apps/trade/api/api/health
+curl http://100.68.142.13:8080/apps/trade/api/api/health
 ```
 
 Response:
@@ -246,7 +246,7 @@ Successfully retrieved data from the database:
 
 ### ✅ Swagger UI
 
-Swagger UI is accessible at `http://tony-omen.local:8080/apps/trade/api/docs` and returns HTTP 200.
+Swagger UI is accessible at `http://100.68.142.13:8080/apps/trade/api/docs` and returns HTTP 200.
 
 ## Database Configuration
 
@@ -372,4 +372,4 @@ The Trade API has been successfully deployed using Docker containers integrated 
 - ✅ Consistent configuration management
 - ✅ Simple deployment and update process
 
-The API is now accessible at `http://tony-omen.local:8080/apps/trade/api` with full Swagger UI documentation available at `/docs`.
+The API is now accessible at `http://100.68.142.13:8080/apps/trade/api` with full Swagger UI documentation available at `/docs`.

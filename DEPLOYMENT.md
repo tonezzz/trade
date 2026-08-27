@@ -11,14 +11,14 @@ TradeCanvas UI is a web-based trading interface that serves static files through
 - **Contains**: All source files including development-only files (NAVIGATION.md, ssot.ui.yml)
 
 ### Production Location
-- **Path**: `/home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui/`
+- **Path**: `/home/tony/CascadeProjects/chaba-tony-dell/stacks/web/public/apps/trade/tradecanvas-ui/`
 - **Purpose**: Production directory served by Caddy web server
 - **Mapped to**: Docker volume at `/srv/public/apps/trade/tradecanvas-ui/`
-- **URL**: `http://tony-omen.local:8080/apps/trade/tradecanvas-ui/`
+- **URL**: `http://100.68.142.13:8080/apps/trade/tradecanvas-ui/`
 
 ### Web Server Configuration
 - **Server**: Caddy running in Docker container
-- **Config File**: `/home/tony/CascadeProjects/chaba/stacks/web/Caddyfile`
+- **Config File**: `/home/tony/CascadeProjects/chaba-tony-dell/stacks/web/Caddyfile`
 - **Port**: 8080
 - **Routing Rule**: 
   ```
@@ -53,10 +53,10 @@ Development-only files that should not be deployed:
 ```bash
 # Copy individual files
 cp /home/tony/CascadeProjects/trade/tradecanvas-ui/app.js \
-   /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui/
+   /home/tony/CascadeProjects/chaba-tony-dell/stacks/web/public/apps/trade/tradecanvas-ui/
 
 # Fix permissions
-sudo chown tony:tony /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui/*
+sudo chown tony:tony /home/tony/CascadeProjects/chaba-tony-dell/stacks/web/public/apps/trade/tradecanvas-ui/*
 ```
 
 #### Automated Sync Script
@@ -75,7 +75,7 @@ The script:
 ```bash
 rsync -av --exclude='NAVIGATION.md' --exclude='ssot.ui.yml' \
   /home/tony/CascadeProjects/trade/tradecanvas-ui/ \
-  /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui/
+  /home/tony/CascadeProjects/chaba-tony-dell/stacks/web/public/apps/trade/tradecanvas-ui/
 ```
 
 ## Verification
@@ -83,25 +83,25 @@ rsync -av --exclude='NAVIGATION.md' --exclude='ssot.ui.yml' \
 ### Test URL Accessibility
 ```bash
 # Test main page
-curl -I http://tony-omen.local:8080/apps/trade/tradecanvas-ui/
+curl -I http://100.68.142.13:8080/apps/trade/tradecanvas-ui/
 
 # Test specific files
-curl -I http://tony-omen.local:8080/apps/trade/tradecanvas-ui/compare.html
-curl -I http://tony-omen.local:8080/apps/trade/tradecanvas-ui/app.js
+curl -I http://100.68.142.13:8080/apps/trade/tradecanvas-ui/compare.html
+curl -I http://100.68.142.13:8080/apps/trade/tradecanvas-ui/app.js
 ```
 
 ### Check File Contents
 ```bash
 # Compare development vs production
 diff /home/tony/CascadeProjects/trade/tradecanvas-ui/compare.html \
-     /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui/compare.html
+     /home/tony/CascadeProjects/chaba-tony-dell/stacks/web/public/apps/trade/tradecanvas-ui/compare.html
 ```
 
 ### Browser Testing
 Open the following URLs in a browser:
-- `http://tony-omen.local:8080/apps/trade/tradecanvas-ui/`
-- `http://tony-omen.local:8080/apps/trade/tradecanvas-ui/compare.html`
-- `http://tony-omen.local:8080/apps/trade/tradecanvas-ui/test.html`
+- `http://100.68.142.13:8080/apps/trade/tradecanvas-ui/`
+- `http://100.68.142.13:8080/apps/trade/tradecanvas-ui/compare.html`
+- `http://100.68.142.13:8080/apps/trade/tradecanvas-ui/test.html`
 
 ## Troubleshooting
 
@@ -120,11 +120,11 @@ Open the following URLs in a browser:
 **Solutions**:
 ```bash
 # Fix ownership
-sudo chown -R tony:tony /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui/
+sudo chown -R tony:tony /home/tony/CascadeProjects/chaba-tony-dell/stacks/web/public/apps/trade/tradecanvas-ui/
 
 # Fix permissions
-chmod -R 644 /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui/*
-chmod 755 /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui
+chmod -R 644 /home/tony/CascadeProjects/chaba-tony-dell/stacks/web/public/apps/trade/tradecanvas-ui/*
+chmod 755 /home/tony/CascadeProjects/chaba-tony-dell/stacks/web/public/apps/trade/tradecanvas-ui
 ```
 
 ### Outdated Files
@@ -149,7 +149,7 @@ chmod 755 /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecan
 1. Make changes in `/home/tony/CascadeProjects/trade/tradecanvas-ui/`
 2. Test locally by opening files directly in browser
 3. Run sync script: `./sync-tradecanvas-ui.sh`
-4. Verify deployment: `curl -I http://tony-omen.local:8080/apps/trade/tradecanvas-ui/`
+4. Verify deployment: `curl -I http://100.68.142.13:8080/apps/trade/tradecanvas-ui/`
 5. Test in browser at production URL
 
 ### Pre-Deployment Checklist
@@ -176,7 +176,7 @@ Consider using symbolic links instead of copying files:
 ```bash
 # Create symbolic link (experimental)
 ln -s /home/tony/CascadeProjects/trade/tradecanvas-ui/app.js \
-      /home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui/app.js
+      /home/tony/CascadeProjects/chaba-tony-dell/stacks/web/public/apps/trade/tradecanvas-ui/app.js
 ```
 
 **Pros**: Changes immediately reflected, no sync needed
@@ -184,7 +184,7 @@ ln -s /home/tony/CascadeProjects/trade/tradecanvas-ui/app.js \
 
 ## Related Documentation
 - [Deployment Sync Skill](.devin/skills/deployment-sync/SKILL.md) - Automated deployment investigation and sync
-- [Caddy Configuration](/home/tony/CascadeProjects/chaba/stacks/web/Caddyfile) - Web server routing rules
+- [Caddy Configuration](/home/tony/CascadeProjects/chaba-tony-dell/stacks/web/Caddyfile) - Web server routing rules
 - [AGENTS.md](AGENTS.md) - Sub-agent usage guidelines
 
 ## Support
