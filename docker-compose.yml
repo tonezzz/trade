@@ -23,13 +23,16 @@ services:
       - web_default
     depends_on:
       - postgres
-    restart: unless-stopped
+    restart: "no"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  # NOTE 2026-08-27: the trade stack now runs on tony-dell (rootless podman).
+  # This docker-compose is kept for reference and local development only.
 
   postgres:
     image: postgres:16-alpine
@@ -44,7 +47,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - web_default
-    restart: unless-stopped
+    restart: "no"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-chaba} -d ${DB_NAME:-trade}"]
       interval: 10s
@@ -73,7 +76,7 @@ services:
       - web_default
     depends_on:
       - trade-api
-    restart: unless-stopped
+    restart: "no"
     healthcheck:
       disable: true
 
