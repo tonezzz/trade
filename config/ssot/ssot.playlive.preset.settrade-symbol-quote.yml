@@ -37,9 +37,11 @@ steps:
     action: eval
     description: Start from a clean browser state
     script: |
-      localStorage.clear();
-      sessionStorage.clear();
-      return 'cleared';
+      (() => {
+        try { localStorage.clear(); } catch {}
+        try { sessionStorage.clear(); } catch {}
+        return 'cleared';
+      })();
     expected: cleared
 
   - id: navigate-symbol
@@ -101,7 +103,7 @@ steps:
   - id: verify-quote
     action: eval
     description: Confirm that the symbol was extracted.
-    script: return !!(window.__settradeQuote && window.__settradeQuote.ok);
+    script: (() => !!(window.__settradeQuote && window.__settradeQuote.ok))();
     expected: true
 
 cleanup:

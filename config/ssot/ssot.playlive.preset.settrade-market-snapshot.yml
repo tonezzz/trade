@@ -35,9 +35,11 @@ steps:
     action: eval
     description: Start from a clean browser state
     script: |
-      localStorage.clear();
-      sessionStorage.clear();
-      return 'cleared';
+      (() => {
+        try { localStorage.clear(); } catch {}
+        try { sessionStorage.clear(); } catch {}
+        return 'cleared';
+      })();
     expected: cleared
 
   - id: navigate-market-summary
@@ -71,11 +73,11 @@ steps:
           const text = document.body.innerText || '';
           output.raw = text.substring(0, 4000);
 
-          const statusMatch = text.match(/สถานะ\s+([^\n]+)/);
-          if (statusMatch) output.marketStatus = statusMatch[1].trim();
+          const statusMatch = text.match(/(?:สถานะ\s*:?)\s*([^\n]+)/);
+          if (statusMatch) output.marketStatus = statusMatch[1].trim().replace(/^:\s*/, '');
 
-          const updateMatch = text.match(/ข้อมูลล่าสุด\s+([^\n]+)/);
-          if (updateMatch) output.lastUpdate = updateMatch[1].trim();
+          const updateMatch = text.match(/(?:ข้อมูลล่าสุด\s*:?)\s*([^\n]+)/);
+          if (updateMatch) output.lastUpdate = updateMatch[1].trim().replace(/^:\s*/, '');
 
           const indexStart = text.indexOf('ข้อมูลดัชนี');
           if (indexStart >= 0) {
@@ -88,14 +90,16 @@ steps:
             const section = text.slice(indexStart, end > 0 ? end : undefined);
             const known = [
               'SET', 'SET50', 'SET50FF', 'SET100', 'SET100FF', 'sSET',
-              'SETCLMV', 'SETHD', 'SETESG', 'SETWB', 'SET TRI', 'FTSE SET Index Series'
+              'SETCLMV', 'SETHD', 'SETESG', 'SETWB', 'mai', 'SET TRI'
             ];
-            const lines = section.split('\n').map(l => l.trim()).filter(Boolean);
-            for (const line of lines) {
-              const name = known.find(k => line.startsWith(k));
-              if (name) {
-                const tokens = line.replace(/,/g, '').split(/\s+/).filter(Boolean);
-                output.indices.push({ name: tokens[0], values: tokens.slice(1) });
+            const tokens = section.split(/\s+/).map(t => t.trim()).filter(Boolean);
+            let current = null;
+            for (const tok of tokens) {
+              if (known.includes(tok)) {
+                current = { name: tok, values: [] };
+                output.indices.push(current);
+              } else if (current) {
+                current.values.push(tok.replace(/,/g, ''));
               }
             }
           }
@@ -120,7 +124,7 @@ steps:
   - id: verify-snapshot
     action: eval
     description: Confirm that at least one index was extracted.
-    script: return !!(window.__settradeSnapshot && window.__settradeSnapshot.ok);
+    script: (() => !!(window.__settradeSnapshot && window.__settradeSnapshot.ok))();
     expected: true
 
 cleanup:
