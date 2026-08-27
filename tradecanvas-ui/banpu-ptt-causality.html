@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANPU + PTT Causality</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html" class="nav-link">TradeCanvas</a></li>
+                <li class="nav-item"><a href="settrade-research.html" class="nav-link">SETTRADE Research</a></li>
+                <li class="nav-item"><a href="banpu-ptt-sma.html" class="nav-link">SMA</a></li>
+                <li class="nav-item"><a href="banpu-ptt-rsi.html" class="nav-link">RSI</a></li>
+                <li class="nav-item"><a href="banpu-ptt-compare.html" class="nav-link">Compare</a></li>
+                <li class="nav-item"><a href="banpu-ptt-causality.html" class="nav-link active">Causality</a></li>
+                <li class="nav-item"><a href="thb-atr.html" class="nav-link">THB ATR</a></li>
+                <li class="nav-item"><a href="/apps/gold/conclusion.html" class="nav-link">Gold/THB Research</a></li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <h1>BANPU + PTT Causality / Lead-Lag</h1>
+            <div class="header-controls">
+                <span id="status" class="status disconnected">Loading...</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Summary</h3>
+                <p class="info-text" id="summary-text"></p>
+            </section>
+
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Cross-Correlation of Daily Returns</h3>
+                <p class="info-text">Positive lag = BANPU leads PTT. Negative lag = PTT leads BANPU.</p>
+                <div class="table-wrapper" style="overflow-x: auto;">
+                    <table class="data-table" id="cross-table">
+                        <thead>
+                            <tr><th>Lag</th><th>Correlation</th></tr>
+                        </thead>
+                        <tbody id="cross-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Granger-Like Predictive Regressions</h3>
+                <p class="info-text">Does adding the other symbol's lagged return improve R² of an AR(1) model?</p>
+                <div class="table-wrapper" style="overflow-x: auto;">
+                    <table class="data-table" id="granger-table">
+                        <thead>
+                            <tr><th>Direction</th><th>R² baseline</th><th>R² with lag</th><th>Improvement</th><th>F score</th></tr>
+                        </thead>
+                        <tbody id="granger-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="raw-data" style="margin-top: 2rem;">
+                <h3>Raw Data</h3>
+                <p class="info-text">Full JSON: <a href="data/banpu_ptt_causality.json" target="_blank">data/banpu_ptt_causality.json</a>.</p>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        async function loadData() {
+            const statusEl = document.getElementById('status');
+            try {
+                const res = await fetch('data/banpu_ptt_causality.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const d = await res.json();
+
+                document.getElementById('summary-text').textContent =
+                    `Period: ${d.start_date} → ${d.end_date}, ${d.n_observations} daily return observations. ` +
+                    `Same-day correlation is ${d.summary.strongest_overall_correlation} at lag ${d.summary.strongest_overall_lag}. ` +
+                    `${d.summary.conclusion}.`;
+
+                const crossBody = document.getElementById('cross-body');
+                d.cross_correlations.forEach(c => {
+                    const tr = document.createElement('tr');
+                    const strong = Math.abs(c.correlation) >= 0.05 ? 'style="font-weight: bold; color: #f1c40f;"' : '';
+                    tr.innerHTML = `<td>${c.lag}</td><td ${strong}>${c.correlation}</td>`;
+                    crossBody.appendChild(tr);
+                });
+
+                const grangerBody = document.getElementById('granger-body');
+                d.granger_like.forEach(g => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${g.direction}</td>
+                        <td>${g.r2_baseline}</td>
+                        <td>${g.r2_with_lag}</td>
+                        <td>${g.improvement}</td>
+                        <td>${g.f_score}</td>
+                    `;
+                    grangerBody.appendChild(tr);
+                });
+
+                statusEl.textContent = 'Loaded';
+                statusEl.classList.remove('disconnected');
+                statusEl.classList.add('connected');
+            } catch (e) {
+                statusEl.textContent = 'Error: ' + e.message;
+                statusEl.classList.add('error');
+                console.error(e);
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+{
+  "analysis": "lead_lag_cross_correlation",
+  "start_date": "2023-08-29",
+  "end_date": "2026-08-26",
+  "n_observations": 714,
+  "cross_correlations": [
+    {
+      "lag": -10,
+      "correlation": 0.0049
+    },
+    {
+      "lag": -9,
+      "correlation": -0.0224
+    },
+    {
+      "lag": -8,
+      "correlation": -0.0166
+    },
+    {
+      "lag": -7,
+      "correlation": 0.0064
+    },
+    {
+      "lag": -6,
+      "correlation": -0.0037
+    },
+    {
+      "lag": -5,
+      "correlation": 0.0049
+    },
+    {
+      "lag": -4,
+      "correlation": 0.0269
+    },
+    {
+      "lag": -3,
+      "correlation": -0.0803
+    },
+    {
+      "lag": -2,
+      "correlation": -0.0013
+    },
+    {
+      "lag": -1,
+      "correlation": 0.0124
+    },
+    {
+      "lag": 0,
+      "correlation": 0.1878
+    },
+    {
+      "lag": 1,
+      "correlation": -0.0216
+    },
+    {
+      "lag": 2,
+      "correlation": 0.0029
+    },
+    {
+      "lag": 3,
+      "correlation": -0.0179
+    },
+    {
+      "lag": 4,
+      "correlation": 0.0089
+    },
+    {
+      "lag": 5,
+      "correlation": 0.0239
+    },
+    {
+      "lag": 6,
+      "correlation": 0.0288
+    },
+    {
+      "lag": 7,
+      "correlation": 0.0086
+    },
+    {
+      "lag": 8,
+      "correlation": -0.0111
+    },
+    {
+      "lag": 9,
+      "correlation": 0.0109
+    },
+    {
+      "lag": 10,
+      "correlation": 0.009
+    }
+  ],
+  "granger_like": [
+    {
+      "direction": "BANPU(t-1) -> PTT(t)",
+      "r2_baseline": 0.0008,
+      "r2_with_lag": 0.001,
+      "improvement": 0.0002,
+      "f_score": 0.1536,
+      "n": 713
+    },
+    {
+      "direction": "PTT(t-1) -> BANPU(t)",
+      "r2_baseline": 0.0005,
+      "r2_with_lag": 0.0005,
+      "improvement": 0.0,
+      "f_score": 0.0355,
+      "n": 713
+    }
+  ],
+  "summary": {
+    "strongest_overall_lag": 0,
+    "strongest_overall_correlation": 0.1878,
+    "best_banpu_leads_ptt": {
+      "lag": 6,
+      "correlation": 0.0288
+    },
+    "best_ptt_leads_banpu": {
+      "lag": -3,
+      "correlation": -0.0803
+    },
+    "conclusion": "PTT appears to lead BANPU"
+  }
+}
