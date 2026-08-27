@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANPU + PTT Strategy Comparison</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html" class="nav-link">TradeCanvas</a></li>
+                <li class="nav-item"><a href="settrade-research.html" class="nav-link">SETTRADE Research</a></li>
+                <li class="nav-item"><a href="banpu-ptt-sma.html" class="nav-link">SMA</a></li>
+                <li class="nav-item"><a href="banpu-ptt-rsi.html" class="nav-link">RSI</a></li>
+                <li class="nav-item"><a href="banpu-ptt-rsi-costs.html" class="nav-link">RSI+Costs</a></li>
+                <li class="nav-item"><a href="banpu-ptt-momentum.html" class="nav-link">Momentum</a></li>
+                <li class="nav-item"><a href="banpu-ptt-compare.html" class="nav-link active">Compare</a></li>
+                <li class="nav-item"><a href="thb-atr.html" class="nav-link">THB ATR</a></li>
+                <li class="nav-item"><a href="/apps/gold/conclusion.html" class="nav-link">Gold/THB Research</a></li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <h1>BANPU + PTT Strategy Comparison</h1>
+            <div class="header-controls">
+                <span id="status" class="status disconnected">Loading...</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h2>Combined Equity Curves</h2>
+                </div>
+                <div id="compare-chart" class="chart-container"></div>
+            </div>
+
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Performance Summary</h3>
+                <div class="table-wrapper" style="overflow-x: auto;">
+                    <table class="data-table" id="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Strategy</th>
+                                <th>Return</th>
+                                <th>Buy/Hold</th>
+                                <th>Max DD</th>
+                                <th>Trades</th>
+                                <th>Start</th>
+                                <th>End</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="raw-data" style="margin-top: 2rem;">
+                <h3>Raw Data</h3>
+                <p class="info-text">
+                    <a href="data/banpu_ptt_sma.json" target="_blank">SMA</a> |
+                    <a href="data/banpu_ptt_rsi.json" target="_blank">RSI</a> |
+                    <a href="data/banpu_ptt_rsi_costs.json" target="_blank">RSI+Costs</a> |
+                    <a href="data/banpu_ptt_momentum.json" target="_blank">Momentum</a>
+                </p>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const files = [
+            { name: 'SMA 20/50', file: 'data/banpu_ptt_sma.json', color: '#2962FF' },
+            { name: 'RSI 14/30/70', file: 'data/banpu_ptt_rsi.json', color: '#26a69a' },
+            { name: 'RSI 14/25/65 + costs', file: 'data/banpu_ptt_rsi_costs.json', color: '#f1c40f' },
+            { name: 'Momentum 20', file: 'data/banpu_ptt_momentum.json', color: '#ef5350' },
+        ];
+
+        function getVal(data, key, alt) {
+            return data.stats[key] !== undefined ? data.stats[key] : (alt !== undefined ? data.stats[alt] : '-');
+        }
+
+        async function loadAll() {
+            const statusEl = document.getElementById('status');
+            try {
+                const loaded = await Promise.all(files.map(async f => {
+                    const res = await fetch(f.file);
+                    if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + f.file);
+                    const data = await res.json();
+                    return { ...f, data };
+                }));
+
+                const allDates = new Set();
+                loaded.forEach(item => {
+                    item.data.combined_series.forEach(r => allDates.add(r.date));
+                });
+
+                const container = document.getElementById('compare-chart');
+                const chart = LightweightCharts.createChart(container, {
+                    width: container.clientWidth,
+                    height: 500,
+                    layout: { background: { color: '#1a1a2e' }, textColor: '#e0e0e0' },
+                    grid: { vertLines: { color: '#2a2a3e' }, horzLines: { color: '#2a2a3e' } },
+                    rightPriceScale: { borderColor: '#2a2a3e' },
+                    timeScale: { borderColor: '#2a2a3e' }
+                });
+
+                loaded.forEach(item => {
+                    const s = chart.addLineSeries({ title: item.name, color: item.color, lineWidth: 2 });
+                    const data = item.data.combined_series.map(r => ({
+                        time: r.date,
+                        value: r.combined_equity !== undefined ? r.combined_equity : r.equity
+                    }));
+                    s.setData(data);
+                });
+                chart.timeScale().fitContent();
+
+                const tbody = document.getElementById('summary-body');
+                tbody.innerHTML = '';
+                loaded.forEach(item => {
+                    const d = item.data;
+                    const ret = getVal(d, 'combined_total_return_pct', 'total_return_pct');
+                    const bh = getVal(d, 'combined_buyhold_return_pct', 'buyhold_return_pct');
+                    const dd = getVal(d, 'combined_max_drawdown_pct', 'max_drawdown_pct');
+                    const trades = getVal(d, 'combined_trade_count', 'switches');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.name}</td>
+                        <td>${ret}%</td>
+                        <td>${bh}%</td>
+                        <td>${dd}%</td>
+                        <td>${trades}</td>
+                        <td>${d.start_date}</td>
+                        <td>${d.end_date}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                window.addEventListener('resize', () => chart.resize(container.clientWidth, 500));
+
+                statusEl.textContent = 'Loaded';
+                statusEl.classList.remove('disconnected');
+                statusEl.classList.add('connected');
+            } catch (e) {
+                statusEl.textContent = 'Error: ' + e.message;
+                statusEl.classList.add('error');
+                console.error(e);
+            }
+        }
+
+        loadAll();
+    </script>
+</body>
+</html>
