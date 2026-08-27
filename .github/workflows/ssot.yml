@@ -1,0 +1,38 @@
+name: SSOT CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'config/ssot/**'
+      - 'scripts/ssot-validate.py'
+      - 'scripts/validate-*.sh'
+      - '.github/workflows/ssot.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'config/ssot/**'
+      - 'scripts/ssot-validate.py'
+      - 'scripts/validate-*.sh'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Validate all Trade SSOT files
+        run: python3 scripts/ssot-validate.py
+
+      - name: Validate UI SSOT wiring
+        run: bash scripts/validate-ui-ssot.sh
