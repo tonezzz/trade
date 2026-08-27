@@ -1,0 +1,57 @@
+title: SET / OR / TH exploration
+subtitle: Fetch and compare Thai equity indexes/stocks via settrade-v2
+icon: experiment
+
+planning:
+  goal: |
+    Use the settrade-v2 SDK to fetch daily 1D candles for SET (index), OR
+    (PTT Oil and Retail), and TH (Thai Airways). Explore the data as possible
+    additional features or benchmarks for the THB-basis gold/USD research.
+  scope: |
+    - Fetch 1D OHLCV for SET, OR, and TH.
+    - Store JSON files in tradecanvas-ui/data/.
+    - Document the fetch result, date range, and first/last close.
+  out_of_scope: |
+    - Live trading.
+    - Backtests using these series (for now).
+
+processing:
+  status: completed
+  completed_at: '2026-08-27'
+  notes: |
+    Fetched data using scripts/settrade_v2_extract.py with the stored
+    settrade-v2 credentials.
+
+fetched:
+  - symbol: SET
+    path: tradecanvas-ui/data/set_history.json
+    sessions: 725
+    first: '2023-08-28'
+    last: '2026-08-26'
+    first_close: 1562.97
+    last_close: 1513.96
+  - symbol: OR
+    path: tradecanvas-ui/data/or_history.json
+    sessions: 725
+    first: '2023-08-28'
+    last: '2026-08-26'
+    first_close: 20.9
+    last_close: 13.0
+  - symbol: TH
+    path: tradecanvas-ui/data/th_history.json
+    sessions: 724
+    first: '2023-08-28'
+    last: '2026-08-21'
+    first_close: 1.62
+    last_close: 0.45
+
+report:
+  status: completed
+  summary: |
+    Successfully retrieved ~725 daily sessions for SET, OR, and TH. The data
+    can now be used as additional Thai-market benchmarks or features in the
+    THB-basis research.
+
+references:
+  - scripts/settrade_v2_extract.py
+  - ~/.config/devin/credentials/settrade-v2.json
