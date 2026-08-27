@@ -65,14 +65,95 @@
                 </div>
             </section>
 
+            <section class="chart-section" style="margin-top: 2rem;">
+                <div class="chart-header">
+                    <h2 id="gold-chart-title">Gold/THB Research — THB+XAG Equity</h2>
+                    <div class="chart-info">
+                        <span id="gold-record-count">--</span>
+                        <span id="gold-date-range">--</span>
+                    </div>
+                </div>
+                <div id="gold-thb-chart" class="chart-container"></div>
+            </section>
+
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Strategy Metrics</h3>
+                <table class="data-table" id="gold-metrics-table">
+                    <thead>
+                        <tr><th>Metric</th><th>Value</th></tr>
+                    </thead>
+                    <tbody id="gold-metrics-body"></tbody>
+                </table>
+            </section>
+
             <section class="raw-data" style="margin-top: 2rem;">
-                <h3>Raw JSON</h3>
-                <p class="info-text">The full extracted dataset is available as <a href="data/banpu_history.json" target="_blank">data/banpu_history.json</a>.</p>
+                <h3>Raw Data</h3>
+                <p class="info-text">BANPU JSON: <a href="data/banpu_history.json" target="_blank">data/banpu_history.json</a>. Gold/THB equity CSV: <a href="data/trended_graph_knn_thb_xag_equity.csv" target="_blank">data/trended_graph_knn_thb_xag_equity.csv</a>.</p>
             </section>
         </div>
     </div>
 
     <script>
+        async function loadGoldThb() {
+            const statusEl = document.getElementById('status');
+            try {
+                const res = await fetch('data/trended_graph_knn_thb_xag_equity.csv');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const text = await res.text();
+                const lines = text.trim().split('\n');
+                const headers = lines[0].split(',');
+                const dateIdx = headers.indexOf('date');
+                const equityIdx = headers.indexOf('equity');
+                const xauIdx = headers.indexOf('xau_t1');
+
+                const rows = lines.slice(1).map(line => {
+                    const parts = line.split(',');
+                    return {
+                        date: parts[dateIdx],
+                        equity: parseFloat(parts[equityIdx]),
+                        xau_t1: parseFloat(parts[xauIdx]),
+                    };
+                }).filter(r => !isNaN(r.equity));
+
+                document.getElementById('gold-record-count').textContent = rows.length + ' days';
+                document.getElementById('gold-date-range').textContent = rows[0].date + ' → ' + rows[rows.length - 1].date;
+
+                const chart = LightweightCharts.createChart(document.getElementById('gold-thb-chart'), {
+                    width: document.getElementById('gold-thb-chart').clientWidth,
+                    height: 420,
+                    layout: { background: { color: '#1a1a2e' }, textColor: '#e0e0e0' },
+                    grid: { vertLines: { color: '#2a2a3e' }, horzLines: { color: '#2a2a3e' } },
+                    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+                    rightPriceScale: { borderColor: '#2a2a3e' },
+                    timeScale: { borderColor: '#2a2a3e' },
+                });
+
+                const strategySeries = chart.addLineSeries({ color: '#26a69a', lineWidth: 2, title: 'THB+XAG' });
+                const strategyData = rows.map(r => ({ time: r.date, value: r.equity }));
+                strategySeries.setData(strategyData);
+
+                const bhSeries = chart.addLineSeries({ color: '#7e7e8e', lineWidth: 1, title: 'Buy & hold XAU' });
+                let bh = 1.0;
+                const bhData = rows.map(r => {
+                    bh *= Math.exp(r.xau_t1);
+                    return { time: r.date, value: bh };
+                });
+                bhSeries.setData(bhData);
+
+                chart.timeScale().fitContent();
+
+                const metrics = [
+                    ['Strategy', 'THB + XAG graph+k-NN'],
+                    ['OOS days', rows.length],
+                    ['Final equity', rows[rows.length - 1].equity.toFixed(3)],
+                    ['Buy-hold final', bh.toFixed(3)],
+                ];
+                document.getElementById('gold-metrics-body').innerHTML = metrics.map(m => `<tr><td>${m[0]}</td><td>${m[1]}</td></tr>`).join('');
+            } catch (e) {
+                console.error('Gold/THB chart error:', e);
+            }
+        }
+
         async function loadBanpu() {
             const statusEl = document.getElementById('status');
             try {
@@ -168,6 +249,7 @@
         });
 
         loadBanpu();
+        loadGoldThb();
     </script>
 </body>
 </html>
