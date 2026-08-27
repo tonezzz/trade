@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANPU/PTT vs Gold/USD/THB Causality</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html" class="nav-link">TradeCanvas</a></li>
+                <li class="nav-item"><a href="settrade-research.html" class="nav-link">SETTRADE Research</a></li>
+                <li class="nav-item"><a href="banpu-ptt-sma.html" class="nav-link">SMA</a></li>
+                <li class="nav-item"><a href="banpu-ptt-compare.html" class="nav-link">Compare</a></li>
+                <li class="nav-item"><a href="banpu-ptt-causality.html" class="nav-link">Causality</a></li>
+                <li class="nav-item"><a href="banpu-ptt-gold-causality.html" class="nav-link active">Gold/THB/USD</a></li>
+                <li class="nav-item"><a href="thb-atr.html" class="nav-link">THB ATR</a></li>
+                <li class="nav-item"><a href="/apps/gold/conclusion.html" class="nav-link">Gold/THB Research</a></li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <h1>BANPU / PTT vs Gold / USD / THB Causality</h1>
+            <div class="header-controls">
+                <span id="status" class="status disconnected">Loading...</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Summary</h3>
+                <p class="info-text" id="summary-text"></p>
+            </section>
+
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Lead-Lag Summary (both directions)</h3>
+                <p class="info-text">
+                    Positive lag means the <em>from</em> asset leads the <em>to</em> asset.
+                    Negative lag means the <em>to</em> asset actually leads the <em>from</em> asset.
+                </p>
+                <div class="table-wrapper" style="overflow-x: auto;">
+                    <table class="data-table" id="summary-table">
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>N</th>
+                                <th>Best Lag</th>
+                                <th>Best Corr</th>
+                                <th>Granger ΔR²</th>
+                                <th>Granger F</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Cross-Correlations by Pair</h3>
+                <p class="info-text">Select a pair to see the full lagged correlation structure.</p>
+                <div class="table-wrapper" style="overflow-x: auto;">
+                    <table class="data-table" id="pair-table">
+                        <thead>
+                            <tr><th>Pair</th><th>N</th><th>Strongest Lag</th><th>Strongest Corr</th></tr>
+                        </thead>
+                        <tbody id="pair-body"></tbody>
+                    </table>
+                </div>
+                <pre id="cross-detail" style="background:#1a1a2e; padding:1rem; border-radius:0.5rem; margin-top:1rem; overflow-x:auto;"></pre>
+            </section>
+
+            <section class="raw-data" style="margin-top: 2rem;">
+                <h3>Raw Data</h3>
+                <p class="info-text">Full JSON: <a href="data/banpu_ptt_gold_causality.json" target="_blank">data/banpu_ptt_gold_causality.json</a>.</p>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        async function loadData() {
+            const statusEl = document.getElementById('status');
+            try {
+                const res = await fetch('data/banpu_ptt_gold_causality.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const d = await res.json();
+
+                document.getElementById('summary-text').textContent =
+                    `Cross-asset causality between BANPU/PTT and the gold (XAU/USD, XAU/THB) and FX (USD/THB) series. ` +
+                    `Correlations and Granger improvements are generally low; no strong leading relationship is evident.`;
+
+                const sumBody = document.getElementById('summary-body');
+                d.summary.forEach(s => {
+                    const tr = document.createElement('tr');
+                    const strong = s.best_corr !== null && Math.abs(s.best_corr) >= 0.05 ? 'style="color:#f1c40f;"' : '';
+                    tr.innerHTML = `
+                        <td>${s.from}</td>
+                        <td>${s.to}</td>
+                        <td>${s.n}</td>
+                        <td>${s.best_lag !== null ? s.best_lag : '-'}</td>
+                        <td ${strong}>${s.best_corr !== null ? s.best_corr : '-'}</td>
+                        <td>${s.granger_improvement}</td>
+                        <td>${s.granger_f}</td>
+                    `;
+                    sumBody.appendChild(tr);
+                });
+
+                const pairBody = document.getElementById('pair-body');
+                const detail = document.getElementById('cross-detail');
+                d.results.forEach((r, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${r.pair}</td>
+                        <td>${r.n_observations}</td>
+                        <td>${r.strongest_overall.lag}</td>
+                        <td>${r.strongest_overall.correlation}</td>
+                    `;
+                    tr.style.cursor = 'pointer';
+                    tr.onclick = () => {
+                        detail.textContent = JSON.stringify(r.cross_correlations, null, 2);
+                    };
+                    pairBody.appendChild(tr);
+                });
+
+                statusEl.textContent = 'Loaded';
+                statusEl.classList.remove('disconnected');
+                statusEl.classList.add('connected');
+            } catch (e) {
+                statusEl.textContent = 'Error: ' + e.message;
+                statusEl.classList.add('error');
+                console.error(e);
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1104 @@
+{
+  "analysis": "cross_asset_causality",
+  "factors": [
+    "XAU/USD",
+    "XAU/THB",
+    "USD/THB"
+  ],
+  "stocks": [
+    "BANPU",
+    "PTT"
+  ],
+  "summary": [
+    {
+      "from": "XAU/USD",
+      "to": "BANPU",
+      "n": 715,
+      "best_lag": 5,
+      "best_corr": -0.1149,
+      "granger_improvement": 0.0006,
+      "granger_f": 0.4555
+    },
+    {
+      "from": "BANPU",
+      "to": "XAU/USD",
+      "n": 715,
+      "best_lag": -3,
+      "best_corr": 0.0866,
+      "granger_improvement": 0.0002,
+      "granger_f": 0.1264
+    },
+    {
+      "from": "XAU/USD",
+      "to": "PTT",
+      "n": 723,
+      "best_lag": 2,
+      "best_corr": -0.028,
+      "granger_improvement": 0.0006,
+      "granger_f": 0.4111
+    },
+    {
+      "from": "PTT",
+      "to": "XAU/USD",
+      "n": 723,
+      "best_lag": -1,
+      "best_corr": 0.0803,
+      "granger_improvement": 0.0068,
+      "granger_f": 4.9211
+    },
+    {
+      "from": "XAU/THB",
+      "to": "BANPU",
+      "n": 715,
+      "best_lag": 4,
+      "best_corr": -0.0664,
+      "granger_improvement": 0.0005,
+      "granger_f": 0.3269
+    },
+    {
+      "from": "BANPU",
+      "to": "XAU/THB",
+      "n": 715,
+      "best_lag": -2,
+      "best_corr": -0.1262,
+      "granger_improvement": 0.0007,
+      "granger_f": 0.4675
+    },
+    {
+      "from": "XAU/THB",
+      "to": "PTT",
+      "n": 723,
+      "best_lag": 10,
+      "best_corr": -0.0797,
+      "granger_improvement": 0.0062,
+      "granger_f": 4.4848
+    },
+    {
+      "from": "PTT",
+      "to": "XAU/THB",
+      "n": 723,
+      "best_lag": -1,
+      "best_corr": 0.0423,
+      "granger_improvement": 0.0013,
+      "granger_f": 0.9073
+    },
+    {
+      "from": "USD/THB",
+      "to": "BANPU",
+      "n": 715,
+      "best_lag": 4,
+      "best_corr": -0.0662,
+      "granger_improvement": 0.0016,
+      "granger_f": 1.1492
+    },
+    {
+      "from": "BANPU",
+      "to": "USD/THB",
+      "n": 715,
+      "best_lag": -2,
+      "best_corr": -0.0813,
+      "granger_improvement": 0.0002,
+      "granger_f": 0.1747
+    },
+    {
+      "from": "USD/THB",
+      "to": "PTT",
+      "n": 723,
+      "best_lag": 8,
+      "best_corr": -0.0967,
+      "granger_improvement": 0.0024,
+      "granger_f": 1.7498
+    },
+    {
+      "from": "PTT",
+      "to": "USD/THB",
+      "n": 723,
+      "best_lag": -9,
+      "best_corr": -0.0617,
+      "granger_improvement": 0.0027,
+      "granger_f": 1.9148
+    },
+    {
+      "from": "XAU/USD",
+      "to": "USD/THB",
+      "n": 3075,
+      "best_lag": 5,
+      "best_corr": 0.0479,
+      "granger_improvement": 0.0004,
+      "granger_f": 1.3085
+    },
+    {
+      "from": "USD/THB",
+      "to": "XAU/USD",
+      "n": 3075,
+      "best_lag": -1,
+      "best_corr": -0.1159,
+      "granger_improvement": 0.0148,
+      "granger_f": 46.1214
+    },
+    {
+      "from": "XAU/THB",
+      "to": "USD/THB",
+      "n": 3075,
+      "best_lag": 10,
+      "best_corr": -0.0399,
+      "granger_improvement": 0.0,
+      "granger_f": 0.0633
+    },
+    {
+      "from": "USD/THB",
+      "to": "XAU/THB",
+      "n": 3075,
+      "best_lag": -4,
+      "best_corr": 0.0535,
+      "granger_improvement": 0.0016,
+      "granger_f": 4.8889
+    }
+  ],
+  "results": [
+    {
+      "pair": "XAU/USD vs BANPU",
+      "n_observations": 715,
+      "cross_correlations": [
+        {
+          "lag": -10,
+          "correlation": -0.0079
+        },
+        {
+          "lag": -9,
+          "correlation": 0.0166
+        },
+        {
+          "lag": -8,
+          "correlation": 0.0075
+        },
+        {
+          "lag": -7,
+          "correlation": 0.033
+        },
+        {
+          "lag": -6,
+          "correlation": 0.0376
+        },
+        {
+          "lag": -5,
+          "correlation": -0.0349
+        },
+        {
+          "lag": -4,
+          "correlation": 0.0115
+        },
+        {
+          "lag": -3,
+          "correlation": 0.0866
+        },
+        {
+          "lag": -2,
+          "correlation": -0.0279
+        },
+        {
+          "lag": -1,
+          "correlation": 0.0129
+        },
+        {
+          "lag": 0,
+          "correlation": 0.0169
+        },
+        {
+          "lag": 1,
+          "correlation": -0.0249
+        },
+        {
+          "lag": 2,
+          "correlation": 0.0084
+        },
+        {
+          "lag": 3,
+          "correlation": 0.0159
+        },
+        {
+          "lag": 4,
+          "correlation": -0.0292
+        },
+        {
+          "lag": 5,
+          "correlation": -0.1149
+        },
+        {
+          "lag": 6,
+          "correlation": 0.016
+        },
+        {
+          "lag": 7,
+          "correlation": -0.017
+        },
+        {
+          "lag": 8,
+          "correlation": -0.004
+        },
+        {
+          "lag": 9,
+          "correlation": 0.0066
+        },
+        {
+          "lag": 10,
+          "correlation": 0.0366
+        }
+      ],
+      "best_a_leads_b": {
+        "lag": 5,
+        "correlation": -0.1149
+      },
+      "best_b_leads_a": {
+        "lag": -3,
+        "correlation": 0.0866
+      },
+      "strongest_overall": {
+        "lag": 5,
+        "correlation": -0.1149
+      },
+      "granger_a_to_b": {
+        "direction": "XAU/USD(t-1) -> BANPU(t)",
+        "r2_baseline": 0.0004,
+        "r2_with_lag": 0.0011,
+        "improvement": 0.0006,
+        "f_score": 0.4555,
+        "n": 714
+      },
+      "granger_b_to_a": {
+        "direction": "BANPU(t-1) -> XAU/USD(t)",
+        "r2_baseline": 0.0005,
+        "r2_with_lag": 0.0007,
+        "improvement": 0.0002,
+        "f_score": 0.1264,
+        "n": 714
+      }
+    },
+    {
+      "pair": "XAU/USD vs PTT",
+      "n_observations": 723,
+      "cross_correlations": [
+        {
+          "lag": -10,
+          "correlation": 0.0356
+        },
+        {
+          "lag": -9,
+          "correlation": 0.0231
+        },
+        {
+          "lag": -8,
+          "correlation": -0.0061
+        },
+        {
+          "lag": -7,
+          "correlation": -0.0109
+        },
+        {
+          "lag": -6,
+          "correlation": 0.0148
+        },
+        {
+          "lag": -5,
+          "correlation": 0.0134
+        },
+        {
+          "lag": -4,
+          "correlation": -0.0258
+        },
+        {
+          "lag": -3,
+          "correlation": -0.0141
+        },
+        {
+          "lag": -2,
+          "correlation": -0.0228
+        },
+        {
+          "lag": -1,
+          "correlation": 0.0803
+        },
+        {
+          "lag": 0,
+          "correlation": 0.071
+        },
+        {
+          "lag": 1,
+          "correlation": 0.0213
+        },
+        {
+          "lag": 2,
+          "correlation": -0.028
+        },
+        {
+          "lag": 3,
+          "correlation": 0.0141
+        },
+        {
+          "lag": 4,
+          "correlation": 0.0007
+        },
+        {
+          "lag": 5,
+          "correlation": 0.0194
+        },
+        {
+          "lag": 6,
+          "correlation": -0.0157
+        },
+        {
+          "lag": 7,
+          "correlation": -0.0222
+        },
+        {
+          "lag": 8,
+          "correlation": 0.0052
+        },
+        {
+          "lag": 9,
+          "correlation": 0.006
+        },
+        {
+          "lag": 10,
+          "correlation": 0.0078
+        }
+      ],
+      "best_a_leads_b": {
+        "lag": 2,
+        "correlation": -0.028
+      },
+      "best_b_leads_a": {
+        "lag": -1,
+        "correlation": 0.0803
+      },
+      "strongest_overall": {
+        "lag": -1,
+        "correlation": 0.0803
+      },
+      "granger_a_to_b": {
+        "direction": "XAU/USD(t-1) -> PTT(t)",
+        "r2_baseline": 0.0013,
+        "r2_with_lag": 0.0018,
+        "improvement": 0.0006,
+        "f_score": 0.4111,
+        "n": 722
+      },
+      "granger_b_to_a": {
+        "direction": "PTT(t-1) -> XAU/USD(t)",
+        "r2_baseline": 0.0008,
+        "r2_with_lag": 0.0075,
+        "improvement": 0.0068,
+        "f_score": 4.9211,
+        "n": 722
+      }
+    },
+    {
+      "pair": "XAU/THB vs BANPU",
+      "n_observations": 715,
+      "cross_correlations": [
+        {
+          "lag": -10,
+          "correlation": -0.0079
+        },
+        {
+          "lag": -9,
+          "correlation": 0.1
+        },
+        {
+          "lag": -8,
+          "correlation": 0.0362
+        },
+        {
+          "lag": -7,
+          "correlation": -0.0331
+        },
+        {
+          "lag": -6,
+          "correlation": -0.0003
+        },
+        {
+          "lag": -5,
+          "correlation": -0.0311
+        },
+        {
+          "lag": -4,
+          "correlation": 0.0004
+        },
+        {
+          "lag": -3,
+          "correlation": -0.0245
+        },
+        {
+          "lag": -2,
+          "correlation": -0.1262
+        },
+        {
+          "lag": -1,
+          "correlation": 0.0352
+        },
+        {
+          "lag": 0,
+          "correlation": -0.1396
+        },
+        {
+          "lag": 1,
+          "correlation": -0.0242
+        },
+        {
+          "lag": 2,
+          "correlation": -0.0015
+        },
+        {
+          "lag": 3,
+          "correlation": -0.0164
+        },
+        {
+          "lag": 4,
+          "correlation": -0.0664
+        },
+        {
+          "lag": 5,
+          "correlation": -0.0072
+        },
+        {
+          "lag": 6,
+          "correlation": 0.0499
+        },
+        {
+          "lag": 7,
+          "correlation": 0.0315
+        },
+        {
+          "lag": 8,
+          "correlation": 0.0004
+        },
+        {
+          "lag": 9,
+          "correlation": 0.0034
+        },
+        {
+          "lag": 10,
+          "correlation": -0.0081
+        }
+      ],
+      "best_a_leads_b": {
+        "lag": 4,
+        "correlation": -0.0664
+      },
+      "best_b_leads_a": {
+        "lag": -2,
+        "correlation": -0.1262
+      },
+      "strongest_overall": {
+        "lag": 0,
+        "correlation": -0.1396
+      },
+      "granger_a_to_b": {
+        "direction": "XAU/THB(t-1) -> BANPU(t)",
+        "r2_baseline": 0.0004,
+        "r2_with_lag": 0.0009,
+        "improvement": 0.0005,
+        "f_score": 0.3269,
+        "n": 714
+      },
+      "granger_b_to_a": {
+        "direction": "BANPU(t-1) -> XAU/THB(t)",
+        "r2_baseline": 0.005,
+        "r2_with_lag": 0.0057,
+        "improvement": 0.0007,
+        "f_score": 0.4675,
+        "n": 714
+      }
+    },
+    {
+      "pair": "XAU/THB vs PTT",
+      "n_observations": 723,
+      "cross_correlations": [
+        {
+          "lag": -10,
+          "correlation": 0.0321
+        },
+        {
+          "lag": -9,
+          "correlation": -0.0291
+        },
+        {
+          "lag": -8,
+          "correlation": 0.018
+        },
+        {
+          "lag": -7,
+          "correlation": 0.0021
+        },
+        {
+          "lag": -6,
+          "correlation": -0.016
+        },
+        {
+          "lag": -5,
+          "correlation": 0.0131
+        },
+        {
+          "lag": -4,
+          "correlation": 0.0245
+        },
+        {
+          "lag": -3,
+          "correlation": -0.0175
+        },
+        {
+          "lag": -2,
+          "correlation": -0.0325
+        },
+        {
+          "lag": -1,
+          "correlation": 0.0423
+        },
+        {
+          "lag": 0,
+          "correlation": -0.1008
+        },
+        {
+          "lag": 1,
+          "correlation": -0.0747
+        },
+        {
+          "lag": 2,
+          "correlation": -0.0129
+        },
+        {
+          "lag": 3,
+          "correlation": 0.0432
+        },
+        {
+          "lag": 4,
+          "correlation": -0.063
+        },
+        {
+          "lag": 5,
+          "correlation": 0.0025
+        },
+        {
+          "lag": 6,
+          "correlation": -0.007
+        },
+        {
+          "lag": 7,
+          "correlation": 0.0228
+        },
+        {
+          "lag": 8,
+          "correlation": -0.0515
+        },
+        {
+          "lag": 9,
+          "correlation": 0.0511
+        },
+        {
+          "lag": 10,
+          "correlation": -0.0797
+        }
+      ],
+      "best_a_leads_b": {
+        "lag": 10,
+        "correlation": -0.0797
+      },
+      "best_b_leads_a": {
+        "lag": -1,
+        "correlation": 0.0423
+      },
+      "strongest_overall": {
+        "lag": 0,
+        "correlation": -0.1008
+      },
+      "granger_a_to_b": {
+        "direction": "XAU/THB(t-1) -> PTT(t)",
+        "r2_baseline": 0.0013,
+        "r2_with_lag": 0.0075,
+        "improvement": 0.0062,
+        "f_score": 4.4848,
+        "n": 722
+      },
+      "granger_b_to_a": {
+        "direction": "PTT(t-1) -> XAU/THB(t)",
+        "r2_baseline": 0.0049,
+        "r2_with_lag": 0.0062,
+        "improvement": 0.0013,
+        "f_score": 0.9073,
+        "n": 722
+      }
+    },
+    {
+      "pair": "USD/THB vs BANPU",
+      "n_observations": 715,
+      "cross_correlations": [
+        {
+          "lag": -10,
+          "correlation": -0.0158
+        },
+        {
+          "lag": -9,
+          "correlation": 0.0041
+        },
+        {
+          "lag": -8,
+          "correlation": -0.0005
+        },
+        {
+          "lag": -7,
+          "correlation": 0.0422
+        },
+        {
+          "lag": -6,
+          "correlation": 0.0805
+        },
+        {
+          "lag": -5,
+          "correlation": -0.0759
+        },
+        {
+          "lag": -4,
+          "correlation": 0.0244
+        },
+        {
+          "lag": -3,
+          "correlation": -0.0205
+        },
+        {
+          "lag": -2,
+          "correlation": -0.0813
+        },
+        {
+          "lag": -1,
+          "correlation": -0.0157
+        },
+        {
+          "lag": 0,
+          "correlation": -0.0062
+        },
+        {
+          "lag": 1,
+          "correlation": 0.04
+        },
+        {
+          "lag": 2,
+          "correlation": -0.0458
+        },
+        {
+          "lag": 3,
+          "correlation": -0.0315
+        },
+        {
+          "lag": 4,
+          "correlation": -0.0662
+        },
+        {
+          "lag": 5,
+          "correlation": 0.0263
+        },
+        {
+          "lag": 6,
+          "correlation": 0.0224
+        },
+        {
+          "lag": 7,
+          "correlation": 0.0651
+        },
+        {
+          "lag": 8,
+          "correlation": -0.0184
+        },
+        {
+          "lag": 9,
+          "correlation": 0.0043
+        },
+        {
+          "lag": 10,
+          "correlation": 0.0301
+        }
+      ],
+      "best_a_leads_b": {
+        "lag": 4,
+        "correlation": -0.0662
+      },
+      "best_b_leads_a": {
+        "lag": -2,
+        "correlation": -0.0813
+      },
+      "strongest_overall": {
+        "lag": -2,
+        "correlation": -0.0813
+      },
+      "granger_a_to_b": {
+        "direction": "USD/THB(t-1) -> BANPU(t)",
+        "r2_baseline": 0.0004,
+        "r2_with_lag": 0.0021,
+        "improvement": 0.0016,
+        "f_score": 1.1492,
+        "n": 714
+      },
+      "granger_b_to_a": {
+        "direction": "BANPU(t-1) -> USD/THB(t)",
+        "r2_baseline": 0.0001,
+        "r2_with_lag": 0.0003,
+        "improvement": 0.0002,
+        "f_score": 0.1747,
+        "n": 714
+      }
+    },
+    {
+      "pair": "USD/THB vs PTT",
+      "n_observations": 723,
+      "cross_correlations": [
+        {
+          "lag": -10,
+          "correlation": -0.0252
+        },
+        {
+          "lag": -9,
+          "correlation": -0.0617
+        },
+        {
+          "lag": -8,
+          "correlation": -0.0033
+        },
+        {
+          "lag": -7,
+          "correlation": -0.0136
+        },
+        {
+          "lag": -6,
+          "correlation": -0.0023
+        },
+        {
+          "lag": -5,
+          "correlation": -0.0278
+        },
+        {
+          "lag": -4,
+          "correlation": 0.0298
+        },
+        {
+          "lag": -3,
+          "correlation": -0.0024
+        },
+        {
+          "lag": -2,
+          "correlation": -0.0078
+        },
+        {
+          "lag": -1,
+          "correlation": 0.0516
+        },
+        {
+          "lag": 0,
+          "correlation": 0.0043
+        },
+        {
+          "lag": 1,
+          "correlation": -0.0494
+        },
+        {
+          "lag": 2,
+          "correlation": -0.0065
+        },
+        {
+          "lag": 3,
+          "correlation": 0.0414
+        },
+        {
+          "lag": 4,
+          "correlation": -0.0551
+        },
+        {
+          "lag": 5,
+          "correlation": 0.0106
+        },
+        {
+          "lag": 6,
+          "correlation": -0.0034
+        },
+        {
+          "lag": 7,
+          "correlation": 0.0202
+        },
+        {
+          "lag": 8,
+          "correlation": -0.0967
+        },
+        {
+          "lag": 9,
+          "correlation": 0.003
+        },
+        {
+          "lag": 10,
+          "correlation": -0.032
+        }
+      ],
+      "best_a_leads_b": {
+        "lag": 8,
+        "correlation": -0.0967
+      },
+      "best_b_leads_a": {
+        "lag": -9,
+        "correlation": -0.0617
+      },
+      "strongest_overall": {
+        "lag": 8,
+        "correlation": -0.0967
+      },
+      "granger_a_to_b": {
+        "direction": "USD/THB(t-1) -> PTT(t)",
+        "r2_baseline": 0.0013,
+        "r2_with_lag": 0.0037,
+        "improvement": 0.0024,
+        "f_score": 1.7498,
+        "n": 722
+      },
+      "granger_b_to_a": {
+        "direction": "PTT(t-1) -> USD/THB(t)",
+        "r2_baseline": 0.0001,
+        "r2_with_lag": 0.0028,
+        "improvement": 0.0027,
+        "f_score": 1.9148,
+        "n": 722
+      }
+    },
+    {
+      "pair": "XAU/USD vs USD/THB",
+      "n_observations": 3075,
+      "cross_correlations": [
+        {
+          "lag": -10,
+          "correlation": -0.0042
+        },
+        {
+          "lag": -9,
+          "correlation": -0.0067
+        },
+        {
+          "lag": -8,
+          "correlation": 0.0158
+        },
+        {
+          "lag": -7,
+          "correlation": -0.0178
+        },
+        {
+          "lag": -6,
+          "correlation": 0.0121
+        },
+        {
+          "lag": -5,
+          "correlation": -0.0118
+        },
+        {
+          "lag": -4,
+          "correlation": 0.007
+        },
+        {
+          "lag": -3,
+          "correlation": 0.0251
+        },
+        {
+          "lag": -2,
+          "correlation": 0.0053
+        },
+        {
+          "lag": -1,
+          "correlation": -0.1159
+        },
+        {
+          "lag": 0,
+          "correlation": -0.249
+        },
+        {
+          "lag": 1,
+          "correlation": -0.021
+        },
+        {
+          "lag": 2,
+          "correlation": -0.0038
+        },
+        {
+          "lag": 3,
+          "correlation": -0.0228
+        },
+        {
+          "lag": 4,
+          "correlation": 0.0065
+        },
+        {
+          "lag": 5,
+          "correlation": 0.0479
+        },
+        {
+          "lag": 6,
+          "correlation": -0.0085
+        },
+        {
+          "lag": 7,
+          "correlation": 0.0179
+        },
+        {
+          "lag": 8,
+          "correlation": -0.0
+        },
+        {
+          "lag": 9,
+          "correlation": 0.0118
+        },
+        {
+          "lag": 10,
+          "correlation": 0.0137
+        }
+      ],
+      "best_a_leads_b": {
+        "lag": 5,
+        "correlation": 0.0479
+      },
+      "best_b_leads_a": {
+        "lag": -1,
+        "correlation": -0.1159
+      },
+      "strongest_overall": {
+        "lag": 0,
+        "correlation": -0.249
+      },
+      "granger_a_to_b": {
+        "direction": "XAU/USD(t-1) -> USD/THB(t)",
+        "r2_baseline": 0.0,
+        "r2_with_lag": 0.0004,
+        "improvement": 0.0004,
+        "f_score": 1.3085,
+        "n": 3074
+      },
+      "granger_b_to_a": {
+        "direction": "USD/THB(t-1) -> XAU/USD(t)",
+        "r2_baseline": 0.0001,
+        "r2_with_lag": 0.0149,
+        "improvement": 0.0148,
+        "f_score": 46.1214,
+        "n": 3074
+      }
+    },
+    {
+      "pair": "XAU/THB vs USD/THB",
+      "n_observations": 3075,
+      "cross_correlations": [
+        {
+          "lag": -10,
+          "correlation": 0.0043
+        },
+        {
+          "lag": -9,
+          "correlation": 0.021
+        },
+        {
+          "lag": -8,
+          "correlation": 0.0191
+        },
+        {
+          "lag": -7,
+          "correlation": -0.0105
+        },
+        {
+          "lag": -6,
+          "correlation": -0.0104
+        },
+        {
+          "lag": -5,
+          "correlation": 0.0136
+        },
+        {
+          "lag": -4,
+          "correlation": 0.0535
+        },
+        {
+          "lag": -3,
+          "correlation": -0.0053
+        },
+        {
+          "lag": -2,
+          "correlation": 0.0089
+        },
+        {
+          "lag": -1,
+          "correlation": 0.029
+        },
+        {
+          "lag": 0,
+          "correlation": 0.4329
+        },
+        {
+          "lag": 1,
+          "correlation": 0.0059
+        },
+        {
+          "lag": 2,
+          "correlation": -0.018
+        },
+        {
+          "lag": 3,
+          "correlation": 0.0111
+        },
+        {
+          "lag": 4,
+          "correlation": -0.0166
+        },
+        {
+          "lag": 5,
+          "correlation": -0.0095
+        },
+        {
+          "lag": 6,
+          "correlation": -0.0119
+        },
+        {
+          "lag": 7,
+          "correlation": -0.0086
+        },
+        {
+          "lag": 8,
+          "correlation": 0.0352
+        },
+        {
+          "lag": 9,
+          "correlation": -0.0244
+        },
+        {
+          "lag": 10,
+          "correlation": -0.0399
+        }
+      ],
+      "best_a_leads_b": {
+        "lag": 10,
+        "correlation": -0.0399
+      },
+      "best_b_leads_a": {
+        "lag": -4,
+        "correlation": 0.0535
+      },
+      "strongest_overall": {
+        "lag": 0,
+        "correlation": 0.4329
+      },
+      "granger_a_to_b": {
+        "direction": "XAU/THB(t-1) -> USD/THB(t)",
+        "r2_baseline": 0.0,
+        "r2_with_lag": 0.0,
+        "improvement": 0.0,
+        "f_score": 0.0633,
+        "n": 3074
+      },
+      "granger_b_to_a": {
+        "direction": "USD/THB(t-1) -> XAU/THB(t)",
+        "r2_baseline": 0.0003,
+        "r2_with_lag": 0.0018,
+        "improvement": 0.0016,
+        "f_score": 4.8889,
+        "n": 3074
+      }
+    }
+  ]
+}
