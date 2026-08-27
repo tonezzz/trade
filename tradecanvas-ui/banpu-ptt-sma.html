@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BANPU + PTT Dual-SMA Strategy</title>
+    <title>BANPU + PTT SMA Backtest</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -21,7 +21,7 @@
         </nav>
 
         <header class="header">
-            <h1>BANPU + PTT Dual-SMA Strategy</h1>
+            <h1>BANPU + PTT SMA Backtest</h1>
             <div class="header-controls">
                 <span id="status" class="status disconnected">Loading...</span>
             </div>
@@ -30,193 +30,78 @@
         <div class="main-content">
             <div class="chart-section">
                 <div class="chart-header">
-                    <h2>Equity Curves</h2>
+                    <h2>50/50 Combined Strategy vs Buy &amp; Hold</h2>
                     <div class="chart-info">
                         <span id="record-count">--</span>
                         <span id="date-range">--</span>
                     </div>
                 </div>
-                <p class="info-text">
-                    Long-only 20/50 SMA cross on adjusted close. A position is held when the
-                    20-day SMA is above the 50-day SMA. BANPU and PTT are each allocated 50%
-                    of a combined portfolio.
-                </p>
-                <div id="equity-chart" class="chart-container"></div>
+                <div id="sma-chart" class="chart-container"></div>
             </div>
 
             <section class="data-section" style="margin-top: 2rem;">
-                <h3>Performance Summary</h3>
-                <div class="table-wrapper">
-                    <table class="data-table" id="stats-table">
-                        <thead>
-                            <tr><th>Metric</th><th>Value</th></tr>
-                        </thead>
-                        <tbody id="stats-body"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="data-section" style="margin-top: 2rem;">
-                <h3>BANPU Trades</h3>
-                <div class="table-wrapper">
-                    <table class="data-table" id="banpu-trades-table">
-                        <thead>
-                            <tr><th>Entry</th><th>Entry Price</th><th>Exit</th><th>Exit Price</th><th>P&L</th></tr>
-                        </thead>
-                        <tbody id="banpu-trades-body"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="data-section" style="margin-top: 2rem;">
-                <h3>PTT Trades</h3>
-                <div class="table-wrapper">
-                    <table class="data-table" id="ptt-trades-table">
-                        <thead>
-                            <tr><th>Entry</th><th>Entry Price</th><th>Exit</th><th>Exit Price</th><th>P&L</th></tr>
-                        </thead>
-                        <tbody id="ptt-trades-body"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="raw-data" style="margin-top: 2rem;">
-                <h3>Raw Data</h3>
-                <p class="info-text">Full JSON: <a href="data/banpu_ptt_sma.json" target="_blank">data/banpu_ptt_sma.json</a>.</p>
+                <h3>Stats</h3>
+                <table class="data-table" id="stats-table">
+                    <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+                    <tbody id="stats-body"></tbody>
+                </table>
             </section>
         </div>
     </div>
 
     <script>
-        let chart;
-
-        async function loadData() {
+        async function loadSma() {
             const statusEl = document.getElementById('status');
             try {
                 const res = await fetch('data/banpu_ptt_sma.json');
                 if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
+                const d = await res.json();
 
-                if (!data.combined_series || data.combined_series.length === 0) {
-                    throw new Error('No records found');
-                }
+                document.getElementById('record-count').textContent = d.combined_series.length + ' days';
+                document.getElementById('date-range').textContent = d.start_date + ' → ' + d.end_date;
 
-                document.getElementById('record-count').textContent = data.combined_series.length + ' days';
-                document.getElementById('date-range').textContent = data.combined_series[0].date + ' -> ' + data.combined_series[data.combined_series.length - 1].date;
+                const chart = LightweightCharts.createChart(document.getElementById('sma-chart'), {
+                    width: document.getElementById('sma-chart').clientWidth,
+                    height: 500,
+                    layout: { background: { color: '#1a1a2e' }, textColor: '#e0e0e0' },
+                    grid: { vertLines: { color: '#2a2a3e' }, horzLines: { color: '#2a2a3e' } },
+                    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+                    rightPriceScale: { borderColor: '#2a2a3e' },
+                    timeScale: { borderColor: '#2a2a3e' }
+                });
 
-                renderChart(data);
-                renderStats(data.stats);
-                renderTrades('banpu-trades-body', data.banpu_trades);
-                renderTrades('ptt-trades-body', data.ptt_trades);
+                const s1 = chart.addLineSeries({ color: '#26a69a', lineWidth: 2, title: 'Strategy' });
+                const s2 = chart.addLineSeries({ color: '#7e7e8e', lineWidth: 1, title: 'Buy & Hold' });
+                s1.setData(d.combined_series.map(r => ({ time: r.date, value: r.combined_equity })));
+                s2.setData(d.combined_series.map((r, i) => ({
+                    time: r.date,
+                    value: 0.5 * r.banpu_buyhold + 0.5 * r.ptt_buyhold
+                })));
+                chart.timeScale().fitContent();
+
+                const stats = [
+                    ['Strategy total return', d.stats.combined_total_return_pct + '%'],
+                    ['Buy-hold total return', d.stats.combined_buyhold_return_pct + '%'],
+                    ['Max drawdown', d.stats.combined_max_drawdown_pct + '%'],
+                    ['Trade count', d.stats.combined_trade_count],
+                    ['Fast window', d.fast_window],
+                    ['Slow window', d.slow_window],
+                    ['BANPU return', d.stats.banpu_total_return_pct + '%'],
+                    ['PTT return', d.stats.ptt_total_return_pct + '%'],
+                ];
+                document.getElementById('stats-body').innerHTML = stats.map(s => `<tr><td>${s[0]}</td><td>${s[1]}</td></tr>`).join('');
 
                 statusEl.textContent = 'Loaded';
                 statusEl.classList.remove('disconnected');
                 statusEl.classList.add('connected');
             } catch (e) {
                 statusEl.textContent = 'Error: ' + e.message;
-                statusEl.classList.remove('disconnected');
                 statusEl.classList.add('error');
                 console.error(e);
             }
         }
 
-        function renderChart(data) {
-            const container = document.getElementById('equity-chart');
-            if (chart) chart.remove();
-            chart = LightweightCharts.createChart(container, {
-                width: container.clientWidth,
-                height: 500,
-                layout: { background: { color: '#1a1a2e' }, textColor: '#e0e0e0' },
-                grid: { vertLines: { color: '#2a2a3e' }, horzLines: { color: '#2a2a3e' } },
-                rightPriceScale: { borderColor: '#2a2a3e' },
-                timeScale: { borderColor: '#2a2a3e', timeVisible: false }
-            });
-
-            const makeSeries = (name, color) => {
-                const s = chart.addLineSeries({ title: name, color: color, lineWidth: 2 });
-                return s;
-            };
-
-            const combined = makeSeries('Combined Strategy', '#26a69a');
-            const buyhold = makeSeries('Combined Buy & Hold', '#f1c40f');
-            const banpu = makeSeries('BANPU Strategy', '#2962FF');
-            const ptt = makeSeries('PTT Strategy', '#ef5350');
-
-            const cData = data.combined_series.map(d => ({
-                time: d.date,
-                value: d.combined_equity
-            }));
-
-            const bhData = data.combined_series.map(d => ({
-                time: d.date,
-                value: (d.banpu_buyhold + d.ptt_buyhold) / 2
-            }));
-
-            const bData = data.combined_series.map(d => ({
-                time: d.date,
-                value: d.banpu_equity
-            }));
-
-            const pData = data.combined_series.map(d => ({
-                time: d.date,
-                value: d.ptt_equity
-            }));
-
-            combined.setData(cData);
-            buyhold.setData(bhData);
-            banpu.setData(bData);
-            ptt.setData(pData);
-
-            chart.timeScale().fitContent();
-        }
-
-        function renderStats(stats) {
-            const tbody = document.getElementById('stats-body');
-            tbody.innerHTML = '';
-            const rows = [
-                ['BANPU strategy return', stats.banpu_total_return_pct + '%'],
-                ['PTT strategy return', stats.ptt_total_return_pct + '%'],
-                ['Combined strategy return', stats.combined_total_return_pct + '%'],
-                ['BANPU buy & hold return', stats.banpu_buyhold_return_pct + '%'],
-                ['PTT buy & hold return', stats.ptt_buyhold_return_pct + '%'],
-                ['Combined buy & hold return', stats.combined_buyhold_return_pct + '%'],
-                ['Combined max drawdown', stats.combined_max_drawdown_pct + '%'],
-                ['Total trades', stats.combined_trade_count],
-            ];
-            rows.forEach(([k, v]) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${k}</td><td>${v}</td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderTrades(bodyId, trades) {
-            const tbody = document.getElementById(bodyId);
-            tbody.innerHTML = '';
-            if (!trades || trades.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5">No trades</td></tr>';
-                return;
-            }
-            trades.slice().reverse().forEach(t => {
-                const tr = document.createElement('tr');
-                const pnl = t.pnl;
-                const color = pnl >= 0 ? '#26a69a' : '#ef5350';
-                tr.innerHTML = `
-                    <td>${t.entry_date}</td>
-                    <td>${t.entry_price}</td>
-                    <td>${t.exit_date}</td>
-                    <td>${t.exit_price}</td>
-                    <td style="color: ${color}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        window.addEventListener('resize', () => {
-            if (chart) chart.resize(document.getElementById('equity-chart').clientWidth, 500);
-        });
-
-        loadData();
+        loadSma();
     </script>
 </body>
 </html>
