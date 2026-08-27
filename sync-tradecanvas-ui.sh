@@ -8,7 +8,7 @@ DEV_DIR="/home/tony/CascadeProjects/trade/tradecanvas-ui"
 DEPLOY_DIR="/home/tony/CascadeProjects/chaba/stacks/web/public/apps/trade/tradecanvas-ui"
 
 # Files to sync (excluding development-only files)
-SYNC_FILES="app.js chart-data-provider.js chart-renderer.js chart-loader.js compare-new.html compare.html compare2.html compare.js favicon.svg hindsight-strategies-new.js hindsight-strategies.js index.html nav.js styles.css strategy-compare-new.js strategy-compare.js strategies-new.js strategies.js test-chart.html test.html test-strategies.html ui-components.js ui-renderer.js"
+SYNC_FILES="app.js chart-data-provider.js chart-renderer.js chart-loader.js compare-new.html compare.html compare2.html compare.js favicon.svg hindsight-strategies-new.js hindsight-strategies.js index.html nav.js settrade-research.html styles.css strategy-compare-new.js strategy-compare.js strategies-new.js strategies.js test-chart.html test.html test-strategies.html ui-components.js ui-renderer.js"
 
 # Authoritative SSOT source directory
 SSOT_DIR="/home/tony/CascadeProjects/trade/config/ssot"
@@ -43,6 +43,16 @@ for file in $SYNC_FILES; do
     fi
 done
 
+# Sync data files used by the UI
+mkdir -p "$DEPLOY_DIR/data"
+for data_file in "$DEV_DIR"/data/*; do
+    if [ -f "$data_file" ]; then
+        filename=$(basename "$data_file")
+        echo "Syncing data: $filename"
+        cp "$data_file" "$DEPLOY_DIR/data/$filename"
+    fi
+done
+
 # Sync all SSOT UI files (picks up new page/family/feature files automatically)
 for ssot_file in "$DEV_DIR"/ssot.ui.yml "$DEV_DIR"/ssot.ui.*.yml "$DEV_DIR"/ssot.playlive-tests.yml "$DEV_DIR"/ssot.*.playlive-tests.yml; do
     if [ -f "$ssot_file" ]; then
@@ -69,15 +79,15 @@ done
 
 # Fix permissions
 echo "Fixing permissions..."
-sudo chown -R tony:tony "$DEPLOY_DIR" "$DATA_DEPLOY_DIR"
+sudo chown -R tony:tony "$DEPLOY_DIR" "$DATA_DEPLOY_DIR" "$DEPLOY_DIR/data"
 chmod -R 644 "$DEPLOY_DIR"/*
 chmod 755 "$DEPLOY_DIR"
-chmod -R 644 "$DATA_DEPLOY_DIR"/*
-chmod 755 "$DATA_DEPLOY_DIR"
+chmod -R 644 "$DEPLOY_DIR/data"/*
+chmod 755 "$DEPLOY_DIR/data"
 
 echo ""
 echo "Sync complete!"
 echo "Backup available at: $BACKUP_DIR"
 echo ""
 echo "Testing deployment..."
-curl -I http://tony-omen.local:8080/apps/trade/tradecanvas-ui/compare.html
+curl -I http://100.68.142.13:8080/apps/trade/tradecanvas-ui/compare.html
