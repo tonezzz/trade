@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THB ATR Sizing — Tuned</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html" class="nav-link">TradeCanvas</a></li>
+                <li class="nav-item"><a href="settrade-research.html" class="nav-link">SETTRADE Research</a></li>
+                <li class="nav-item"><a href="thb-atr.html" class="nav-link active">THB ATR</a></li>
+                <li class="nav-item"><a href="/apps/gold/conclusion.html" class="nav-link">Gold/THB Research</a></li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <h1>THB ATR Sizing (Tuned)</h1>
+            <div class="header-controls">
+                <span class="status connected">Loaded</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h2>THB+XAG + ATR sizing — W=7, TV=15%, cap=2x</h2>
+                    <div class="chart-info">
+                        <span id="record-count">--</span>
+                        <span id="date-range">--</span>
+                    </div>
+                </div>
+                <div id="atr-chart" class="chart-container"></div>
+            </div>
+
+            <section class="data-section" style="margin-top: 2rem;">
+                <h3>Strategy Metrics</h3>
+                <table class="data-table" id="atr-metrics-table">
+                    <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+                    <tbody id="atr-metrics-body"></tbody>
+                </table>
+            </section>
+
+            <section class="raw-data" style="margin-top: 2rem;">
+                <h3>Raw Data</h3>
+                <p class="info-text">
+                    CSV: <a href="data/trended_atr_sizing_w7_t15_equity.csv" target="_blank">data/trended_atr_sizing_w7_t15_equity.csv</a>
+                    JSON: <a href="data/trended_atr_sizing_w7_t15_results.json" target="_blank">data/trended_atr_sizing_w7_t15_results.json</a>
+                </p>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        async function loadAtr() {
+            try {
+                const [csvRes, jsonRes] = await Promise.all([
+                    fetch('data/trended_atr_sizing_w7_t15_equity.csv'),
+                    fetch('data/trended_atr_sizing_w7_t15_results.json')
+                ]);
+                if (!csvRes.ok || !jsonRes.ok) throw new Error('HTTP ' + Math.max(csvRes.status, jsonRes.status));
+
+                const text = await csvRes.text();
+                const lines = text.trim().split('\n');
+                const header = lines[0].split(',');
+                const dateIdx = header.indexOf('date');
+                const equityIdx = header.indexOf('equity');
+
+                const data = lines.slice(1).map(line => {
+                    const parts = line.split(',');
+                    return { date: parts[dateIdx], equity: parseFloat(parts[equityIdx]) };
+                }).filter(r => !isNaN(r.equity));
+
+                document.getElementById('record-count').textContent = data.length + ' days';
+                document.getElementById('date-range').textContent = data[0].date + ' → ' + data[data.length - 1].date;
+
+                const chart = LightweightCharts.createChart(document.getElementById('atr-chart'), {
+                    width: document.getElementById('atr-chart').clientWidth,
+                    height: 500,
+                    layout: { background: { color: '#1a1a2e' }, textColor: '#e0e0e0' },
+                    grid: { vertLines: { color: '#2a2a3e' }, horzLines: { color: '#2a2a3e' } },
+                    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+                    rightPriceScale: { borderColor: '#2a2a3e' },
+                    timeScale: { borderColor: '#2a2a3e' }
+                });
+
+                const lineSeries = chart.addLineSeries({ color: '#26a69a', lineWidth: 2, title: 'ATR-sized' });
+                lineSeries.setData(data.map(r => ({ time: r.date, value: r.equity })));
+                chart.timeScale().fitContent();
+
+                const results = await jsonRes.json();
+                const m = results.strategy_metrics;
+                const rows = [
+                    ['ATR window', results.config.atr_window],
+                    ['Target vol', (results.config.target_vol * 100).toFixed(0) + '%'],
+                    ['Max leverage', results.config.max_leverage],
+                    ['Sharpe', m.sharpe.toFixed(2)],
+                    ['Annual return', (m.annual_return * 100).toFixed(1) + '%'],
+                    ['Annual vol', (m.annual_vol * 100).toFixed(1) + '%'],
+                    ['Max drawdown', (m.max_dd * 100).toFixed(1) + '%'],
+                    ['Win rate', (m.win_rate * 100).toFixed(1) + '%'],
+                ];
+                document.getElementById('atr-metrics-body').innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+            } catch (e) {
+                console.error(e);
+                document.getElementById('record-count').textContent = 'Error: ' + e.message;
+            }
+        }
+
+        loadAtr();
+    </script>
+</body>
+</html>
