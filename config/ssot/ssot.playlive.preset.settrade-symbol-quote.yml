@@ -1,0 +1,109 @@
+title: PlayLive Preset - SETTRADE Symbol Quote
+type: playlive-preset
+target:
+  name: SETTRADE Symbol Quote
+  url: https://www.settrade.com/th/equities/quote/PTT/overview
+  primary_url: https://www.settrade.com/th/equities/quote/PTT/overview
+  description: |
+    Extract a Thai stock quote page from SETTRADE (default example symbol PTT).
+    The parser works from `document.body.innerText` and the page title, so it is
+    tolerant of layout changes. Replace the `navigate-symbol` URL and the `symbol`
+    param to target a different ticker.
+  source: https://www.settrade.com
+  requires: Internet access and a PlayLive Chrome session.
+
+params:
+  - name: symbol
+    default: PTT
+    description: Thai stock symbol to look up. Change the navigate URL to use a different symbol.
+  - name: url_template
+    default: https://www.settrade.com/th/equities/quote/{symbol}/overview
+    description: URL template for the quote page.
+
+output_schema:
+  type: json
+  fields:
+    - ok: boolean extraction success
+    - symbol: symbol parsed from the page title
+    - company: company name in Thai
+    - status: market status for the symbol, e.g. "Open" or "Closed"
+    - lastUpdate: Thai date/time string
+    - priceSummary: object with extracted price-related numbers
+    - raw: first 3000 characters of page innerText
+    - errors: list of parsing errors encountered
+
+steps:
+  - id: clear-state
+    action: eval
+    description: Start from a clean browser state
+    script: |
+      localStorage.clear();
+      sessionStorage.clear();
+      return 'cleared';
+    expected: cleared
+
+  - id: navigate-symbol
+    action: navigate
+    url: https://www.settrade.com/th/equities/quote/PTT/overview
+    description: Load the SETTRADE quote page for the default symbol PTT.
+
+  - id: wait-for-render
+    action: wait
+    duration_ms: 3000
+    description: Allow JavaScript-rendered quote data to load.
+
+  - id: extract-quote
+    action: eval
+    description: Parse the quote page into a structured JSON snapshot.
+    script: |
+      (() => {
+        const output = {
+          ok: false,
+          source: 'settrade-symbol-quote',
+          extractedAt: new Date().toISOString(),
+          url: window.location.href,
+          symbol: '',
+          company: '',
+          status: '',
+          lastUpdate: '',
+          priceSummary: { numbers: [] },
+          raw: '',
+          errors: []
+        };
+        try {
+          const text = document.body.innerText || '';
+          output.raw = text.substring(0, 3000);
+
+          const titleParts = document.title ? document.title.split(' - ') : [];
+          if (titleParts.length) output.symbol = titleParts[0].trim();
+
+          const statusMatch = text.match(/หุ้น\s+สถานะ\s+([^\n]+)/);
+          if (statusMatch) output.status = statusMatch[1].trim();
+
+          const updateMatch = text.match(/ข้อมูลล่าสุด\s+([^\n]+)/);
+          if (updateMatch) output.lastUpdate = updateMatch[1].trim();
+
+          const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+          const companyLine = lines.find(l => l.includes('บริษัท'));
+          if (companyLine) output.company = companyLine;
+
+          const matches = [...text.matchAll(/(\d{1,3}(?:,\d{3})+\.\d+|\d+\.\d+)(\s*\(\s*[+-]?\d+\.?\d*%\s*\))?/g)].map(m => m[0]);
+          output.priceSummary.numbers = matches.slice(0, 24);
+
+          output.ok = output.symbol.length > 0;
+          window.__settradeQuote = output;
+        } catch (e) {
+          output.errors.push(e.message);
+        }
+        return JSON.stringify(output, null, 2);
+      })();
+
+  - id: verify-quote
+    action: eval
+    description: Confirm that the symbol was extracted.
+    script: return !!(window.__settradeQuote && window.__settradeQuote.ok);
+    expected: true
+
+cleanup:
+  - action: close_session
+    description: Close the PlayLive browser session

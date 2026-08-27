@@ -1,0 +1,128 @@
+title: PlayLive Preset - SETTRADE Market Snapshot
+type: playlive-preset
+target:
+  name: SETTRADE Market Summary
+  url: https://www.settrade.com/th/equities/market-summary/overview
+  primary_url: https://www.settrade.com/th/equities/market-summary/overview
+  description: |
+    Extract Thai SET market index table, market status, last update, and top-ranking
+    raw text from the SETTRADE public market summary page. The parser is resilient:
+    it works from `document.body.innerText` and does not rely on fragile CSS selectors.
+  source: https://www.settrade.com
+  requires: Internet access and a PlayLive Chrome session.
+
+params:
+  - name: url
+    default: https://www.settrade.com/th/equities/market-summary/overview
+    description: Market summary page to load.
+  - name: wait_ms
+    default: 3500
+    description: Time to wait for dynamic rendering before extraction.
+
+output_schema:
+  type: json
+  fields:
+    - ok: boolean extraction success
+    - marketStatus: e.g. "Open" or "Closed"
+    - lastUpdate: Thai date/time string
+    - indices: array of index objects, each with name and numeric value tokens
+    - topRanking: raw text of the Top Ranking section
+    - raw: first 4000 characters of page innerText
+    - errors: list of parsing errors encountered
+
+steps:
+  - id: clear-state
+    action: eval
+    description: Start from a clean browser state
+    script: |
+      localStorage.clear();
+      sessionStorage.clear();
+      return 'cleared';
+    expected: cleared
+
+  - id: navigate-market-summary
+    action: navigate
+    url: https://www.settrade.com/th/equities/market-summary/overview
+    description: Load the SETTRADE market summary page.
+
+  - id: wait-for-render
+    action: wait
+    duration_ms: 3500
+    description: Allow JavaScript-rendered tables and index data to load.
+
+  - id: extract-snapshot
+    action: eval
+    description: Parse the market summary into a structured JSON snapshot.
+    script: |
+      (() => {
+        const output = {
+          ok: false,
+          source: 'settrade-market-snapshot',
+          extractedAt: new Date().toISOString(),
+          url: window.location.href,
+          marketStatus: '',
+          lastUpdate: '',
+          indices: [],
+          topRanking: '',
+          raw: '',
+          errors: []
+        };
+        try {
+          const text = document.body.innerText || '';
+          output.raw = text.substring(0, 4000);
+
+          const statusMatch = text.match(/สถานะ\s+([^\n]+)/);
+          if (statusMatch) output.marketStatus = statusMatch[1].trim();
+
+          const updateMatch = text.match(/ข้อมูลล่าสุด\s+([^\n]+)/);
+          if (updateMatch) output.lastUpdate = updateMatch[1].trim();
+
+          const indexStart = text.indexOf('ข้อมูลดัชนี');
+          if (indexStart >= 0) {
+            const endMarkers = ['จัดอันดับ', 'สรุปซื้อขาย', 'ข้อมูลสถิติ', 'ผลรวมภาวะตลาด'];
+            let end = -1;
+            for (const m of endMarkers) {
+              const p = text.indexOf(m, indexStart + 1);
+              if (p > 0 && (end < 0 || p < end)) end = p;
+            }
+            const section = text.slice(indexStart, end > 0 ? end : undefined);
+            const known = [
+              'SET', 'SET50', 'SET50FF', 'SET100', 'SET100FF', 'sSET',
+              'SETCLMV', 'SETHD', 'SETESG', 'SETWB', 'SET TRI', 'FTSE SET Index Series'
+            ];
+            const lines = section.split('\n').map(l => l.trim()).filter(Boolean);
+            for (const line of lines) {
+              const name = known.find(k => line.startsWith(k));
+              if (name) {
+                const tokens = line.replace(/,/g, '').split(/\s+/).filter(Boolean);
+                output.indices.push({ name: tokens[0], values: tokens.slice(1) });
+              }
+            }
+          }
+
+          const topStart = text.indexOf('จัดอันดับ (Top Ranking)');
+          if (topStart >= 0) {
+            const topEnd = ['ข้อมูลสถิติ', 'สรุปซื้อขายสิ้นวัน', 'ผลรวมภาวะตลาด', 'ข้อมูลดัชนี']
+              .map(h => text.indexOf(h, topStart + 1))
+              .filter(p => p > topStart);
+            const end = topEnd.length ? Math.min(...topEnd) : topStart + 2000;
+            output.topRanking = text.slice(topStart, end);
+          }
+
+          output.ok = output.indices.length > 0;
+          window.__settradeSnapshot = output;
+        } catch (e) {
+          output.errors.push(e.message);
+        }
+        return JSON.stringify(output, null, 2);
+      })();
+
+  - id: verify-snapshot
+    action: eval
+    description: Confirm that at least one index was extracted.
+    script: return !!(window.__settradeSnapshot && window.__settradeSnapshot.ok);
+    expected: true
+
+cleanup:
+  - action: close_session
+    description: Close the PlayLive browser session

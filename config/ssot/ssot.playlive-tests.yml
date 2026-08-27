@@ -145,3 +145,13 @@ presets:
     label: USD/THB 1D Candle Default
     description: Verifies that compare2.html loads with USD/THB, 1D, candlestick default and that GOLD still renders candlesticks.
     file: config/ssot/ssot.playlive.preset.usd-thb-1d.yml
+
+  - id: settrade-market-snapshot
+    label: SETTRADE Market Snapshot
+    description: Extract SET index table, market status, and top-ranking text from SETTRADE public market summary.
+    file: config/ssot/ssot.playlive.preset.settrade-market-snapshot.yml
+
+  - id: settrade-symbol-quote
+    label: SETTRADE Symbol Quote
+    description: Extract a Thai stock quote page from SETTRADE (default PTT) as a structured JSON snapshot.
+    file: config/ssot/ssot.playlive.preset.settrade-symbol-quote.yml

@@ -134,6 +134,14 @@ sections:
         text: PlayLive preset for verifying the USD/THB 1D candlestick default on compare2.html
         path: config/ssot/ssot.playlive.preset.usd-thb-1d.yml
 
+      - label: ssot.playlive.preset.settrade-market-snapshot.yml
+        text: PlayLive preset for extracting the SETTRADE public market summary (indices, status, top-ranking text)
+        path: config/ssot/ssot.playlive.preset.settrade-market-snapshot.yml
+
+      - label: ssot.playlive.preset.settrade-symbol-quote.yml
+        text: PlayLive preset for extracting a Thai stock quote page from SETTRADE (default symbol PTT)
+        path: config/ssot/ssot.playlive.preset.settrade-symbol-quote.yml
+
   - title: Planning and Improvement
     layout: list
     items:
