@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy Recommendations</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <script src="strategies.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html" class="nav-link">TradeCanvas</a></li>
+                <li class="nav-item"><a href="compare.html" class="nav-link">Compare</a></li>
+                <li class="nav-item"><a href="compare2.html" class="nav-link">Compare2</a></li>
+                <li class="nav-item"><a href="banpu-ptt-sma.html" class="nav-link">BANPU+PTT</a></li>
+                <li class="nav-item"><a href="thb-atr.html" class="nav-link">THB ATR</a></li>
+                <li class="nav-item"><a href="strategy-recommendations.html" class="nav-link active">Strategy Recs</a></li>
+                <li class="nav-item"><a href="/apps/gold/conclusion.html" class="nav-link">Gold/THB Research</a></li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <h1>Strategy Recommendations</h1>
+            <div class="header-controls">
+                <span id="status" class="status disconnected">Ready</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h2 id="page-title">Test strategy against all available symbols</h2>
+                </div>
+
+                <div class="chart-controls" style="flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <div class="control-group">
+                        <label for="strategy-select">Strategy:</label>
+                        <select id="strategy-select" class="btn">
+                            <option value="sma_crossover">SMA Crossover</option>
+                            <option value="ema_crossover">EMA Crossover</option>
+                            <option value="rsi_reversal">RSI Reversal</option>
+                            <option value="macd_crossover">MACD Crossover</option>
+                            <option value="bollinger_reversion">Bollinger Reversion</option>
+                            <option value="manual_perfect">Manual Perfect</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="timeframe-select">Timeframe:</label>
+                        <select id="timeframe-select" class="btn">
+                            <option value="1y" selected>1 Year</option>
+                            <option value="6m">6 Months</option>
+                            <option value="3m">3 Months</option>
+                            <option value="1m">1 Month</option>
+                            <option value="5y">5 Years</option>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+
+                    <div id="parameters-container" class="control-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    </div>
+
+                    <button id="run-btn" class="btn">Run Strategy</button>
+                </div>
+
+                <div id="summary" style="margin: 1rem 0; display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+
+                <div class="table-wrapper" style="overflow-x: auto; margin-top: 1rem;">
+                    <table class="data-table" id="results-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Type</th>
+                                <th>Latest Price</th>
+                                <th>Records</th>
+                                <th>Last Signal</th>
+                                <th>Recommendation</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_PREFIX = '/apps/trade/api';
+
+        const STRATEGY_DEFAULTS = {
+            sma_crossover: { short_period: 20, long_period: 50 },
+            ema_crossover: { short_period: 12, long_period: 26 },
+            rsi_reversal: { period: 14, oversold: 30, overbought: 70 },
+            macd_crossover: { fast: 12, slow: 26, signal: 9 },
+            bollinger_reversion: { period: 20, std_dev: 2.0 },
+            manual_perfect: { auto_detect: true }
+        };
+
+        const PARAM_LABELS = {
+            short_period: 'Short Period',
+            long_period: 'Long Period',
+            period: 'Period',
+            oversold: 'Oversold',
+            overbought: 'Overbought',
+            fast: 'Fast',
+            slow: 'Slow',
+            signal: 'Signal',
+            std_dev: 'Std Dev',
+            auto_detect: 'Auto Detect'
+        };
+
+        function renderParameters() {
+            const strategy = document.getElementById('strategy-select').value;
+            const container = document.getElementById('parameters-container');
+            container.innerHTML = '';
+
+            const defaults = STRATEGY_DEFAULTS[strategy];
+            for (const [key, value] of Object.entries(defaults)) {
+                const label = document.createElement('label');
+                label.style.display = 'inline-flex';
+                label.style.alignItems = 'center';
+                label.style.gap = '0.25rem';
+                label.style.color = '#e0e0e0';
+
+                if (typeof value === 'boolean') {
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = value;
+                    checkbox.dataset.param = key;
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(PARAM_LABELS[key] || key));
+                } else {
+                    label.textContent = (PARAM_LABELS[key] || key) + ':';
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.value = value;
+                    input.dataset.param = key;
+                    input.style.width = '4rem';
+                    input.style.padding = '0.25rem';
+                    label.appendChild(input);
+                }
+                container.appendChild(label);
+            }
+        }
+
+        function readParameters() {
+            const strategy = document.getElementById('strategy-select').value;
+            const result = {};
+            const container = document.getElementById('parameters-container');
+
+            for (const el of container.querySelectorAll('[data-param]')) {
+                const key = el.dataset.param;
+                if (el.type === 'checkbox') {
+                    result[key] = el.checked;
+                } else {
+                    const num = parseFloat(el.value);
+                    result[key] = isNaN(num) ? STRATEGY_DEFAULTS[strategy][key] : num;
+                }
+            }
+            return result;
+        }
+
+        function formatDate(timestamp) {
+            try {
+                return new Date(timestamp * 1000).toISOString().split('T')[0];
+            } catch {
+                return '-';
+            }
+        }
+
+        function getRecommendation(signal) {
+            if (signal.buy) return 'BUY';
+            if (signal.sell) return 'SELL';
+            return 'HOLD';
+        }
+
+        function buildDetails(strategy, indicators, lastIndex) {
+            if (strategy === 'sma_crossover' || strategy === 'ema_crossover') {
+                const s = indicators.short[lastIndex];
+                const l = indicators.long[lastIndex];
+                if (s != null && l != null) {
+                    return `Short: ${s.toFixed(4)}  Long: ${l.toFixed(4)}`;
+                }
+            } else if (strategy === 'rsi_reversal') {
+                const r = indicators.rsi[lastIndex];
+                if (r != null) return `RSI: ${r.toFixed(2)}`;
+            } else if (strategy === 'macd_crossover') {
+                const m = indicators.macd[lastIndex];
+                const s = indicators.signal[lastIndex];
+                if (m != null && s != null) return `MACD: ${m.toFixed(4)}  Signal: ${s.toFixed(4)}`;
+            } else if (strategy === 'bollinger_reversion') {
+                const u = indicators.upper[lastIndex];
+                const l = indicators.lower[lastIndex];
+                const m = indicators.middle[lastIndex];
+                if (u != null && l != null) {
+                    return `Upper: ${u.toFixed(4)}  Middle: ${(m || 0).toFixed(4)}  Lower: ${l.toFixed(4)}`;
+                }
+            } else if (strategy === 'manual_perfect') {
+                return `Buy points: ${indicators.buyPoints.length}  Sell points: ${indicators.sellPoints.length}`;
+            }
+            return '';
+        }
+
+        async function fetchAvailable() {
+            const [currenciesRes, commoditiesRes] = await Promise.all([
+                fetch(`${API_PREFIX}/available/currencies`),
+                fetch(`${API_PREFIX}/available/commodities`)
+            ]);
+
+            const currencies = currenciesRes.ok ? (await currenciesRes.json()).items || [] : [];
+            const commodities = commoditiesRes.ok ? (await commoditiesRes.json()).items || [] : [];
+
+            return [
+                ...currencies.map(s => ({ symbol: s, type: 'Currency' })),
+                ...commodities.map(s => ({ symbol: s, type: 'Commodity' }))
+            ];
+        }
+
+        async function evaluateSymbol(symbol, type, strategy, parameters, timeframe) {
+            const res = await fetch(`${API_PREFIX}/ui/chart-data/${encodeURIComponent(symbol)}?timeframe=${timeframe}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+            const json = await res.json();
+            const data = (json.data || []).slice();
+            if (data.length === 0) throw new Error('No data');
+
+            data.sort((a, b) => a.time - b.time);
+
+            const strat = StrategyFactory.create(strategy, parameters);
+            if (typeof strat.setData === 'function') {
+                strat.setData(data);
+            }
+            const indicators = strat.calculateIndicators(data);
+
+            let lastSignal = null;
+            let lastSignalDate = null;
+            let lastSignalType = null;
+
+            for (let i = 0; i < data.length; i++) {
+                const sig = strat.getSignal(i, indicators);
+                if (sig.buy || sig.sell) {
+                    lastSignal = i;
+                    lastSignalDate = data[i].time;
+                    lastSignalType = sig.buy ? 'BUY' : 'SELL';
+                }
+            }
+
+            const lastIndex = data.length - 1;
+            const currentSignal = strat.getSignal(lastIndex, indicators);
+            const recommendation = getRecommendation(currentSignal);
+            const last = data[lastIndex];
+
+            return {
+                symbol,
+                type,
+                latestClose: last.close,
+                records: data.length,
+                lastSignalIndex: lastSignal,
+                lastSignalDate,
+                lastSignalType,
+                recommendation,
+                details: buildDetails(strategy, indicators, lastIndex),
+                error: null
+            };
+        }
+
+        function renderSummary(results) {
+            const summary = document.getElementById('summary');
+            const buy = results.filter(r => r.recommendation === 'BUY').length;
+            const sell = results.filter(r => r.recommendation === 'SELL').length;
+            const hold = results.filter(r => r.recommendation === 'HOLD').length;
+            const error = results.filter(r => r.error).length;
+
+            summary.innerHTML = `
+                <span class="status" style="background:#1a2f23; color:#3fb950;">BUY: ${buy}</span>
+                <span class="status" style="background:#2f1a1a; color:#f85149;">SELL: ${sell}</span>
+                <span class="status" style="background:#30363d; color:#e6edf3;">HOLD: ${hold}</span>
+                ${error ? `<span class="status" style="background:#2f1a1a; color:#f85149;">Errors: ${error}</span>` : ''}
+            `;
+        }
+
+        function renderResults(results) {
+            const tbody = document.getElementById('results-body');
+            tbody.innerHTML = '';
+
+            const sorted = [...results].sort((a, b) => {
+                const order = { BUY: 0, SELL: 1, HOLD: 2 };
+                return (order[a.recommendation] ?? 3) - (order[b.recommendation] ?? 3);
+            });
+
+            for (const r of sorted) {
+                const tr = document.createElement('tr');
+                if (r.error) {
+                    tr.innerHTML = `
+                        <td><strong>${r.symbol}</strong></td>
+                        <td>${r.type}</td>
+                        <td colspan="5" style="color:#f85149;">Error: ${r.error}</td>
+                    `;
+                } else {
+                    const recClass = r.recommendation === 'BUY' ? 'buy' : r.recommendation === 'SELL' ? 'sell' : 'hold';
+                    const lastSignalText = r.lastSignalDate
+                        ? `${r.lastSignalType} at ${formatDate(r.lastSignalDate)}`
+                        : 'None';
+                    tr.innerHTML = `
+                        <td><strong>${r.symbol}</strong></td>
+                        <td>${r.type}</td>
+                        <td>${r.latestClose != null ? r.latestClose.toFixed(4) : '-'}</td>
+                        <td>${r.records}</td>
+                        <td>${lastSignalText}</td>
+                        <td><span class="rec-badge ${recClass}">${r.recommendation}</span></td>
+                        <td style="font-size: 0.85rem; color: #b0b0b0;">${r.details}</td>
+                    `;
+                }
+                tbody.appendChild(tr);
+            }
+
+            renderSummary(results);
+        }
+
+        async function run() {
+            const status = document.getElementById('status');
+            const btn = document.getElementById('run-btn');
+            const strategy = document.getElementById('strategy-select').value;
+            const timeframe = document.getElementById('timeframe-select').value;
+            const parameters = readParameters();
+
+            status.textContent = 'Loading symbols...';
+            status.className = 'status disconnected';
+            btn.disabled = true;
+
+            try {
+                const symbols = await fetchAvailable();
+                if (symbols.length === 0) throw new Error('No available symbols');
+
+                status.textContent = `Evaluating ${symbols.length} symbols...`;
+                const results = await Promise.all(
+                    symbols.map(({ symbol, type }) =>
+                        evaluateSymbol(symbol, type, strategy, parameters, timeframe)
+                            .catch(e => ({ symbol, type, error: e.message, recommendation: 'ERROR' }))
+                    )
+                );
+
+                renderResults(results);
+                status.textContent = `Done - ${results.length} symbols`;
+                status.className = 'status';
+            } catch (e) {
+                status.textContent = 'Error: ' + e.message;
+                status.className = 'status disconnected';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        document.getElementById('strategy-select').addEventListener('change', renderParameters);
+        document.getElementById('run-btn').addEventListener('click', run);
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .rec-badge { padding: 0.25rem 0.6rem; border-radius: 0.25rem; font-weight: bold; }
+            .rec-badge.buy { background: #1a2f23; color: #3fb950; border: 1px solid #238636; }
+            .rec-badge.sell { background: #2f1a1a; color: #f85149; border: 1px solid #da3633; }
+            .rec-badge.hold { background: #30363d; color: #e6edf3; border: 1px solid #484f58; }
+        `;
+        document.head.appendChild(style);
+
+        renderParameters();
+    </script>
+</body>
+</html>
