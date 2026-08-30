@@ -1,87 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Strategy Recommendations</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="stylesheet" href="styles.css">
-    <script src="strategies.js"></script>
+    <link rel='icon' type='image/svg+xml' href='favicon.svg'>
+    <link rel='stylesheet' href='styles.css'>
+    <script src='strategies.js'></script>
 </head>
 <body>
-    <div class="container">
-        <nav class="nav-menu">
-            <ul class="nav-list">
-                <li class="nav-item"><a href="index.html" class="nav-link">TradeCanvas</a></li>
-                <li class="nav-item"><a href="compare.html" class="nav-link">Compare</a></li>
-                <li class="nav-item"><a href="compare2.html" class="nav-link">Compare2</a></li>
-                <li class="nav-item"><a href="banpu-ptt-sma.html" class="nav-link">BANPU+PTT</a></li>
-                <li class="nav-item"><a href="thb-atr.html" class="nav-link">THB ATR</a></li>
-                <li class="nav-item"><a href="strategy-recommendations.html" class="nav-link active">Strategy Recs</a></li>
-                <li class="nav-item"><a href="/apps/gold/conclusion.html" class="nav-link">Gold/THB Research</a></li>
+    <div class='container'>
+        <nav class='nav-menu'>
+            <ul class='nav-list'>
+                <li class='nav-item'><a href='index.html' class='nav-link'>TradeCanvas</a></li>
+                <li class='nav-item'><a href='compare.html' class='nav-link'>Compare</a></li>
+                <li class='nav-item'><a href='compare2.html' class='nav-link'>Compare2</a></li>
+                <li class='nav-item'><a href='banpu-ptt-sma.html' class='nav-link'>BANPU+PTT</a></li>
+                <li class='nav-item'><a href='thb-atr.html' class='nav-link'>THB ATR</a></li>
+                <li class='nav-item'><a href='strategy-recommendations.html' class='nav-link active'>Strategy Recs</a></li>
+                <li class='nav-item'><a href='/apps/gold/conclusion.html' class='nav-link'>Gold/THB Research</a></li>
             </ul>
         </nav>
 
-        <header class="header">
+        <header class='header'>
             <h1>Strategy Recommendations</h1>
-            <div class="header-controls">
-                <span id="status" class="status disconnected">Ready</span>
+            <div class='header-controls'>
+                <span id='status' class='status disconnected'>Ready</span>
             </div>
         </header>
 
-        <div class="main-content">
-            <div class="chart-section">
-                <div class="chart-header">
-                    <h2 id="page-title">Test strategy against all available symbols</h2>
+        <div class='main-content'>
+            <div class='chart-section'>
+                <div class='chart-header'>
+                    <h2 id='page-title'>Test strategy against all available symbols</h2>
                 </div>
 
-                <div class="chart-controls" style="flex-wrap: wrap; gap: 1rem; align-items: center;">
-                    <div class="control-group">
-                        <label for="strategy-select">Strategy:</label>
-                        <select id="strategy-select" class="btn">
-                            <option value="sma_crossover">SMA Crossover</option>
-                            <option value="ema_crossover">EMA Crossover</option>
-                            <option value="rsi_reversal">RSI Reversal</option>
-                            <option value="macd_crossover">MACD Crossover</option>
-                            <option value="bollinger_reversion">Bollinger Reversion</option>
-                            <option value="manual_perfect">Manual Perfect</option>
+                <div class='chart-controls' style='flex-wrap: wrap; gap: 1rem; align-items: center;'>
+                    <div class='control-group'>
+                        <label for='strategy-select'>Strategy:</label>
+                        <select id='strategy-select' class='btn'>
+                            <option value='sma_crossover'>SMA Crossover</option>
+                            <option value='ema_crossover'>EMA Crossover</option>
+                            <option value='rsi_reversal'>RSI Reversal</option>
+                            <option value='macd_crossover'>MACD Crossover</option>
+                            <option value='bollinger_reversion'>Bollinger Reversion</option>
+                            <option value='manual_perfect'>Manual Perfect</option>
                         </select>
                     </div>
 
-                    <div class="control-group">
-                        <label for="timeframe-select">Timeframe:</label>
-                        <select id="timeframe-select" class="btn">
-                            <option value="1y" selected>1 Year</option>
-                            <option value="6m">6 Months</option>
-                            <option value="3m">3 Months</option>
-                            <option value="1m">1 Month</option>
-                            <option value="5y">5 Years</option>
-                            <option value="all">All</option>
+                    <div class='control-group'>
+                        <label for='timeframe-select'>Timeframe:</label>
+                        <select id='timeframe-select' class='btn'>
+                            <option value='1y' selected>1 Year</option>
+                            <option value='6m'>6 Months</option>
+                            <option value='3m'>3 Months</option>
+                            <option value='1m'>1 Month</option>
+                            <option value='5y'>5 Years</option>
+                            <option value='all'>All</option>
                         </select>
                     </div>
 
-                    <div id="parameters-container" class="control-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <div id='parameters-container' class='control-group' style='display: flex; gap: 0.5rem; flex-wrap: wrap;'>
                     </div>
 
-                    <button id="run-btn" class="btn">Run Strategy</button>
+                    <button id='run-btn' class='btn'>Run Strategy</button>
                 </div>
 
-                <div id="summary" style="margin: 1rem 0; display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+                <div id='summary' style='margin: 1rem 0; display: flex; gap: 1rem; flex-wrap: wrap;'></div>
 
-                <div class="table-wrapper" style="overflow-x: auto; margin-top: 1rem;">
-                    <table class="data-table" id="results-table">
+                <div class='table-wrapper' style='overflow-x: auto; margin-top: 1rem;'>
+                    <table class='data-table' id='results-table'>
                         <thead>
                             <tr>
                                 <th>Symbol</th>
                                 <th>Type</th>
-                                <th>Latest Price</th>
+                                <th>Latest (THB)</th>
                                 <th>Records</th>
+                                <th>Chart</th>
                                 <th>Last Signal</th>
                                 <th>Recommendation</th>
                                 <th>Details</th>
                             </tr>
                         </thead>
-                        <tbody id="results-body"></tbody>
+                        <tbody id='results-body'></tbody>
                     </table>
                 </div>
             </div>
@@ -178,10 +179,11 @@
             return 'HOLD';
         }
 
-        function buildDetails(strategy, indicators, lastIndex) {
+        function buildDetails(strategy, indicators, lastIndex, thbClose) {
+            const mult = (v) => v == null ? null : (thbClose && thbClose !== 1 ? v * thbClose : v);
             if (strategy === 'sma_crossover' || strategy === 'ema_crossover') {
-                const s = indicators.short[lastIndex];
-                const l = indicators.long[lastIndex];
+                const s = mult(indicators.short[lastIndex]);
+                const l = mult(indicators.long[lastIndex]);
                 if (s != null && l != null) {
                     return `Short: ${s.toFixed(4)}  Long: ${l.toFixed(4)}`;
                 }
@@ -189,13 +191,13 @@
                 const r = indicators.rsi[lastIndex];
                 if (r != null) return `RSI: ${r.toFixed(2)}`;
             } else if (strategy === 'macd_crossover') {
-                const m = indicators.macd[lastIndex];
-                const s = indicators.signal[lastIndex];
+                const m = mult(indicators.macd[lastIndex]);
+                const s = mult(indicators.signal[lastIndex]);
                 if (m != null && s != null) return `MACD: ${m.toFixed(4)}  Signal: ${s.toFixed(4)}`;
             } else if (strategy === 'bollinger_reversion') {
-                const u = indicators.upper[lastIndex];
-                const l = indicators.lower[lastIndex];
-                const m = indicators.middle[lastIndex];
+                const u = mult(indicators.upper[lastIndex]);
+                const l = mult(indicators.lower[lastIndex]);
+                const m = mult(indicators.middle[lastIndex]);
                 if (u != null && l != null) {
                     return `Upper: ${u.toFixed(4)}  Middle: ${(m || 0).toFixed(4)}  Lower: ${l.toFixed(4)}`;
                 }
@@ -203,6 +205,48 @@
                 return `Buy points: ${indicators.buyPoints.length}  Sell points: ${indicators.sellPoints.length}`;
             }
             return '';
+        }
+
+        function createSvgSparkline(values, width, height) {
+            const w = width || 160;
+            const h = height || 40;
+            const valid = [];
+            for (let i = 0; i < values.length; i++) {
+                if (values[i] != null) valid.push({ v: values[i], i });
+            }
+            if (valid.length < 2) return '-';
+            const nums = valid.map(p => p.v);
+            const min = Math.min(...nums);
+            const max = Math.max(...nums);
+            const range = max - min || 1;
+            const points = valid.map(p => {
+                const x = values.length === 1 ? 0 : (p.i / (values.length - 1)) * w;
+                const y = h - ((p.v - min) / range) * h;
+                return `${x.toFixed(2)},${y.toFixed(2)}`;
+            }).join(' ');
+            const end = valid[valid.length - 1].v;
+            const start = valid[0].v;
+            const color = end >= start ? '#3fb950' : '#f85149';
+            const lastX = w;
+            const lastY = h - ((end - min) / range) * h;
+            return `<svg width='${w}' height='${h}' viewBox='0 0 ${w} ${h}' style='overflow: visible; vertical-align: middle;'>` +
+                `<polyline points='${points}' fill='none' stroke='${color}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>` +
+                `<circle cx='${lastX}' cy='${lastY}' r='3' fill='${color}'/>` +
+                `</svg>`;
+        }
+
+        async function fetchThbData(timeframe) {
+            const res = await fetch(`${API_PREFIX}/ui/chart-data/THB?timeframe=${timeframe}`);
+            if (!res.ok) throw new Error('THB base data not available: ' + res.status);
+            const json = await res.json();
+            const data = (json.data || []).slice().sort((a, b) => a.time - b.time);
+            const map = {};
+            let latest = 1;
+            for (const p of data) {
+                map[p.time] = p.close;
+                latest = p.close;
+            }
+            return { data, map, latest };
         }
 
         async function fetchAvailable() {
@@ -220,15 +264,27 @@
             ];
         }
 
-        async function evaluateSymbol(symbol, type, strategy, parameters, timeframe) {
-            const res = await fetch(`${API_PREFIX}/ui/chart-data/${encodeURIComponent(symbol)}?timeframe=${timeframe}`);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        async function evaluateSymbol(symbol, type, strategy, parameters, timeframe, thbMap, thbLatest, thbPreloaded) {
+            let data;
+            if (thbPreloaded) {
+                data = thbPreloaded.slice();
+            } else {
+                const res = await fetch(`${API_PREFIX}/ui/chart-data/${encodeURIComponent(symbol)}?timeframe=${timeframe}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-            const json = await res.json();
-            const data = (json.data || []).slice();
-            if (data.length === 0) throw new Error('No data');
+                const json = await res.json();
+                data = (json.data || []).slice();
+                if (data.length === 0) throw new Error('No data');
+            }
 
             data.sort((a, b) => a.time - b.time);
+
+            const isThb = symbol.toUpperCase() === 'THB';
+            const thbValues = new Array(data.length);
+            for (let i = 0; i < data.length; i++) {
+                const thbClose = isThb ? 1 : (thbMap[data[i].time] ?? thbLatest);
+                thbValues[i] = data[i].close * thbClose;
+            }
 
             const strat = StrategyFactory.create(strategy, parameters);
             if (typeof strat.setData === 'function') {
@@ -253,22 +309,26 @@
             const currentSignal = strat.getSignal(lastIndex, indicators);
             const recommendation = getRecommendation(currentSignal);
             const last = data[lastIndex];
+            const thbCloseLast = isThb ? 1 : (thbMap[last.time] ?? thbLatest);
+            const latestCloseTHB = thbValues[lastIndex];
 
             return {
                 symbol,
                 type,
                 latestClose: last.close,
+                latestCloseTHB,
                 records: data.length,
+                thbValues,
                 lastSignalIndex: lastSignal,
                 lastSignalDate,
                 lastSignalType,
                 recommendation,
-                details: buildDetails(strategy, indicators, lastIndex),
+                details: buildDetails(strategy, indicators, lastIndex, thbCloseLast),
                 error: null
             };
         }
 
-        function renderSummary(results) {
+        function renderSummary(results, thbLatest) {
             const summary = document.getElementById('summary');
             const buy = results.filter(r => r.recommendation === 'BUY').length;
             const sell = results.filter(r => r.recommendation === 'SELL').length;
@@ -276,14 +336,15 @@
             const error = results.filter(r => r.error).length;
 
             summary.innerHTML = `
-                <span class="status" style="background:#1a2f23; color:#3fb950;">BUY: ${buy}</span>
-                <span class="status" style="background:#2f1a1a; color:#f85149;">SELL: ${sell}</span>
-                <span class="status" style="background:#30363d; color:#e6edf3;">HOLD: ${hold}</span>
-                ${error ? `<span class="status" style="background:#2f1a1a; color:#f85149;">Errors: ${error}</span>` : ''}
+                <span class='status' style='background:#1a2f23; color:#3fb950;'>BUY: ${buy}</span>
+                <span class='status' style='background:#2f1a1a; color:#f85149;'>SELL: ${sell}</span>
+                <span class='status' style='background:#30363d; color:#e6edf3;'>HOLD: ${hold}</span>
+                ${error ? `<span class='status' style='background:#2f1a1a; color:#f85149;'>Errors: ${error}</span>` : ''}
+                <span class='status' style='background:#1a1a2e; color:#e0e0e0;'>THB base: 1 USD = ${thbLatest != null ? thbLatest.toFixed(2) : '?'} THB</span>
             `;
         }
 
-        function renderResults(results) {
+        function renderResults(results, thbLatest) {
             const tbody = document.getElementById('results-body');
             tbody.innerHTML = '';
 
@@ -298,7 +359,7 @@
                     tr.innerHTML = `
                         <td><strong>${r.symbol}</strong></td>
                         <td>${r.type}</td>
-                        <td colspan="5" style="color:#f85149;">Error: ${r.error}</td>
+                        <td colspan='6' style='color:#f85149;'>Error: ${r.error}</td>
                     `;
                 } else {
                     const recClass = r.recommendation === 'BUY' ? 'buy' : r.recommendation === 'SELL' ? 'sell' : 'hold';
@@ -308,17 +369,18 @@
                     tr.innerHTML = `
                         <td><strong>${r.symbol}</strong></td>
                         <td>${r.type}</td>
-                        <td>${r.latestClose != null ? r.latestClose.toFixed(4) : '-'}</td>
+                        <td>${r.latestCloseTHB != null ? r.latestCloseTHB.toFixed(2) : '-'}</td>
                         <td>${r.records}</td>
+                        <td class='sparkline'>${createSvgSparkline(r.thbValues)}</td>
                         <td>${lastSignalText}</td>
-                        <td><span class="rec-badge ${recClass}">${r.recommendation}</span></td>
-                        <td style="font-size: 0.85rem; color: #b0b0b0;">${r.details}</td>
+                        <td><span class='rec-badge ${recClass}'>${r.recommendation}</span></td>
+                        <td style='font-size: 0.85rem; color: #b0b0b0;'>${r.details}</td>
                     `;
                 }
                 tbody.appendChild(tr);
             }
 
-            renderSummary(results);
+            renderSummary(results, thbLatest);
         }
 
         async function run() {
@@ -328,23 +390,28 @@
             const timeframe = document.getElementById('timeframe-select').value;
             const parameters = readParameters();
 
-            status.textContent = 'Loading symbols...';
+            status.textContent = 'Loading THB base...';
             status.className = 'status disconnected';
             btn.disabled = true;
 
             try {
+                const thb = await fetchThbData(timeframe);
+                const thbPreloaded = thb.data;
+
+                status.textContent = 'Loading symbols...';
                 const symbols = await fetchAvailable();
                 if (symbols.length === 0) throw new Error('No available symbols');
 
                 status.textContent = `Evaluating ${symbols.length} symbols...`;
                 const results = await Promise.all(
-                    symbols.map(({ symbol, type }) =>
-                        evaluateSymbol(symbol, type, strategy, parameters, timeframe)
-                            .catch(e => ({ symbol, type, error: e.message, recommendation: 'ERROR' }))
-                    )
+                    symbols.map(({ symbol, type }) => {
+                        const pre = symbol.toUpperCase() === 'THB' ? thbPreloaded : null;
+                        return evaluateSymbol(symbol, type, strategy, parameters, timeframe, thb.map, thb.latest, pre)
+                            .catch(e => ({ symbol, type, error: e.message, recommendation: 'ERROR' }));
+                    })
                 );
 
-                renderResults(results);
+                renderResults(results, thb.latest);
                 status.textContent = `Done - ${results.length} symbols`;
                 status.className = 'status';
             } catch (e) {
@@ -364,6 +431,8 @@
             .rec-badge.buy { background: #1a2f23; color: #3fb950; border: 1px solid #238636; }
             .rec-badge.sell { background: #2f1a1a; color: #f85149; border: 1px solid #da3633; }
             .rec-badge.hold { background: #30363d; color: #e6edf3; border: 1px solid #484f58; }
+            .sparkline { line-height: 0; }
+            .sparkline svg { display: inline-block; }
         `;
         document.head.appendChild(style);
 
